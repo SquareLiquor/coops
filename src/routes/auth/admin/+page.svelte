@@ -1,24 +1,24 @@
 <script lang="ts">
-  let isSignUp = $state(false);
+  let isSignUp = $state(false)
   let loginForm = $state({
     email: '',
-    password: ''
-  });
+    password: '',
+  })
   let signupForm = $state({
     email: '',
     name: '',
     password: '',
     confirmPassword: '',
-    storeId: ''
-  });
+    storeId: '',
+  })
 
   const storeTypes = [
     { value: 'hq', label: '본사' },
     { value: 'store1', label: '강남점' },
     { value: 'store2', label: '동대문점' },
     { value: 'store3', label: '용산점' },
-    { value: 'store4', label: '잠실점' }
-  ];
+    { value: 'store4', label: '잠실점' },
+  ]
 </script>
 
 <!-- 가맹점/본사 관리자 로그인 페이지 - Skeleton UI 컨셉 -->
@@ -30,19 +30,14 @@
       <header class="mb-6 space-y-2 text-center">
         <h2 class="h3 font-bold">{isSignUp ? '회원가입' : '로그인'}</h2>
         <p class="opacity-75">
-          {isSignUp
-            ? '새로운 매장을 등록하고 관리를 시작하세요'
-            : '등록된 관리자 계정으로 로그인하세요'}
+          {isSignUp ? '새로운 매장을 등록하고 관리를 시작하세요' : '등록된 관리자 계정으로 로그인하세요'}
         </p>
       </header>
 
       <!-- Divider with Toggle Link -->
       <div class="mb-4 flex items-center justify-center">
         <hr class="flex-1 border-surface-300" />
-        <button
-          class="px-4 anchor text-sm hover:text-primary-600"
-          onclick={() => (isSignUp = !isSignUp)}
-        >
+        <button class="px-4 anchor text-sm hover:text-primary-600" onclick={() => (isSignUp = !isSignUp)}>
           {isSignUp ? '로그인' : '회원가입'}
         </button>
         <hr class="flex-1 border-surface-300" />
@@ -71,19 +66,14 @@
           </label>
 
           <div class="flex justify-end text-sm">
-            <button
-              type="button"
-              class="anchor"
-              onclick={() => alert('비밀번호 찾기 기능은 추후 구현 예정입니다.')}
-            >
+            <button type="button" class="anchor" onclick={() => alert('비밀번호 찾기 기능은 추후 구현 예정입니다.')}>
               비밀번호 찾기
             </button>
           </div>
 
           <button
             type="submit"
-            class="btn w-full rounded-lg bg-primary-500 py-3 font-medium text-white hover:bg-primary-600"
-            >로그인</button
+            class="btn w-full rounded-lg bg-primary-500 py-3 font-medium text-white hover:bg-primary-600">로그인</button
           >
         </form>
       {:else}
@@ -150,9 +140,7 @@
 
         <!-- Info Section -->
         <div class="space-y-2 text-center">
-          <p class="text-sm opacity-75">
-            신청 후 본사 승인이 완료되면 서비스를 이용할 수 있습니다.
-          </p>
+          <p class="text-sm opacity-75">신청 후 본사 승인이 완료되면 서비스를 이용할 수 있습니다.</p>
         </div>
       {/if}
     </div>

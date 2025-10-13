@@ -14,7 +14,7 @@
       status: 'active',
       registeredAt: '2024-01-15',
       lastUpdated: '2024-10-10',
-      totalSold: 158
+      totalSold: 158,
     },
     {
       id: 'PROD-002',
@@ -30,7 +30,7 @@
       status: 'active',
       registeredAt: '2024-02-01',
       lastUpdated: '2024-10-11',
-      totalSold: 213
+      totalSold: 213,
     },
     {
       id: 'PROD-003',
@@ -46,7 +46,7 @@
       status: 'out_of_stock',
       registeredAt: '2024-03-15',
       lastUpdated: '2024-10-09',
-      totalSold: 200
+      totalSold: 200,
     },
     {
       id: 'PROD-004',
@@ -62,37 +62,37 @@
       status: 'low_stock',
       registeredAt: '2024-04-01',
       lastUpdated: '2024-10-08',
-      totalSold: 105
-    }
-  ];
+      totalSold: 105,
+    },
+  ]
 
-  let selectedStatus = 'all';
-  let selectedCategory = 'all';
-  let searchTerm = '';
+  let selectedStatus = 'all'
+  let selectedCategory = 'all'
+  let searchTerm = ''
 
   const statusOptions = [
     { value: 'all', label: '전체', count: products.length },
     {
       value: 'active',
       label: '판매중',
-      count: products.filter((p) => p.status === 'active').length
+      count: products.filter((p) => p.status === 'active').length,
     },
     {
       value: 'low_stock',
       label: '재고부족',
-      count: products.filter((p) => p.status === 'low_stock').length
+      count: products.filter((p) => p.status === 'low_stock').length,
     },
     {
       value: 'out_of_stock',
       label: '품절',
-      count: products.filter((p) => p.status === 'out_of_stock').length
+      count: products.filter((p) => p.status === 'out_of_stock').length,
     },
     {
       value: 'inactive',
       label: '판매중지',
-      count: products.filter((p) => p.status === 'inactive').length
-    }
-  ];
+      count: products.filter((p) => p.status === 'inactive').length,
+    },
+  ]
 
   const categoryOptions = [
     { value: 'all', label: '전체 카테고리' },
@@ -100,110 +100,110 @@
     { value: '과일', label: '과일' },
     { value: '채소', label: '채소' },
     { value: '육류', label: '육류' },
-    { value: '수산물', label: '수산물' }
-  ];
+    { value: '수산물', label: '수산물' },
+  ]
 
   $: filteredProducts = products.filter((product) => {
-    const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory
     const matchesSearch =
       !searchTerm ||
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.supplier.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesCategory && matchesSearch;
-  });
+      product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+    return matchesStatus && matchesCategory && matchesSearch
+  })
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'low_stock':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'out_of_stock':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       case 'inactive':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function getStatusText(status: string) {
     switch (status) {
       case 'active':
-        return '판매중';
+        return '판매중'
       case 'low_stock':
-        return '재고부족';
+        return '재고부족'
       case 'out_of_stock':
-        return '품절';
+        return '품절'
       case 'inactive':
-        return '판매중지';
+        return '판매중지'
       default:
-        return status;
+        return status
     }
   }
 
   function getStockStatusColor(currentStock: number, initialStock: number) {
-    const ratio = currentStock / initialStock;
-    if (ratio === 0) return 'text-red-600';
-    if (ratio < 0.2) return 'text-yellow-600';
-    return 'text-green-600';
+    const ratio = currentStock / initialStock
+    if (ratio === 0) return 'text-red-600'
+    if (ratio < 0.2) return 'text-yellow-600'
+    return 'text-green-600'
   }
 
   function toggleProductStatus(productId: string) {
     products = products.map((product) => {
       if (product.id === productId) {
-        const newStatus = product.status === 'active' ? 'inactive' : 'active';
+        const newStatus = product.status === 'active' ? 'inactive' : 'active'
         return {
           ...product,
           status: newStatus,
-          lastUpdated: new Date().toISOString().split('T')[0]
-        };
+          lastUpdated: new Date().toISOString().split('T')[0],
+        }
       }
-      return product;
-    });
+      return product
+    })
   }
 
   function addStock(productId: string) {
-    const quantity = prompt('추가할 재고 수량을 입력하세요:');
+    const quantity = prompt('추가할 재고 수량을 입력하세요:')
     if (quantity && !isNaN(Number(quantity))) {
       products = products.map((product) => {
         if (product.id === productId) {
-          const newStock = product.currentStock + Number(quantity);
-          let newStatus = product.status;
+          const newStock = product.currentStock + Number(quantity)
+          let newStatus = product.status
           if (newStock > 0 && product.status === 'out_of_stock') {
-            newStatus = 'active';
+            newStatus = 'active'
           }
           return {
             ...product,
             currentStock: newStock,
             status: newStatus,
-            lastUpdated: new Date().toISOString().split('T')[0]
-          };
+            lastUpdated: new Date().toISOString().split('T')[0],
+          }
         }
-        return product;
-      });
+        return product
+      })
     }
   }
 
   function viewProductDetails(productId: string) {
-    const product = products.find((p) => p.id === productId);
+    const product = products.find((p) => p.id === productId)
     if (product) {
       alert(
         `상품 상세 정보:\n상품명: ${product.name}\n카테고리: ${product.category}\n가격: ${formatCurrency(product.price)}\n현재재고: ${product.currentStock}개\n공급업체: ${product.supplier}\n연락처: ${product.supplierContact}\n설명: ${product.description}\n총 판매량: ${product.totalSold}개`
-      );
+      )
     }
   }
 
   function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
+      currency: 'KRW',
+    }).format(amount)
   }
 
   function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('ko-KR');
+    return new Date(dateString).toLocaleDateString('ko-KR')
   }
 </script>
 
@@ -231,12 +231,7 @@
         <!-- 검색 필터 -->
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -257,8 +252,7 @@
         <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
           {#each categoryOptions as option}
             <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory ===
-              option.value
+              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory === option.value
                 ? 'bg-primary-500 text-primary-contrast shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'}"
               on:click={() => (selectedCategory = option.value)}
@@ -273,8 +267,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -282,9 +275,7 @@
             {option.label}
             <span
               class={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                selectedStatus === option.value
-                  ? 'bg-primary-600 text-primary-contrast'
-                  : 'bg-gray-200 text-gray-600'
+                selectedStatus === option.value ? 'bg-primary-600 text-primary-contrast' : 'bg-gray-200 text-gray-600'
               }`}
             >
               {option.count}
@@ -336,9 +327,7 @@
                 <div class="text-xs text-gray-500">판매량: {product.totalSold}개</div>
               </td>
               <td class="px-4 py-4">
-                <div
-                  class={`text-sm font-medium ${getStockStatusColor(product.currentStock, product.initialStock)}`}
-                >
+                <div class={`text-sm font-medium ${getStockStatusColor(product.currentStock, product.initialStock)}`}>
                   {product.currentStock}/{product.initialStock}
                 </div>
                 <div class="text-xs text-gray-500">
@@ -392,12 +381,7 @@
 
       {#if filteredProducts.length === 0}
         <div class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

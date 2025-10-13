@@ -4,8 +4,8 @@
     totalStores: 24,
     totalOrders: 142,
     totalRevenue: 248000000,
-    pendingApprovals: 8
-  };
+    pendingApprovals: 8,
+  }
 
   let recentActivities = [
     {
@@ -14,7 +14,7 @@
       managerName: '김철수',
       action: '관리자 승인 요청',
       status: 'pending',
-      createdAt: '2024-12-19 14:30'
+      createdAt: '2024-12-19 14:30',
     },
     {
       id: 'ACT-002',
@@ -22,7 +22,7 @@
       managerName: '이영희',
       action: '발주 승인 완료',
       status: 'confirmed',
-      createdAt: '2024-12-19 13:15'
+      createdAt: '2024-12-19 13:15',
     },
     {
       id: 'ACT-003',
@@ -30,7 +30,7 @@
       managerName: '박민수',
       action: '가맹점 등록 승인',
       status: 'confirmed',
-      createdAt: '2024-12-19 11:45'
+      createdAt: '2024-12-19 11:45',
     },
     {
       id: 'ACT-004',
@@ -38,7 +38,7 @@
       managerName: '최지현',
       action: '관리자 승인 요청',
       status: 'pending',
-      createdAt: '2024-12-19 10:20'
+      createdAt: '2024-12-19 10:20',
     },
     {
       id: 'ACT-005',
@@ -46,9 +46,9 @@
       managerName: '정민호',
       action: '발주 거부',
       status: 'rejected',
-      createdAt: '2024-12-19 09:30'
-    }
-  ];
+      createdAt: '2024-12-19 09:30',
+    },
+  ]
 
   let activeStores = [
     {
@@ -58,7 +58,7 @@
       status: 'active',
       monthlyRevenue: 15000000,
       orderCount: 45,
-      location: '서울시 강남구'
+      location: '서울시 강남구',
     },
     {
       id: 'STORE-002',
@@ -67,7 +67,7 @@
       status: 'active',
       monthlyRevenue: 12000000,
       orderCount: 38,
-      location: '서울시 마포구'
+      location: '서울시 마포구',
     },
     {
       id: 'STORE-003',
@@ -76,7 +76,7 @@
       status: 'pending',
       monthlyRevenue: 8000000,
       orderCount: 25,
-      location: '서울시 송파구'
+      location: '서울시 송파구',
     },
     {
       id: 'STORE-004',
@@ -85,30 +85,30 @@
       status: 'active',
       monthlyRevenue: 18000000,
       orderCount: 52,
-      location: '서울시 중구'
-    }
-  ];
+      location: '서울시 중구',
+    },
+  ]
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'confirmed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
+      currency: 'KRW',
+    }).format(amount)
   }
 </script>
 
@@ -134,9 +134,7 @@
 
     <!-- Stats Cards -->
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">총 가맹점수</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -151,9 +149,7 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">이번 달 발주건수</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -168,9 +164,7 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">총 발주금액</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -183,9 +177,7 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">승인 대기</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -206,9 +198,7 @@
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
             <h3 class="text-lg font-semibold text-gray-900">최근 활동</h3>
-            <a href="/hq/users" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-              모두 보기
-            </a>
+            <a href="/hq/users" class="text-sm text-blue-600 hover:text-blue-800 font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each recentActivities as activity}
@@ -251,9 +241,7 @@
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
             <h3 class="text-lg font-semibold text-gray-900">가맹점 현황</h3>
-            <a href="/hq/stores" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-              모두 보기
-            </a>
+            <a href="/hq/stores" class="text-sm text-blue-600 hover:text-blue-800 font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each activeStores as store}
@@ -288,17 +276,9 @@
       <div class="p-6">
         <h3 class="text-lg font-semibold text-gray-900 pb-4">빠른 액션</h3>
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <a
-            href="/hq/users"
-            class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-          >
+          <a href="/hq/users" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
             <div class="flex-shrink-0">
-              <svg
-                class="h-8 w-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -318,12 +298,7 @@
             class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
           >
             <div class="flex-shrink-0">
-              <svg
-                class="h-8 w-8 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -343,12 +318,7 @@
             class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
           >
             <div class="flex-shrink-0">
-              <svg
-                class="h-8 w-8 text-purple-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -368,12 +338,7 @@
             class="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
           >
             <div class="flex-shrink-0">
-              <svg
-                class="h-8 w-8 text-orange-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import HQSidebar from '$lib/components/HQSidebar.svelte';
+  import HQSidebar from '$lib/components/HQSidebar.svelte'
 
   // Mobile menu toggle
-  let mobileMenuOpen = false;
+  let mobileMenuOpen = false
 </script>
 
 <div class="flex h-screen bg-surface-100">

@@ -1,5 +1,5 @@
 <script lang="ts">
-  let activeTab = 'general';
+  let activeTab = 'general'
   let settings = {
     siteName: '농협 공동구매 플랫폼',
     adminEmail: 'admin@coops.com',
@@ -13,20 +13,20 @@
     minOrderAmount: 10000,
     maxOrderAmount: 1000000,
     deliveryFee: 3000,
-    freeDeliveryThreshold: 50000
-  };
+    freeDeliveryThreshold: 50000,
+  }
 
-  let saveStatus = '';
+  let saveStatus = ''
 
   function saveSettings() {
     // 설정 저장 로직
-    saveStatus = 'saving';
+    saveStatus = 'saving'
     setTimeout(() => {
-      saveStatus = 'saved';
+      saveStatus = 'saved'
       setTimeout(() => {
-        saveStatus = '';
-      }, 2000);
-    }, 1000);
+        saveStatus = ''
+      }, 2000)
+    }, 1000)
   }
 
   function resetSettings() {
@@ -44,16 +44,16 @@
         minOrderAmount: 10000,
         maxOrderAmount: 1000000,
         deliveryFee: 3000,
-        freeDeliveryThreshold: 50000
-      };
+        freeDeliveryThreshold: 50000,
+      }
     }
   }
 
   function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
+      currency: 'KRW',
+    }).format(amount)
   }
 </script>
 
@@ -123,9 +123,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="siteName" class="block text-sm font-medium text-gray-700 mb-2"
-              >사이트 이름</label
-            >
+            <label for="siteName" class="block text-sm font-medium text-gray-700 mb-2">사이트 이름</label>
             <input
               id="siteName"
               type="text"
@@ -135,9 +133,7 @@
           </div>
 
           <div>
-            <label for="adminEmail" class="block text-sm font-medium text-gray-700 mb-2"
-              >관리자 이메일</label
-            >
+            <label for="adminEmail" class="block text-sm font-medium text-gray-700 mb-2">관리자 이메일</label>
             <input
               id="adminEmail"
               type="email"
@@ -147,9 +143,7 @@
           </div>
 
           <div>
-            <label for="contactPhone" class="block text-sm font-medium text-gray-700 mb-2"
-              >고객센터 전화번호</label
-            >
+            <label for="contactPhone" class="block text-sm font-medium text-gray-700 mb-2">고객센터 전화번호</label>
             <input
               id="contactPhone"
               type="tel"
@@ -159,8 +153,7 @@
           </div>
 
           <div>
-            <label for="businessRegistration" class="block text-sm font-medium text-gray-700 mb-2"
-              >사업자등록번호</label
+            <label for="businessRegistration" class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호</label
             >
             <input
               id="businessRegistration"
@@ -171,9 +164,7 @@
           </div>
 
           <div class="md:col-span-2">
-            <label for="businessAddress" class="block text-sm font-medium text-gray-700 mb-2"
-              >사업장 주소</label
-            >
+            <label for="businessAddress" class="block text-sm font-medium text-gray-700 mb-2">사업장 주소</label>
             <input
               id="businessAddress"
               type="text"
@@ -197,11 +188,7 @@
               <p class="text-sm text-gray-500">새로운 주문, 문의사항 등의 알림을 받습니다.</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                bind:checked={settings.enableNotifications}
-                class="sr-only peer"
-              />
+              <input type="checkbox" bind:checked={settings.enableNotifications} class="sr-only peer" />
               <div
                 class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
               ></div>
@@ -214,11 +201,7 @@
               <p class="text-sm text-gray-500">중요한 알림을 이메일로 받습니다.</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                bind:checked={settings.enableEmailAlerts}
-                class="sr-only peer"
-              />
+              <input type="checkbox" bind:checked={settings.enableEmailAlerts} class="sr-only peer" />
               <div
                 class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
               ></div>
@@ -253,11 +236,7 @@
               <p class="text-sm text-gray-500">새로운 주문을 자동으로 승인합니다.</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                bind:checked={settings.autoApproveOrders}
-                class="sr-only peer"
-              />
+              <input type="checkbox" bind:checked={settings.autoApproveOrders} class="sr-only peer" />
               <div
                 class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
               ></div>
@@ -266,9 +245,7 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="minOrderAmount" class="block text-sm font-medium text-gray-700 mb-2"
-                >최소 주문 금액</label
-              >
+              <label for="minOrderAmount" class="block text-sm font-medium text-gray-700 mb-2">최소 주문 금액</label>
               <input
                 id="minOrderAmount"
                 type="number"
@@ -281,9 +258,7 @@
             </div>
 
             <div>
-              <label for="maxOrderAmount" class="block text-sm font-medium text-gray-700 mb-2"
-                >최대 주문 금액</label
-              >
+              <label for="maxOrderAmount" class="block text-sm font-medium text-gray-700 mb-2">최대 주문 금액</label>
               <input
                 id="maxOrderAmount"
                 type="number"
@@ -306,9 +281,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="deliveryFee" class="block text-sm font-medium text-gray-700 mb-2"
-              >기본 배송비</label
-            >
+            <label for="deliveryFee" class="block text-sm font-medium text-gray-700 mb-2">기본 배송비</label>
             <input
               id="deliveryFee"
               type="number"
@@ -352,8 +325,7 @@
       {#if saveStatus === 'saving'}
         <div class="flex items-center gap-2 text-indigo-600">
           <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
-            ></circle>
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path
               class="opacity-75"
               fill="currentColor"

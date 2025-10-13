@@ -1,8 +1,8 @@
 <script lang="ts">
-  import AdminSidebar from '$lib/components/AdminSidebar.svelte';
+  import AdminSidebar from '$lib/components/AdminSidebar.svelte'
 
   // Mobile menu toggle
-  let mobileMenuOpen = false;
+  let mobileMenuOpen = false
 </script>
 
 <!-- <div class="flex min-h-screen bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50"></div> -->

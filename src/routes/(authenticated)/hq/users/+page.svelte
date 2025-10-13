@@ -11,7 +11,7 @@
       status: 'pending',
       appliedDate: '2024-10-12',
       approvedDate: null,
-      note: '신규 가맹점 신청'
+      note: '신규 가맹점 신청',
     },
     {
       id: 'USER-002',
@@ -24,7 +24,7 @@
       status: 'approved',
       appliedDate: '2024-10-10',
       approvedDate: '2024-10-11',
-      note: ''
+      note: '',
     },
     {
       id: 'USER-003',
@@ -37,7 +37,7 @@
       status: 'rejected',
       appliedDate: '2024-10-08',
       approvedDate: null,
-      note: '서류 미비로 거부'
+      note: '서류 미비로 거부',
     },
     {
       id: 'USER-004',
@@ -50,7 +50,7 @@
       status: 'pending',
       appliedDate: '2024-10-11',
       approvedDate: null,
-      note: '추가 서류 검토 중'
+      note: '추가 서류 검토 중',
     },
     {
       id: 'USER-005',
@@ -63,87 +63,83 @@
       status: 'approved',
       appliedDate: '2024-10-09',
       approvedDate: '2024-10-10',
-      note: ''
-    }
-  ];
+      note: '',
+    },
+  ]
 
-  let selectedStatus = 'all';
-  let searchName = '';
-  let dateFrom = '';
-  let dateTo = '';
+  let selectedStatus = 'all'
+  let searchName = ''
+  let dateFrom = ''
+  let dateTo = ''
 
   const statusOptions = [
     { value: 'all', label: '전체', count: users.length },
     {
       value: 'pending',
       label: '승인대기',
-      count: users.filter((u) => u.status === 'pending').length
+      count: users.filter((u) => u.status === 'pending').length,
     },
     {
       value: 'approved',
       label: '승인완료',
-      count: users.filter((u) => u.status === 'approved').length
+      count: users.filter((u) => u.status === 'approved').length,
     },
     {
       value: 'rejected',
       label: '거부됨',
-      count: users.filter((u) => u.status === 'rejected').length
-    }
-  ];
+      count: users.filter((u) => u.status === 'rejected').length,
+    },
+  ]
 
   $: filteredUsers = users.filter((user) => {
-    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus;
+    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus
     const matchesName =
       !searchName ||
       user.name.toLowerCase().includes(searchName.toLowerCase()) ||
-      user.storeName.toLowerCase().includes(searchName.toLowerCase());
-    const matchesDateFrom = !dateFrom || user.appliedDate >= dateFrom;
-    const matchesDateTo = !dateTo || user.appliedDate <= dateTo;
-    return matchesStatus && matchesName && matchesDateFrom && matchesDateTo;
-  });
+      user.storeName.toLowerCase().includes(searchName.toLowerCase())
+    const matchesDateFrom = !dateFrom || user.appliedDate >= dateFrom
+    const matchesDateTo = !dateTo || user.appliedDate <= dateTo
+    return matchesStatus && matchesName && matchesDateFrom && matchesDateTo
+  })
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'approved':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function getStatusText(status: string) {
     switch (status) {
       case 'pending':
-        return '승인대기';
+        return '승인대기'
       case 'approved':
-        return '승인완료';
+        return '승인완료'
       case 'rejected':
-        return '거부됨';
+        return '거부됨'
       default:
-        return status;
+        return status
     }
   }
 
   function approveUser(userId: string) {
     users = users.map((user) =>
-      user.id === userId
-        ? { ...user, status: 'approved', approvedDate: new Date().toISOString().split('T')[0] }
-        : user
-    );
+      user.id === userId ? { ...user, status: 'approved', approvedDate: new Date().toISOString().split('T')[0] } : user
+    )
   }
 
   function rejectUser(userId: string) {
-    users = users.map((user) =>
-      user.id === userId ? { ...user, status: 'rejected', note: '본사에서 거부됨' } : user
-    );
+    users = users.map((user) => (user.id === userId ? { ...user, status: 'rejected', note: '본사에서 거부됨' } : user))
   }
 
   function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('ko-KR');
+    return new Date(dateString).toLocaleDateString('ko-KR')
   }
 </script>
 
@@ -198,8 +194,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -207,9 +202,7 @@
             {option.label}
             <span
               class={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                selectedStatus === option.value
-                  ? 'bg-primary-600 text-primary-contrast'
-                  : 'bg-gray-200 text-gray-600'
+                selectedStatus === option.value ? 'bg-primary-600 text-primary-contrast' : 'bg-gray-200 text-gray-600'
               }`}
             >
               {option.count}
@@ -243,9 +236,7 @@
               <td class="px-4 py-4">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-10 w-10">
-                    <div
-                      class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center"
-                    >
+                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                       <span class="text-sm font-medium text-gray-700">{user.name.charAt(0)}</span>
                     </div>
                   </div>
@@ -268,9 +259,7 @@
                 {/if}
               </td>
               <td class="px-4 py-4">
-                <span
-                  class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(user.status)}`}
-                >
+                <span class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(user.status)}`}>
                   {getStatusText(user.status)}
                 </span>
                 {#if user.note}
@@ -304,12 +293,7 @@
 
       {#if filteredUsers.length === 0}
         <div class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

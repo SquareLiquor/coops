@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { children } = $props();
+  let { children } = $props()
 </script>
 
 <!-- 모바일 컨테이너 -->

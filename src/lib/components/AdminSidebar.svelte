@@ -1,41 +1,41 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { Avatar } from '@skeletonlabs/skeleton-svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { page } from '$app/stores'
+  import { Avatar } from '@skeletonlabs/skeleton-svelte'
+  import { createEventDispatcher } from 'svelte'
 
   // Props
-  export let mobileMenuOpen: boolean = false;
+  export let mobileMenuOpen: boolean = false
 
   // Event dispatcher
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher()
 
   const mainMenuItems = [
     {
       href: '/admin',
       label: '대시보드',
-      icon: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'
+      icon: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z',
     },
     {
       href: '/admin/coops',
       label: '공동구매 관리',
-      icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'
+      icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
     },
     {
       href: '/admin/orders',
       label: '주문 관리',
-      icon: 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+      icon: 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
     },
     {
       href: '/admin/purchases',
       label: '발주 관리',
-      icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'
-    }
-  ];
+      icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+    },
+  ]
 
-  $: currentPath = $page.url.pathname;
+  $: currentPath = $page.url.pathname
 
   function handleMenuClick() {
-    dispatch('closeMobile');
+    dispatch('closeMobile')
   }
 </script>
 

@@ -13,7 +13,7 @@
       registeredAt: '2024-01-15',
       totalOrders: 142,
       monthlyRevenue: 15800000,
-      lastOrderDate: '2024-10-11'
+      lastOrderDate: '2024-10-11',
     },
     {
       id: 'STORE-002',
@@ -28,7 +28,7 @@
       registeredAt: '2024-02-20',
       totalOrders: 98,
       monthlyRevenue: 11200000,
-      lastOrderDate: '2024-10-10'
+      lastOrderDate: '2024-10-10',
     },
     {
       id: 'STORE-003',
@@ -43,13 +43,13 @@
       registeredAt: '2024-03-10',
       totalOrders: 67,
       monthlyRevenue: 8500000,
-      lastOrderDate: '2024-09-28'
-    }
-  ];
+      lastOrderDate: '2024-09-28',
+    },
+  ]
 
-  let selectedStatus = 'all';
-  let searchTerm = '';
-  let selectedType = 'all';
+  let selectedStatus = 'all'
+  let searchTerm = ''
+  let selectedType = 'all'
 
   const statusOptions = [
     { value: 'all', label: '전체', count: stores.length },
@@ -57,92 +57,90 @@
     {
       value: 'inactive',
       label: '휴업중',
-      count: stores.filter((s) => s.status === 'inactive').length
+      count: stores.filter((s) => s.status === 'inactive').length,
     },
     {
       value: 'suspended',
       label: '정지',
-      count: stores.filter((s) => s.status === 'suspended').length
-    }
-  ];
+      count: stores.filter((s) => s.status === 'suspended').length,
+    },
+  ]
 
   const typeOptions = [
     { value: 'all', label: '전체 매장' },
     { value: '가맹점', label: '가맹점' },
-    { value: '직영점', label: '직영점' }
-  ];
+    { value: '직영점', label: '직영점' },
+  ]
 
   $: filteredStores = stores.filter((store) => {
-    const matchesStatus = selectedStatus === 'all' || store.status === selectedStatus;
-    const matchesType = selectedType === 'all' || store.type === selectedType;
+    const matchesStatus = selectedStatus === 'all' || store.status === selectedStatus
+    const matchesType = selectedType === 'all' || store.type === selectedType
     const matchesSearch =
       !searchTerm ||
       store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       store.manager.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      store.address.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesType && matchesSearch;
-  });
+      store.address.toLowerCase().includes(searchTerm.toLowerCase())
+    return matchesStatus && matchesType && matchesSearch
+  })
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'inactive':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'suspended':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function getStatusText(status: string) {
     switch (status) {
       case 'active':
-        return '운영중';
+        return '운영중'
       case 'inactive':
-        return '휴업중';
+        return '휴업중'
       case 'suspended':
-        return '정지';
+        return '정지'
       default:
-        return status;
+        return status
     }
   }
 
   function toggleStoreStatus(storeId: string) {
     stores = stores.map((store) => {
       if (store.id === storeId) {
-        const newStatus = store.status === 'active' ? 'inactive' : 'active';
-        return { ...store, status: newStatus };
+        const newStatus = store.status === 'active' ? 'inactive' : 'active'
+        return { ...store, status: newStatus }
       }
-      return store;
-    });
+      return store
+    })
   }
 
   function suspendStore(storeId: string) {
-    stores = stores.map((store) =>
-      store.id === storeId ? { ...store, status: 'suspended' } : store
-    );
+    stores = stores.map((store) => (store.id === storeId ? { ...store, status: 'suspended' } : store))
   }
 
   function viewStoreDetails(storeId: string) {
-    const store = stores.find((s) => s.id === storeId);
+    const store = stores.find((s) => s.id === storeId)
     if (store) {
       alert(
         `매장 상세 정보:\n매장명: ${store.name}\n관리자: ${store.manager}\n주소: ${store.address}\n전화번호: ${store.phone}\n사업자번호: ${store.businessNumber}\n이번달 매출: ${formatCurrency(store.monthlyRevenue)}\n총 주문수: ${store.totalOrders}건`
-      );
+      )
     }
   }
 
   function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
+      currency: 'KRW',
+    }).format(amount)
   }
 
   function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('ko-KR');
+    return new Date(dateString).toLocaleDateString('ko-KR')
   }
 </script>
 
@@ -170,12 +168,7 @@
         <!-- 검색 필터 -->
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -196,8 +189,7 @@
         <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
           {#each typeOptions as option}
             <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedType ===
-              option.value
+              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedType === option.value
                 ? 'bg-primary-500 text-primary-contrast shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'}"
               on:click={() => (selectedType = option.value)}
@@ -212,8 +204,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -221,9 +212,7 @@
             {option.label}
             <span
               class={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                selectedStatus === option.value
-                  ? 'bg-primary-600 text-primary-contrast'
-                  : 'bg-gray-200 text-gray-600'
+                selectedStatus === option.value ? 'bg-primary-600 text-primary-contrast' : 'bg-gray-200 text-gray-600'
               }`}
             >
               {option.count}
@@ -257,9 +246,7 @@
               <td class="px-4 py-4">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-10 w-10">
-                    <div
-                      class="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center"
-                    >
+                    <div class="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center">
                       <span class="text-sm font-medium text-primary-700">🏪</span>
                     </div>
                   </div>
@@ -287,9 +274,7 @@
                 <div class="text-xs text-gray-400">최근: {formatDate(store.lastOrderDate)}</div>
               </td>
               <td class="px-4 py-4">
-                <span
-                  class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(store.status)}`}
-                >
+                <span class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(store.status)}`}>
                   {getStatusText(store.status)}
                 </span>
               </td>
@@ -306,11 +291,7 @@
                       on:click={() => toggleStoreStatus(store.id)}
                       class={`px-2 py-1 text-xs font-medium rounded hover:${
                         store.status === 'active' ? 'bg-yellow-200' : 'bg-green-200'
-                      } ${
-                        store.status === 'active'
-                          ? 'text-yellow-700 bg-yellow-100'
-                          : 'text-green-700 bg-green-100'
-                      }`}
+                      } ${store.status === 'active' ? 'text-yellow-700 bg-yellow-100' : 'text-green-700 bg-green-100'}`}
                     >
                       {store.status === 'active' ? '휴업' : '재개'}
                     </button>
@@ -330,12 +311,7 @@
 
       {#if filteredStores.length === 0}
         <div class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

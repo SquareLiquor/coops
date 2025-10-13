@@ -4,8 +4,8 @@
     totalOrders: 245,
     totalRevenue: 8940000,
     activeCoops: 12,
-    pendingOrders: 23
-  };
+    pendingOrders: 23,
+  }
 
   let recentOrders = [
     {
@@ -14,7 +14,7 @@
       product: '유기농 쌀 10kg',
       amount: 45000,
       status: 'pending',
-      createdAt: '2024-12-19 14:30'
+      createdAt: '2024-12-19 14:30',
     },
     {
       id: 'ORD-002',
@@ -22,7 +22,7 @@
       product: '사과 5kg',
       amount: 25000,
       status: 'confirmed',
-      createdAt: '2024-12-19 13:15'
+      createdAt: '2024-12-19 13:15',
     },
     {
       id: 'ORD-003',
@@ -30,7 +30,7 @@
       product: '배추 10포기',
       amount: 15000,
       status: 'shipped',
-      createdAt: '2024-12-19 11:45'
+      createdAt: '2024-12-19 11:45',
     },
     {
       id: 'ORD-004',
@@ -38,7 +38,7 @@
       product: '무 20개',
       amount: 12000,
       status: 'confirmed',
-      createdAt: '2024-12-19 10:20'
+      createdAt: '2024-12-19 10:20',
     },
     {
       id: 'ORD-005',
@@ -46,9 +46,9 @@
       product: '당근 3kg',
       amount: 8000,
       status: 'pending',
-      createdAt: '2024-12-19 09:30'
-    }
-  ];
+      createdAt: '2024-12-19 09:30',
+    },
+  ]
 
   let activeCoops = [
     {
@@ -57,7 +57,7 @@
       minQuantity: 100,
       currentQuantity: 85,
       endDate: '2024-12-25',
-      status: 'active'
+      status: 'active',
     },
     {
       id: 'COOP-002',
@@ -65,7 +65,7 @@
       minQuantity: 100,
       currentQuantity: 95,
       endDate: '2024-12-22',
-      status: 'almost_full'
+      status: 'almost_full',
     },
     {
       id: 'COOP-003',
@@ -73,7 +73,7 @@
       minQuantity: 50,
       currentQuantity: 100,
       endDate: '2024-12-20',
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: 'COOP-004',
@@ -81,40 +81,40 @@
       minQuantity: 80,
       currentQuantity: 42,
       endDate: '2024-12-28',
-      status: 'active'
-    }
-  ];
+      status: 'active',
+    },
+  ]
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'confirmed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'shipped':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'active':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'almost_full':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800'
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'full':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
+      currency: 'KRW',
+    }).format(amount)
   }
 
   function getProgressPercentage(current: number, min: number): number {
-    return Math.min((current / min) * 100, 100);
+    return Math.min((current / min) * 100, 100)
   }
 </script>
 
@@ -140,9 +140,7 @@
 
     <!-- Stats Cards -->
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">총 주문수</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -157,9 +155,7 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">총 매출</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -172,9 +168,7 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">활성 공구</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -187,9 +181,7 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-      >
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
           <h3 class="tracking-tight text-sm font-medium text-gray-600">대기 주문</h3>
           <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -210,9 +202,7 @@
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
             <h3 class="text-lg font-semibold text-gray-900">최근 주문</h3>
-            <a href="/admin/orders" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-              모두 보기
-            </a>
+            <a href="/admin/orders" class="text-sm text-blue-600 hover:text-blue-800 font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each recentOrders as order}
@@ -225,11 +215,7 @@
                     <span
                       class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(order.status)}`}
                     >
-                      {order.status === 'pending'
-                        ? '대기'
-                        : order.status === 'confirmed'
-                          ? '확인'
-                          : '배송'}
+                      {order.status === 'pending' ? '대기' : order.status === 'confirmed' ? '확인' : '배송'}
                     </span>
                   </div>
                   <div class="text-sm text-gray-600">
@@ -255,15 +241,11 @@
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
             <h3 class="text-lg font-semibold text-gray-900">진행중인 공구</h3>
-            <a href="/admin/coops" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-              모두 보기
-            </a>
+            <a href="/admin/coops" class="text-sm text-blue-600 hover:text-blue-800 font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each activeCoops as coop}
-              <div
-                class="p-4 border border-gray-100 rounded-lg space-y-3 hover:bg-gray-50 transition-colors"
-              >
+              <div class="p-4 border border-gray-100 rounded-lg space-y-3 hover:bg-gray-50 transition-colors">
                 <div class="flex items-center justify-between">
                   <div class="space-y-1">
                     <div class="font-medium text-gray-900">{coop.title}</div>
@@ -274,11 +256,7 @@
                   <span
                     class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(coop.status)}`}
                   >
-                    {coop.status === 'active'
-                      ? '진행중'
-                      : coop.status === 'almost_full'
-                        ? '거의찬'
-                        : '완료'}
+                    {coop.status === 'active' ? '진행중' : coop.status === 'almost_full' ? '거의찬' : '완료'}
                   </span>
                 </div>
                 <div class="space-y-2">
@@ -289,10 +267,7 @@
                   <div class="w-full bg-gray-100 rounded-full h-2">
                     <div
                       class="bg-blue-500 h-2 rounded-full transition-all"
-                      style="width: {getProgressPercentage(
-                        coop.currentQuantity,
-                        coop.minQuantity
-                      )}%"
+                      style="width: {getProgressPercentage(coop.currentQuantity, coop.minQuantity)}%"
                     ></div>
                   </div>
                 </div>
@@ -316,16 +291,9 @@
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="text-sm font-medium text-gray-600 group-hover:text-blue-600"
-            >새 공구 등록</span
-          >
+          <span class="text-sm font-medium text-gray-600 group-hover:text-blue-600">새 공구 등록</span>
         </button>
 
         <button
@@ -344,8 +312,7 @@
               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
             />
           </svg>
-          <span class="text-sm font-medium text-gray-600 group-hover:text-green-600">주문 확인</span
-          >
+          <span class="text-sm font-medium text-gray-600 group-hover:text-green-600">주문 확인</span>
         </button>
 
         <button
@@ -364,9 +331,7 @@
               d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
             />
           </svg>
-          <span class="text-sm font-medium text-gray-600 group-hover:text-purple-600"
-            >재고 관리</span
-          >
+          <span class="text-sm font-medium text-gray-600 group-hover:text-purple-600">재고 관리</span>
         </button>
 
         <button
@@ -385,9 +350,7 @@
               d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <span class="text-sm font-medium text-gray-600 group-hover:text-orange-600"
-            >리포트 생성</span
-          >
+          <span class="text-sm font-medium text-gray-600 group-hover:text-orange-600">리포트 생성</span>
         </button>
       </div>
     </div>
