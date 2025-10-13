@@ -1,5 +1,22 @@
 <script lang="ts">
-  let purchases = [
+  interface Purchase {
+    id: string
+    storeName: string
+    storeId: string
+    productName: string
+    productId: string
+    quantity: number
+    unitPrice: number
+    totalAmount: number
+    status: 'pending' | 'approved' | 'shipped' | 'completed' | 'rejected'
+    requestDate: string
+    approvedDate: string | null
+    shippedDate: string | null
+    receivedDate: string | null
+    note: string
+  }
+
+  let purchases: Purchase[] = [
     {
       id: 'PO-001',
       storeName: '강남점',
@@ -14,7 +31,7 @@
       approvedDate: null,
       shippedDate: null,
       receivedDate: null,
-      note: '긴급 발주 요청'
+      note: '긴급 발주 요청',
     },
     {
       id: 'PO-002',
@@ -30,7 +47,7 @@
       approvedDate: '2024-10-11',
       shippedDate: null,
       receivedDate: null,
-      note: ''
+      note: '',
     },
     {
       id: 'PO-003',
@@ -46,7 +63,7 @@
       approvedDate: '2024-10-10',
       shippedDate: '2024-10-11',
       receivedDate: null,
-      note: ''
+      note: '',
     },
     {
       id: 'PO-004',
@@ -62,7 +79,7 @@
       approvedDate: '2024-10-09',
       shippedDate: '2024-10-10',
       receivedDate: '2024-10-11',
-      note: '배송 완료'
+      note: '배송 완료',
     },
     {
       id: 'PO-005',
@@ -78,91 +95,91 @@
       approvedDate: null,
       shippedDate: null,
       receivedDate: null,
-      note: '재고 부족으로 거부'
-    }
-  ];
+      note: '재고 부족으로 거부',
+    },
+  ]
 
-  let selectedStatus = 'all';
-  let selectedStore = 'all';
-  let dateFrom = '';
-  let dateTo = '';
+  let selectedStatus = 'all'
+  let selectedStore = 'all'
+  let dateFrom = ''
+  let dateTo = ''
 
   const statusOptions = [
     { value: 'all', label: '전체', count: purchases.length },
     {
       value: 'pending',
       label: '승인대기',
-      count: purchases.filter((p) => p.status === 'pending').length
+      count: purchases.filter((p) => p.status === 'pending').length,
     },
     {
       value: 'approved',
       label: '승인됨',
-      count: purchases.filter((p) => p.status === 'approved').length
+      count: purchases.filter((p) => p.status === 'approved').length,
     },
     {
       value: 'shipped',
       label: '출고됨',
-      count: purchases.filter((p) => p.status === 'shipped').length
+      count: purchases.filter((p) => p.status === 'shipped').length,
     },
     {
       value: 'completed',
       label: '완료',
-      count: purchases.filter((p) => p.status === 'completed').length
+      count: purchases.filter((p) => p.status === 'completed').length,
     },
     {
       value: 'rejected',
       label: '거부됨',
-      count: purchases.filter((p) => p.status === 'rejected').length
-    }
-  ];
+      count: purchases.filter((p) => p.status === 'rejected').length,
+    },
+  ]
 
   const storeOptions = [
     { value: 'all', label: '전체 매장' },
     { value: 'STORE-001', label: '강남점' },
     { value: 'STORE-002', label: '홍대점' },
     { value: 'STORE-003', label: '잠실점' },
-    { value: 'STORE-004', label: '명동점' }
-  ];
+    { value: 'STORE-004', label: '명동점' },
+  ]
 
   $: filteredPurchases = purchases.filter((purchase) => {
-    const matchesStatus = selectedStatus === 'all' || purchase.status === selectedStatus;
-    const matchesStore = selectedStore === 'all' || purchase.storeId === selectedStore;
-    const matchesDateFrom = !dateFrom || purchase.requestDate >= dateFrom;
-    const matchesDateTo = !dateTo || purchase.requestDate <= dateTo;
-    return matchesStatus && matchesStore && matchesDateFrom && matchesDateTo;
-  });
+    const matchesStatus = selectedStatus === 'all' || purchase.status === selectedStatus
+    const matchesStore = selectedStore === 'all' || purchase.storeId === selectedStore
+    const matchesDateFrom = !dateFrom || purchase.requestDate >= dateFrom
+    const matchesDateTo = !dateTo || purchase.requestDate <= dateTo
+    return matchesStatus && matchesStore && matchesDateFrom && matchesDateTo
+  })
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'approved':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'shipped':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function getStatusText(status: string) {
     switch (status) {
       case 'pending':
-        return '승인대기';
+        return '승인대기'
       case 'approved':
-        return '승인됨';
+        return '승인됨'
       case 'shipped':
-        return '출고됨';
+        return '출고됨'
       case 'completed':
-        return '완료';
+        return '완료'
       case 'rejected':
-        return '거부됨';
+        return '거부됨'
       default:
-        return status;
+        return status
     }
   }
 
@@ -171,15 +188,13 @@
       purchase.id === purchaseId
         ? { ...purchase, status: 'approved', approvedDate: new Date().toISOString().split('T')[0] }
         : purchase
-    );
+    )
   }
 
   function rejectPurchase(purchaseId: string) {
     purchases = purchases.map((purchase) =>
-      purchase.id === purchaseId
-        ? { ...purchase, status: 'rejected', note: '본사에서 거부됨' }
-        : purchase
-    );
+      purchase.id === purchaseId ? { ...purchase, status: 'rejected', note: '본사에서 거부됨' } : purchase
+    )
   }
 
   function shipPurchase(purchaseId: string) {
@@ -187,18 +202,18 @@
       purchase.id === purchaseId
         ? { ...purchase, status: 'shipped', shippedDate: new Date().toISOString().split('T')[0] }
         : purchase
-    );
+    )
   }
 
   function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
+      currency: 'KRW',
+    }).format(amount)
   }
 
   function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('ko-KR');
+    return new Date(dateString).toLocaleDateString('ko-KR')
   }
 </script>
 
@@ -243,8 +258,7 @@
         <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
           {#each storeOptions as option}
             <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStore ===
-              option.value
+              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStore === option.value
                 ? 'bg-primary-500 text-primary-contrast shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'}"
               on:click={() => (selectedStore = option.value)}
@@ -259,8 +273,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -268,9 +281,7 @@
             {option.label}
             <span
               class={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                selectedStatus === option.value
-                  ? 'bg-primary-600 text-primary-contrast'
-                  : 'bg-gray-200 text-gray-600'
+                selectedStatus === option.value ? 'bg-primary-600 text-primary-contrast' : 'bg-gray-200 text-gray-600'
               }`}
             >
               {option.count}
@@ -320,9 +331,7 @@
                 <span class="text-sm text-gray-700">{purchase.quantity}</span>
               </td>
               <td class="px-4 py-4">
-                <span class="text-sm font-medium text-gray-900"
-                  >{formatCurrency(purchase.totalAmount)}</span
-                >
+                <span class="text-sm font-medium text-gray-900">{formatCurrency(purchase.totalAmount)}</span>
               </td>
               <td class="px-4 py-4">
                 <div class="text-sm text-gray-700">{formatDate(purchase.requestDate)}</div>
@@ -376,12 +385,7 @@
 
       {#if filteredPurchases.length === 0}
         <div class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

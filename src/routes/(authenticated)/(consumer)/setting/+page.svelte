@@ -16,7 +16,7 @@
   })
 
   let isEditing = $state(false)
-  let tempProfile = $state<UserProfile>({ ...userProfile })
+  let tempProfile = $derived(userProfile)
 
   // Functions
   function startEdit() {
@@ -113,9 +113,12 @@
         <!-- Profile Form -->
         <div class="space-y-4">
           <div>
-            <label class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium"> 이름 </label>
+            <label for="user-name" class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium">
+              이름
+            </label>
             {#if isEditing}
               <input
+                id="user-name"
                 type="text"
                 bind:value={tempProfile.name}
                 class="border-surface-300 focus:border-primary-500 dark:border-surface-600 dark:bg-surface-700 dark:text-surface-100 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
@@ -131,8 +134,11 @@
           </div>
 
           <div>
-            <label class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium"> 이메일 </label>
+            <label for="user-email" class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium">
+              이메일
+            </label>
             <p
+              id="user-email"
               class="bg-surface-50 text-surface-600 dark:bg-surface-700 dark:text-surface-400 rounded-lg px-3 py-2 text-sm"
             >
               {userProfile.email}
@@ -141,9 +147,12 @@
           </div>
 
           <div>
-            <label class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium"> 전화번호 </label>
+            <label for="user-phone" class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium">
+              전화번호
+            </label>
             {#if isEditing}
               <input
+                id="user-phone"
                 type="tel"
                 bind:value={tempProfile.phone}
                 class="border-surface-300 focus:border-primary-500 dark:border-surface-600 dark:bg-surface-700 dark:text-surface-100 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
@@ -238,23 +247,29 @@
       </div>
 
       <div class="divide-surface-100 dark:divide-surface-700 divide-y">
-        <a href="#" class="hover:bg-surface-50 dark:hover:bg-surface-700 block p-4 transition-colors">
+        <button
+          type="button"
+          class="hover:bg-surface-50 dark:hover:bg-surface-700 block w-full p-4 text-left transition-colors"
+        >
           <div class="flex items-center justify-between">
             <span class="text-surface-900 dark:text-surface-100 text-sm">이용약관</span>
             <svg class="text-surface-400 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </div>
-        </a>
+        </button>
 
-        <a href="#" class="hover:bg-surface-50 dark:hover:bg-surface-700 block p-4 transition-colors">
+        <button
+          type="button"
+          class="hover:bg-surface-50 dark:hover:bg-surface-700 block w-full p-4 text-left transition-colors"
+        >
           <div class="flex items-center justify-between">
             <span class="text-surface-900 dark:text-surface-100 text-sm">개인정보처리방침</span>
             <svg class="text-surface-400 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </div>
-        </a>
+        </button>
 
         <div class="p-4">
           <div class="flex items-center justify-between">

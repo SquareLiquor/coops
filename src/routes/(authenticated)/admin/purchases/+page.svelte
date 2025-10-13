@@ -11,7 +11,7 @@
       status: 'pending',
       orderDate: '2024-12-18',
       expectedDelivery: '2024-12-25',
-      category: '곡물'
+      category: '곡물',
     },
     {
       id: 'PUR-002',
@@ -24,7 +24,7 @@
       status: 'completed',
       orderDate: '2024-12-15',
       expectedDelivery: '2024-12-20',
-      category: '과일'
+      category: '과일',
     },
     {
       id: 'PUR-003',
@@ -37,7 +37,7 @@
       status: 'processing',
       orderDate: '2024-12-19',
       expectedDelivery: '2024-12-26',
-      category: '채소'
+      category: '채소',
     },
     {
       id: 'PUR-004',
@@ -50,7 +50,7 @@
       status: 'approved',
       orderDate: '2024-12-20',
       expectedDelivery: '2024-12-28',
-      category: '과일'
+      category: '과일',
     },
     {
       id: 'PUR-005',
@@ -63,15 +63,15 @@
       status: 'rejected',
       orderDate: '2024-12-17',
       expectedDelivery: '2024-12-30',
-      category: '곡물'
-    }
-  ];
+      category: '곡물',
+    },
+  ]
 
   // Filter variables
-  let dateFrom = '';
-  let dateTo = '';
-  let selectedStatus = 'all';
-  let selectedCategory = 'all';
+  let dateFrom = ''
+  let dateTo = ''
+  let selectedStatus = 'all'
+  let selectedCategory = 'all'
 
   // Status options for purchases
   const statusOptions = [
@@ -80,8 +80,8 @@
     { value: 'approved', label: '승인됨' },
     { value: 'processing', label: '처리 중' },
     { value: 'completed', label: '완료' },
-    { value: 'rejected', label: '거부됨' }
-  ];
+    { value: 'rejected', label: '거부됨' },
+  ]
 
   // Category options
   const categoryOptions = [
@@ -90,46 +90,40 @@
     { value: '채소', label: '채소' },
     { value: '과일', label: '과일' },
     { value: '육류', label: '육류' },
-    { value: '유제품', label: '유제품' }
-  ];
+    { value: '유제품', label: '유제품' },
+  ]
 
-  function getStatusBadge(status: string) {
-    const statusMap = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
-      processing: 'bg-blue-100 text-blue-800',
-      completed: 'bg-gray-100 text-gray-800',
-      rejected: 'bg-red-100 text-red-800'
-    };
-    return statusMap[status] || 'bg-gray-100 text-gray-800';
-  }
+  type PurchaseStatus = 'pending' | 'approved' | 'processing' | 'completed' | 'rejected'
 
   function getStatusText(status: string) {
-    const statusTextMap = {
+    const statusTextMap: Record<PurchaseStatus, string> = {
       pending: '검토 중',
       approved: '승인됨',
       processing: '처리 중',
       completed: '완료',
-      rejected: '거부됨'
-    };
-    return statusTextMap[status] || status;
+      rejected: '거부됨',
+    }
+    if (status in statusTextMap) {
+      return statusTextMap[status as PurchaseStatus]
+    }
+    return status
   }
 
   // Filtered purchases based on filters
   $: filteredPurchases = purchases.filter((purchase) => {
-    const statusMatch = selectedStatus === 'all' || purchase.status === selectedStatus;
-    const categoryMatch = selectedCategory === 'all' || purchase.category === selectedCategory;
+    const statusMatch = selectedStatus === 'all' || purchase.status === selectedStatus
+    const categoryMatch = selectedCategory === 'all' || purchase.category === selectedCategory
 
-    let dateMatch = true;
+    let dateMatch = true
     if (dateFrom && dateTo) {
-      const purchaseDate = new Date(purchase.orderDate);
-      const fromDate = new Date(dateFrom);
-      const toDate = new Date(dateTo);
-      dateMatch = purchaseDate >= fromDate && purchaseDate <= toDate;
+      const purchaseDate = new Date(purchase.orderDate)
+      const fromDate = new Date(dateFrom)
+      const toDate = new Date(dateTo)
+      dateMatch = purchaseDate >= fromDate && purchaseDate <= toDate
     }
 
-    return statusMatch && categoryMatch && dateMatch;
-  });
+    return statusMatch && categoryMatch && dateMatch
+  })
 </script>
 
 <svelte:head>
@@ -174,8 +168,7 @@
         <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
           {#each categoryOptions as option}
             <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory ===
-              option.value
+              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory === option.value
                 ? 'bg-primary-500 text-primary-contrast shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'}"
               on:click={() => (selectedCategory = option.value)}
@@ -190,8 +183,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -270,7 +262,7 @@
                 {purchase.orderDate}
               </td>
               <td class="px-4 py-4 text-center">
-                <button class="text-gray-400 hover:text-gray-600">
+                <button class="text-gray-400 hover:text-gray-600" aria-label="더보기 옵션">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"

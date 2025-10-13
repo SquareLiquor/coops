@@ -10,7 +10,7 @@
       amount: 90000,
       status: 'pending',
       createdAt: '2024-12-19 14:30',
-      address: '서울시 강남구 테헤란로 123'
+      address: '서울시 강남구 테헤란로 123',
     },
     {
       id: 'ORD-002',
@@ -22,7 +22,7 @@
       amount: 25000,
       status: 'completed',
       createdAt: '2024-12-19 13:15',
-      address: '부산시 해운대구 센텀중앙로 456'
+      address: '부산시 해운대구 센텀중앙로 456',
     },
     {
       id: 'ORD-003',
@@ -34,7 +34,7 @@
       amount: 18000,
       status: 'processing',
       createdAt: '2024-12-19 12:20',
-      address: '대구시 중구 동성로 789'
+      address: '대구시 중구 동성로 789',
     },
     {
       id: 'ORD-004',
@@ -46,7 +46,7 @@
       amount: 75000,
       status: 'shipped',
       createdAt: '2024-12-18 16:45',
-      address: '광주시 서구 상무대로 321'
+      address: '광주시 서구 상무대로 321',
     },
     {
       id: 'ORD-005',
@@ -58,79 +58,78 @@
       amount: 24000,
       status: 'pending',
       createdAt: '2024-12-18 10:15',
-      address: '울산시 남구 삼산로 654'
-    }
-  ];
+      address: '울산시 남구 삼산로 654',
+    },
+  ]
 
   // 필터 상태
-  let searchName = '';
-  let selectedCategory = 'all';
-  let selectedStatus = 'all';
-  let dateFrom = '';
-  let dateTo = '';
+  let searchName = ''
+  let selectedCategory = 'all'
+  let selectedStatus = 'all'
+  let dateFrom = ''
+  let dateTo = ''
 
   const categoryOptions = [
     { value: 'all', label: '전체 카테고리' },
     { value: '곡물', label: '곡물' },
     { value: '과일', label: '과일' },
-    { value: '채소', label: '채소' }
-  ];
+    { value: '채소', label: '채소' },
+  ]
 
   const statusOptions = [
     { value: 'all', label: '전체 상태' },
     { value: 'pending', label: '대기중' },
     { value: 'processing', label: '처리중' },
     { value: 'shipped', label: '배송중' },
-    { value: 'completed', label: '완료' }
-  ];
+    { value: 'completed', label: '완료' },
+  ]
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'processing':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'shipped':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-100 text-purple-800'
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function getStatusText(status: string) {
     switch (status) {
       case 'pending':
-        return '대기중';
+        return '대기중'
       case 'processing':
-        return '처리중';
+        return '처리중'
       case 'shipped':
-        return '배송중';
+        return '배송중'
       case 'completed':
-        return '완료';
+        return '완료'
       default:
-        return status;
+        return status
     }
   }
 
   // Filtered orders based on filters
   $: filteredOrders = orders.filter((order) => {
-    const statusMatch = selectedStatus === 'all' || order.status === selectedStatus;
-    const categoryMatch = selectedCategory === 'all' || order.category === selectedCategory;
-    const nameMatch =
-      searchName === '' || order.customerName.toLowerCase().includes(searchName.toLowerCase());
+    const statusMatch = selectedStatus === 'all' || order.status === selectedStatus
+    const categoryMatch = selectedCategory === 'all' || order.category === selectedCategory
+    const nameMatch = searchName === '' || order.customerName.toLowerCase().includes(searchName.toLowerCase())
 
-    let dateMatch = true;
+    let dateMatch = true
     if (dateFrom && dateTo) {
-      const orderDate = new Date(order.createdAt.split(' ')[0]);
-      const fromDate = new Date(dateFrom);
-      const toDate = new Date(dateTo);
-      dateMatch = orderDate >= fromDate && orderDate <= toDate;
+      const orderDate = new Date(order.createdAt.split(' ')[0])
+      const fromDate = new Date(dateFrom)
+      const toDate = new Date(dateTo)
+      dateMatch = orderDate >= fromDate && orderDate <= toDate
     }
 
-    return statusMatch && categoryMatch && nameMatch && dateMatch;
-  });
+    return statusMatch && categoryMatch && nameMatch && dateMatch
+  })
 </script>
 
 <svelte:head>
@@ -208,8 +207,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -276,7 +274,7 @@
                 {order.customerName}
               </td>
               <td class="px-4 py-4 text-center">
-                <button class="text-gray-400 hover:text-gray-600">
+                <button class="text-gray-400 hover:text-gray-600" aria-label="주문 옵션 더보기">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"

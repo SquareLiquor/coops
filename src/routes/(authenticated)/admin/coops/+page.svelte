@@ -8,7 +8,7 @@
       target: '50',
       current: '32',
       price: '45000',
-      endDate: '2024-12-25'
+      endDate: '2024-12-25',
     },
     {
       id: 'COOP-002',
@@ -18,7 +18,7 @@
       target: '100',
       current: '100',
       price: '25000',
-      endDate: '2024-12-20'
+      endDate: '2024-12-20',
     },
     {
       id: 'COOP-003',
@@ -28,7 +28,7 @@
       target: '80',
       current: '15',
       price: '18000',
-      endDate: '2024-12-30'
+      endDate: '2024-12-30',
     },
     {
       id: 'COOP-004',
@@ -38,7 +38,7 @@
       target: '30',
       current: '28',
       price: '12000',
-      endDate: '2024-12-28'
+      endDate: '2024-12-28',
     },
     {
       id: 'COOP-005',
@@ -48,7 +48,7 @@
       target: '60',
       current: '45',
       price: '22000',
-      endDate: '2024-12-27'
+      endDate: '2024-12-27',
     },
     {
       id: 'COOP-006',
@@ -58,15 +58,15 @@
       target: '40',
       current: '8',
       price: '15000',
-      endDate: '2025-01-05'
-    }
-  ];
+      endDate: '2025-01-05',
+    },
+  ]
 
   // 필터 상태
-  let selectedStatus = 'all';
-  let selectedCategory = 'all';
-  let dateFrom = '';
-  let dateTo = '';
+  let selectedStatus = 'all'
+  let selectedCategory = 'all'
+  let dateFrom = ''
+  let dateTo = ''
 
   const statusOptions = [
     { value: 'all', label: '전체', count: coops.length },
@@ -74,45 +74,45 @@
     {
       value: 'pending',
       label: '대기중',
-      count: coops.filter((c) => c.status === 'pending').length
+      count: coops.filter((c) => c.status === 'pending').length,
     },
     {
       value: 'completed',
       label: '완료',
-      count: coops.filter((c) => c.status === 'completed').length
-    }
-  ];
+      count: coops.filter((c) => c.status === 'completed').length,
+    },
+  ]
 
   const categoryOptions = [
     { value: 'all', label: '전체 카테고리' },
     { value: '곡물', label: '곡물' },
     { value: '과일', label: '과일' },
-    { value: '채소', label: '채소' }
-  ];
+    { value: '채소', label: '채소' },
+  ]
 
   function getStatusBadge(status: string) {
     switch (status) {
       case 'active':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   function getStatusText(status: string) {
     switch (status) {
       case 'active':
-        return '진행중';
+        return '진행중'
       case 'completed':
-        return '완료';
+        return '완료'
       case 'pending':
-        return '대기중';
+        return '대기중'
       default:
-        return status;
+        return status
     }
   }
 </script>
@@ -159,8 +159,7 @@
         <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
           {#each categoryOptions as option}
             <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory ===
-              option.value
+              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory === option.value
                 ? 'bg-primary-500 text-primary-contrast shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'}"
               on:click={() => (selectedCategory = option.value)}
@@ -175,8 +174,7 @@
       <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
         {#each statusOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus ===
-            option.value
+            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
               ? 'bg-primary-500 text-primary-contrast shadow-sm'
               : 'text-gray-600 hover:text-gray-800'}"
             on:click={() => (selectedStatus = option.value)}
@@ -243,7 +241,7 @@
                 {coop.endDate}
               </td>
               <td class="px-4 py-4 text-center">
-                <button class="text-gray-400 hover:text-gray-600">
+                <button class="text-gray-400 hover:text-gray-600" aria-label="공구 관리 옵션">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
