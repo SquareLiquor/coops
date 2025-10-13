@@ -18,7 +18,7 @@
 
 <!-- 반응형 헤더 -->
 <header
-  class="mobile-header sticky top-0 z-40 bg-primary-500 shadow-lg"
+  class="mobile-header bg-primary-500 sticky top-0 z-40 shadow-lg"
   style="box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);"
 >
   <div class="px-4 py-2">
@@ -57,8 +57,8 @@
             style="border-color: #a6adc8;"
           >
             <div class="py-2">
-              <a href="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"> 주문 내역 </a>
-              <a href="/setting" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"> 설정 </a>
+              <a href="/orders" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 주문 내역 </a>
+              <a href="/settings" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 설정 </a>
               <hr class="my-2" style="border-color: #a6adc8;" />
               <button class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"> 로그아웃 </button>
             </div>

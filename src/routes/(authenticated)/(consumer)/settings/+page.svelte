@@ -81,7 +81,7 @@
             />
             {#if isEditing}
               <label
-                class="bg-primary-500 hover:bg-primary-600 absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-white shadow-lg transition-colors"
+                class="bg-primary-500 hover:bg-primary-600 absolute right-0 bottom-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-white shadow-lg transition-colors"
               >
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -214,7 +214,7 @@
             <label class="relative inline-flex cursor-pointer items-center">
               <input type="checkbox" checked class="peer sr-only" />
               <div
-                class="bg-surface-200 peer-checked:bg-primary-500 after:border-surface-300 dark:border-surface-600 dark:bg-surface-700 peer h-6 w-11 rounded-full after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"
+                class="bg-surface-200 peer-checked:bg-primary-500 after:border-surface-300 dark:border-surface-600 dark:bg-surface-700 peer h-6 w-11 rounded-full peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
               ></div>
             </label>
           </div>
@@ -230,7 +230,7 @@
             <label class="relative inline-flex cursor-pointer items-center">
               <input type="checkbox" class="peer sr-only" />
               <div
-                class="bg-surface-200 peer-checked:bg-primary-500 after:border-surface-300 dark:border-surface-600 dark:bg-surface-700 peer h-6 w-11 rounded-full after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"
+                class="bg-surface-200 peer-checked:bg-primary-500 after:border-surface-300 dark:border-surface-600 dark:bg-surface-700 peer h-6 w-11 rounded-full peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
               ></div>
             </label>
           </div>

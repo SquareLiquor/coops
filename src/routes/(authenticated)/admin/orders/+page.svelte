@@ -70,7 +70,7 @@
   let dateTo = ''
 
   const categoryOptions = [
-    { value: 'all', label: '전체 카테고리' },
+    { value: 'all', label: '전체' },
     { value: '곡물', label: '곡물' },
     { value: '과일', label: '과일' },
     { value: '채소', label: '채소' },
@@ -95,7 +95,7 @@
       case 'completed':
         return 'bg-green-100 text-green-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-surface-100 text-surface-800'
     }
   }
 
@@ -136,156 +136,149 @@
   <title>주문 관리 - 관리자</title>
 </svelte:head>
 
-<div class="bg-white rounded-lg shadow-sm">
-  <!-- Header -->
-  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-    <div class="flex items-center space-x-4">
-      <h1 class="text-2xl font-bold text-gray-900">주문관리</h1>
-    </div>
+<!-- Header -->
+<div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
+  <div class="flex items-center space-x-4">
+    <h1 class="text-surface-900 text-2xl font-bold">주문관리</h1>
   </div>
+</div>
 
-  <div class="p-6">
-    <!-- 필터 영역 -->
-    <div class="mb-6 flex items-center justify-between">
-      <!-- 좌측 필터 영역 -->
-      <div class="flex items-center gap-4">
-        <!-- 날짜 필터 -->
-        <div class="flex items-center gap-2">
-          <input
-            type="date"
-            bind:value={dateFrom}
-            class="px-3 py-1.5 text-sm border-0 border-b {dateFrom
-              ? 'border-primary-500 text-primary-700'
-              : 'border-gray-300'} bg-transparent focus:outline-none focus:border-primary-500"
-            placeholder="From"
-          />
-          <span class="text-gray-400">~</span>
-          <input
-            type="date"
-            bind:value={dateTo}
-            class="px-3 py-1.5 text-sm border-0 border-b {dateTo
-              ? 'border-primary-500 text-primary-700'
-              : 'border-gray-300'} bg-transparent focus:outline-none focus:border-primary-500"
-            placeholder="To"
-          />
-        </div>
-
-        <!-- 카테고리 필터 -->
-        <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
-          {#each categoryOptions as option, index}
-            <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors flex items-center gap-2 {selectedCategory ===
-              option.value
-                ? 'bg-primary-500 text-primary-contrast shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'}"
-              on:click={() => (selectedCategory = option.value)}
-            >
-              {option.label}
-              {#if index === 1}
-                <span class="text-xs text-gray-500">3</span>
-              {:else if index === 2}
-                <span class="text-xs text-gray-500">2</span>
-              {/if}
-            </button>
-          {/each}
-        </div>
-
-        <!-- 주문자 이름 검색 -->
-        <div class="flex items-center">
-          <input
-            type="text"
-            bind:value={searchName}
-            placeholder="주문자 이름 검색"
-            class="px-3 py-1.5 text-sm border-0 border-b {searchName
-              ? 'border-primary-500 text-primary-700'
-              : 'border-gray-300'} bg-transparent focus:outline-none focus:border-primary-500 w-40"
-          />
-        </div>
+<div class="p-6">
+  <!-- 필터 영역 -->
+  <div class="mb-6 flex items-center justify-between">
+    <!-- 좌측 필터 영역 -->
+    <div class="flex items-center gap-4">
+      <!-- 날짜 필터 -->
+      <div class="flex items-center gap-2">
+        <input
+          type="date"
+          bind:value={dateFrom}
+          class="border-0 border-b px-3 py-1.5 text-sm {dateFrom
+            ? 'border-primary-500 text-primary-700'
+            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
+          placeholder="From"
+        />
+        <span class="text-surface-400">~</span>
+        <input
+          type="date"
+          bind:value={dateTo}
+          class="border-0 border-b px-3 py-1.5 text-sm {dateTo
+            ? 'border-primary-500 text-primary-700'
+            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
+          placeholder="To"
+        />
       </div>
 
-      <!-- 우측 상태 필터 영역 -->
-      <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
-        {#each statusOptions as option}
+      <!-- 카테고리 필터 -->
+      <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
+        {#each categoryOptions as option, index}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
-              ? 'bg-primary-500 text-primary-contrast shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'}"
-            on:click={() => (selectedStatus = option.value)}
+            class="flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedCategory ===
+            option.value
+              ? 'bg-primary-300 text-primary-contrast shadow-sm'
+              : 'text-surface-600 hover:text-surface-800'}"
+            on:click={() => (selectedCategory = option.value)}
           >
             {option.label}
           </button>
         {/each}
       </div>
+
+      <!-- 주문자 이름 검색 -->
+      <div class="flex items-center">
+        <input
+          type="text"
+          bind:value={searchName}
+          placeholder="주문자 이름 검색"
+          class="border-0 border-b px-3 py-1.5 text-sm {searchName
+            ? 'border-primary-500 text-primary-700'
+            : 'border-surface-100'} focus:border-primary-500 w-40 bg-transparent focus:outline-none"
+        />
+      </div>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <table class="min-w-full">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="w-8 px-4 py-3 text-center">
-              <span class="text-xs font-medium text-gray-500">#</span>
-            </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> Header </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> Section Type </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> Status </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> Target </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> Limit </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> Reviewer </th>
-            <th class="w-8 px-4 py-3"></th>
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          {#each filteredOrders as order, index}
-            <tr class="border-b border-gray-100 hover:bg-gray-50">
-              <td class="px-4 py-4 text-center text-sm text-gray-500">
-                {index + 1}
-              </td>
-              <td class="px-4 py-4">
-                <div class="text-sm font-medium text-gray-900">{order.product}</div>
-              </td>
-              <td class="px-4 py-4">
-                <span class="text-sm text-gray-700">{order.category}</span>
-              </td>
-              <td class="px-4 py-4">
-                {#if order.status === 'completed'}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">Done</span>
-                  </div>
-                {:else if order.status === 'processing'}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">In Progress</span>
-                  </div>
-                {:else}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">{getStatusText(order.status)}</span>
-                  </div>
-                {/if}
-              </td>
-              <td class="px-4 py-4 text-sm text-gray-700">
-                {Math.floor(Math.random() * 30) + 1}
-              </td>
-              <td class="px-4 py-4 text-sm text-gray-700">
-                {Math.floor(Math.random() * 15) + 5}
-              </td>
-              <td class="px-4 py-4 text-sm text-gray-700">
-                {order.customerName}
-              </td>
-              <td class="px-4 py-4 text-center">
-                <button class="text-gray-400 hover:text-gray-600" aria-label="주문 옵션 더보기">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+    <!-- 우측 상태 필터 영역 -->
+    <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
+      {#each statusOptions as option}
+        <button
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
+            ? 'bg-primary-300 text-primary-contrast shadow-sm'
+            : 'text-surface-600 hover:text-surface-800'}"
+          on:click={() => (selectedStatus = option.value)}
+        >
+          {option.label}
+        </button>
+      {/each}
     </div>
+  </div>
+
+  <div class="border-surface-100 overflow-hidden rounded-lg border bg-white">
+    <table class="min-w-full">
+      <thead class="bg-surface-50/50 border-surface-100 border-b">
+        <tr>
+          <th class="w-8 px-4 py-3 text-center">
+            <span class="text-surface-500 text-xs font-medium">#</span>
+          </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Header </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Section Type </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Status </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Target </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Limit </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Reviewer </th>
+          <th class="w-8 px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="bg-white">
+        {#each filteredOrders as order, index}
+          <tr class="hover:bg-surface-50 border-surface-50 border-b">
+            <td class="text-surface-500 px-4 py-4 text-center text-sm">
+              {index + 1}
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-surface-900 text-sm font-medium">{order.product}</div>
+            </td>
+            <td class="px-4 py-4">
+              <span class="text-surface-700 text-sm">{order.category}</span>
+            </td>
+            <td class="px-4 py-4">
+              {#if order.status === 'completed'}
+                <div class="flex items-center">
+                  <div class="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
+                  <span class="text-surface-700 text-sm">Done</span>
+                </div>
+              {:else if order.status === 'processing'}
+                <div class="flex items-center">
+                  <div class="mr-2 h-2 w-2 rounded-full bg-yellow-500"></div>
+                  <span class="text-surface-700 text-sm">In Progress</span>
+                </div>
+              {:else}
+                <div class="flex items-center">
+                  <div class="bg-surface-400 mr-2 h-2 w-2 rounded-full"></div>
+                  <span class="text-surface-700 text-sm">{getStatusText(order.status)}</span>
+                </div>
+              {/if}
+            </td>
+            <td class="text-surface-700 px-4 py-4 text-sm">
+              {Math.floor(Math.random() * 30) + 1}
+            </td>
+            <td class="text-surface-700 px-4 py-4 text-sm">
+              {Math.floor(Math.random() * 15) + 5}
+            </td>
+            <td class="text-surface-700 px-4 py-4 text-sm">
+              {order.customerName}
+            </td>
+            <td class="px-4 py-4 text-center">
+              <button class="text-surface-400 hover:text-surface-600" aria-label="주문 옵션 더보기">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                  />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
   </div>
 </div>

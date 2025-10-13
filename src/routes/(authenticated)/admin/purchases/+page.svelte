@@ -85,7 +85,7 @@
 
   // Category options
   const categoryOptions = [
-    { value: 'all', label: '전체 카테고리' },
+    { value: 'all', label: '전체' },
     { value: '곡물', label: '곡물' },
     { value: '채소', label: '채소' },
     { value: '과일', label: '과일' },
@@ -130,63 +130,47 @@
   <title>발주관리 - 관리자</title>
 </svelte:head>
 
-<div class="bg-white rounded-lg shadow-sm">
-  <!-- Header -->
-  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-    <div class="flex items-center space-x-4">
-      <h1 class="text-2xl font-bold text-gray-900">발주관리</h1>
-    </div>
+<!-- Header -->
+<div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
+  <div class="flex items-center space-x-4">
+    <h1 class="text-surface-900 text-2xl font-bold">발주관리</h1>
   </div>
+</div>
 
-  <div class="p-6">
-    <!-- Filter Area -->
-    <div class="mb-6 flex items-center justify-between">
-      <!-- 좌측 필터 영역 -->
-      <div class="flex items-center gap-4">
-        <!-- Date Range -->
-        <div class="flex items-center gap-2">
-          <input
-            type="date"
-            bind:value={dateFrom}
-            class="px-3 py-1.5 text-sm border-0 border-b {dateFrom
-              ? 'border-primary-500 text-primary-700'
-              : 'border-gray-300'} bg-transparent focus:outline-none focus:border-primary-500"
-            placeholder="From"
-          />
-          <span class="text-gray-400">~</span>
-          <input
-            type="date"
-            bind:value={dateTo}
-            class="px-3 py-1.5 text-sm border-0 border-b {dateTo
-              ? 'border-primary-500 text-primary-700'
-              : 'border-gray-300'} bg-transparent focus:outline-none focus:border-primary-500"
-            placeholder="To"
-          />
-        </div>
-
-        <!-- Category Filter -->
-        <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
-          {#each categoryOptions as option}
-            <button
-              class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedCategory === option.value
-                ? 'bg-primary-500 text-primary-contrast shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'}"
-              on:click={() => (selectedCategory = option.value)}
-            >
-              {option.label}
-            </button>
-          {/each}
-        </div>
+<div class="p-6">
+  <!-- Filter Area -->
+  <div class="mb-6 flex items-center justify-between">
+    <!-- 좌측 필터 영역 -->
+    <div class="flex items-center gap-4">
+      <!-- Date Range -->
+      <div class="flex items-center gap-2">
+        <input
+          type="date"
+          bind:value={dateFrom}
+          class="border-0 border-b px-3 py-1.5 text-sm {dateFrom
+            ? 'border-primary-500 text-primary-700'
+            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
+          placeholder="From"
+        />
+        <span class="text-surface-400">~</span>
+        <input
+          type="date"
+          bind:value={dateTo}
+          class="border-0 border-b px-3 py-1.5 text-sm {dateTo
+            ? 'border-primary-500 text-primary-700'
+            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
+          placeholder="To"
+        />
       </div>
 
-      <!-- 우측 상태 필터 영역 -->
-      <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
-        {#each statusOptions as option}
+      <!-- Category Filter -->
+      <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
+        {#each categoryOptions as option}
           <button
-            class="px-3 py-1.5 text-sm font-medium rounded transition-colors {selectedStatus === option.value
-              ? 'bg-primary-500 text-primary-contrast shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'}"
-            on:click={() => (selectedStatus = option.value)}
+            class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedCategory === option.value
+              ? 'bg-primary-300 text-primary-contrast shadow-sm'
+              : 'text-surface-600 hover:text-surface-800'}"
+            on:click={() => (selectedCategory = option.value)}
           >
             {option.label}
           </button>
@@ -194,86 +178,100 @@
       </div>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <table class="min-w-full">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="w-8 px-4 py-3 text-center">
-              <span class="text-xs font-medium text-gray-500">#</span>
-            </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> 발주 ID </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> 공급업체 </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> 상품명 </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> 총액 </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> 상태 </th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500"> 발주일 </th>
-            <th class="w-8 px-4 py-3"></th>
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          {#each filteredPurchases as purchase, index}
-            <tr class="border-b border-gray-100 hover:bg-gray-50">
-              <td class="px-4 py-4 text-center text-sm text-gray-500">
-                {index + 1}
-              </td>
-              <td class="px-4 py-4">
-                <div class="text-sm font-medium text-gray-900">{purchase.id}</div>
-              </td>
-              <td class="px-4 py-4">
-                <div class="text-sm font-medium text-gray-900">{purchase.supplier}</div>
-                <div class="text-sm text-gray-500">{purchase.supplierPhone}</div>
-              </td>
-              <td class="px-4 py-4">
-                <div class="text-sm font-medium text-gray-900">{purchase.product}</div>
-                <div class="text-sm text-gray-500">{purchase.category}</div>
-              </td>
-              <td class="px-4 py-4 text-sm text-gray-700">
-                ₩{purchase.totalAmount.toLocaleString()}
-              </td>
-              <td class="px-4 py-4">
-                {#if purchase.status === 'completed'}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">완료</span>
-                  </div>
-                {:else if purchase.status === 'processing'}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">처리 중</span>
-                  </div>
-                {:else if purchase.status === 'approved'}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">승인됨</span>
-                  </div>
-                {:else if purchase.status === 'pending'}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">검토 중</span>
-                  </div>
-                {:else}
-                  <div class="flex items-center">
-                    <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-                    <span class="text-sm text-gray-700">{getStatusText(purchase.status)}</span>
-                  </div>
-                {/if}
-              </td>
-              <td class="px-4 py-4 text-sm text-gray-700">
-                {purchase.orderDate}
-              </td>
-              <td class="px-4 py-4 text-center">
-                <button class="text-gray-400 hover:text-gray-600" aria-label="더보기 옵션">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+    <!-- 우측 상태 필터 영역 -->
+    <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
+      {#each statusOptions as option}
+        <button
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
+            ? 'bg-primary-300 text-primary-contrast shadow-sm'
+            : 'text-surface-600 hover:text-surface-800'}"
+          on:click={() => (selectedStatus = option.value)}
+        >
+          {option.label}
+        </button>
+      {/each}
     </div>
+  </div>
+
+  <div class="border-surface-100 overflow-hidden rounded-lg border bg-white">
+    <table class="min-w-full">
+      <thead class="bg-surface-50/50 border-surface-100 border-b">
+        <tr>
+          <th class="w-8 px-4 py-3 text-center">
+            <span class="text-surface-500 text-xs font-medium">#</span>
+          </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 발주 ID </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 공급업체 </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 상품명 </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 총액 </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 상태 </th>
+          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 발주일 </th>
+          <th class="w-8 px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="bg-white">
+        {#each filteredPurchases as purchase, index}
+          <tr class="hover:bg-surface-50 border-surface-50 border-b">
+            <td class="text-surface-500 px-4 py-4 text-center text-sm">
+              {index + 1}
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-surface-900 text-sm font-medium">{purchase.id}</div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-surface-900 text-sm font-medium">{purchase.supplier}</div>
+              <div class="text-surface-500 text-sm">{purchase.supplierPhone}</div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-surface-900 text-sm font-medium">{purchase.product}</div>
+              <div class="text-surface-500 text-sm">{purchase.category}</div>
+            </td>
+            <td class="text-surface-700 px-4 py-4 text-sm">
+              ₩{purchase.totalAmount.toLocaleString()}
+            </td>
+            <td class="px-4 py-4">
+              {#if purchase.status === 'completed'}
+                <div class="flex items-center">
+                  <div class="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
+                  <span class="text-surface-700 text-sm">완료</span>
+                </div>
+              {:else if purchase.status === 'processing'}
+                <div class="flex items-center">
+                  <div class="mr-2 h-2 w-2 rounded-full bg-blue-500"></div>
+                  <span class="text-surface-700 text-sm">처리 중</span>
+                </div>
+              {:else if purchase.status === 'approved'}
+                <div class="flex items-center">
+                  <div class="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
+                  <span class="text-surface-700 text-sm">승인됨</span>
+                </div>
+              {:else if purchase.status === 'pending'}
+                <div class="flex items-center">
+                  <div class="mr-2 h-2 w-2 rounded-full bg-yellow-500"></div>
+                  <span class="text-surface-700 text-sm">검토 중</span>
+                </div>
+              {:else}
+                <div class="flex items-center">
+                  <div class="bg-surface-400 mr-2 h-2 w-2 rounded-full"></div>
+                  <span class="text-surface-700 text-sm">{getStatusText(purchase.status)}</span>
+                </div>
+              {/if}
+            </td>
+            <td class="text-surface-700 px-4 py-4 text-sm">
+              {purchase.orderDate}
+            </td>
+            <td class="px-4 py-4 text-center">
+              <button class="text-surface-400 hover:text-surface-600" aria-label="더보기 옵션">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                  />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
   </div>
 </div>

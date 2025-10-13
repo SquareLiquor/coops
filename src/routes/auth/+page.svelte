@@ -1,8 +1,8 @@
 <!-- 소비자 로그인 페이지 - Skeleton UI 컨셉 -->
-<div class="flex min-h-screen items-center justify-center bg-surface-100 p-4">
+<div class="bg-surface-100 flex min-h-screen items-center justify-center p-4">
   <div class="w-full max-w-md">
     <!-- Login Card -->
-    <div class="space-y-6 card preset-outlined-surface-200-800 bg-surface-50 p-8 shadow-lg">
+    <div class="card preset-outlined-surface-200-800 bg-surface-50 space-y-6 p-8 shadow-lg">
       <header class="space-y-2 text-center">
         <h2 class="h3 font-bold">카카오로 시작하기</h2>
         <p class="opacity-75">카카오 계정으로 간편하게 시작하세요</p>
@@ -26,7 +26,7 @@
 
       <!-- Terms -->
       <div class="text-center">
-        <p class="text-xs text-surface-500">
+        <p class="text-surface-500 text-xs">
           로그인 시 <a href="/terms" class="anchor">이용약관</a> 및
           <a href="/privacy" class="anchor">개인정보처리방침</a>에 동의하게 됩니다.
         </p>

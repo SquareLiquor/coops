@@ -22,10 +22,10 @@
 </script>
 
 <!-- 가맹점/본사 관리자 로그인 페이지 - Skeleton UI 컨셉 -->
-<div class="flex min-h-screen items-center justify-center bg-surface-100 p-4">
+<div class="bg-surface-100 flex min-h-screen items-center justify-center p-4">
   <div class="w-full max-w-md">
     <!-- Main Content Card -->
-    <div class="space-y-5 card preset-outlined-surface-200-800 bg-surface-50 p-8 shadow-lg">
+    <div class="card preset-outlined-surface-200-800 bg-surface-50 space-y-5 p-8 shadow-lg">
       <!-- Login Form -->
       <header class="mb-6 space-y-2 text-center">
         <h2 class="h3 font-bold">{isSignUp ? '회원가입' : '로그인'}</h2>
@@ -36,11 +36,11 @@
 
       <!-- Divider with Toggle Link -->
       <div class="mb-4 flex items-center justify-center">
-        <hr class="flex-1 border-surface-300" />
-        <button class="px-4 anchor text-sm hover:text-primary-600" onclick={() => (isSignUp = !isSignUp)}>
+        <hr class="border-surface-300 flex-1" />
+        <button class="anchor hover:text-primary-600 px-4 text-sm" onclick={() => (isSignUp = !isSignUp)}>
           {isSignUp ? '로그인' : '회원가입'}
         </button>
-        <hr class="flex-1 border-surface-300" />
+        <hr class="border-surface-300 flex-1" />
       </div>
 
       {#if isSignUp}
@@ -73,14 +73,14 @@
 
           <button
             type="submit"
-            class="btn w-full rounded-lg bg-primary-500 py-3 font-medium text-white hover:bg-primary-600">로그인</button
+            class="btn bg-primary-500 hover:bg-primary-600 w-full rounded-lg py-3 font-medium text-white">로그인</button
           >
         </form>
       {:else}
         <form class="space-y-4">
           <label class="label">
             <span>매장 선택</span>
-            <select class="select h-8 px-4" bind:value={signupForm.storeId}>
+            <select class="select h-9 px-4" bind:value={signupForm.storeId}>
               {#each storeTypes as type}
                 <option value={type.value} class={type.value === 'hq' ? 'pl-2 font-bold' : 'pl-2'}>
                   {type.label}
@@ -130,7 +130,7 @@
 
           <button
             type="submit"
-            class="btn w-full rounded-lg bg-primary-500 py-3 font-medium text-white hover:bg-primary-600"
+            class="btn bg-primary-500 hover:bg-primary-600 w-full rounded-lg py-3 font-medium text-white"
             >회원가입</button
           >
         </form>
@@ -140,7 +140,7 @@
 
         <!-- Info Section -->
         <div class="space-y-2 text-center">
-          <p class="text-sm opacity-75">신청 후 본사 승인이 완료되면 서비스를 이용할 수 있습니다.</p>
+          <p class="text-sm opacity-75">신청 후 승인이 완료되면 서비스를 이용할 수 있습니다.</p>
         </div>
       {/if}
     </div>

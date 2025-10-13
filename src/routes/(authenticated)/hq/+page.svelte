@@ -100,7 +100,7 @@
       case 'active':
         return 'bg-green-100 text-green-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-surface-100 text-surface-800'
     }
   }
 
@@ -116,77 +116,85 @@
   <title>Dashboard - 본사</title>
 </svelte:head>
 
-<div class="h-full flex flex-col">
+<div class="flex h-full flex-col">
   <!-- Header -->
-  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+  <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
     <div class="flex items-center space-x-4">
-      <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <h1 class="text-surface-900 text-2xl font-bold">Dashboard</h1>
     </div>
   </div>
 
   <!-- Content -->
-  <div class="flex-1 p-6 space-y-6 overflow-auto">
+  <div class="flex-1 space-y-6 overflow-auto p-6">
     <!-- Welcome Section -->
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-      <h2 class="text-2xl font-bold mb-2">안녕하세요, 본사관리자님!</h2>
-      <p class="text-blue-100">오늘도 좋은 하루 되세요. 전체 가맹점 현황을 확인해보세요.</p>
+    <div class="text-surface-50 from-primary-500 to-primary-600 rounded-xl bg-gradient-to-r p-6">
+      <h2 class="mb-2 text-2xl font-bold">안녕하세요, 본사관리자님!</h2>
+      <p class="text-surface-50">오늘도 좋은 하루 되세요. 전체 가맹점 현황을 확인해보세요.</p>
     </div>
 
     <!-- Stats Cards -->
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div
+        class="border-surface-100 bg-surface-50/10 rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 class="tracking-tight text-sm font-medium text-gray-600">총 가맹점수</h3>
-          <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+          <h3 class="text-surface-600 text-sm font-medium tracking-tight">총 가맹점수</h3>
+          <svg class="text-surface-400 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
             <path
               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
             />
           </svg>
         </div>
         <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold text-gray-900">{stats.totalStores}</div>
-          <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">+2.4%</span>
+          <div class="text-surface-900 text-2xl font-bold">{stats.totalStores}</div>
+          <span class="rounded-full bg-green-50 px-2 py-1 text-xs text-green-600">+2.4%</span>
         </div>
       </div>
 
-      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div
+        class="border-surface-100 bg-surface-50/10 rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 class="tracking-tight text-sm font-medium text-gray-600">이번 달 발주건수</h3>
-          <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+          <h3 class="text-surface-600 text-sm font-medium tracking-tight">이번 달 발주건수</h3>
+          <svg class="text-surface-400 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
             <path
               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
         </div>
         <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold text-gray-900">{stats.totalOrders}</div>
-          <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">+12.1%</span>
+          <div class="text-surface-900 text-2xl font-bold">{stats.totalOrders}</div>
+          <span class="rounded-full bg-green-50 px-2 py-1 text-xs text-green-600">+12.1%</span>
         </div>
       </div>
 
-      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div
+        class="border-surface-100 bg-surface-50/10 rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 class="tracking-tight text-sm font-medium text-gray-600">총 발주금액</h3>
-          <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+          <h3 class="text-surface-600 text-sm font-medium tracking-tight">총 발주금액</h3>
+          <svg class="text-surface-400 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
           </svg>
         </div>
         <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalRevenue)}</div>
-          <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">+8.7%</span>
+          <div class="text-surface-900 text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+          <span class="rounded-full bg-green-50 px-2 py-1 text-xs text-green-600">+8.7%</span>
         </div>
       </div>
 
-      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div
+        class="border-surface-100 bg-surface-50/10 rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
         <div class="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 class="tracking-tight text-sm font-medium text-gray-600">승인 대기</h3>
-          <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+          <h3 class="text-surface-600 text-sm font-medium tracking-tight">승인 대기</h3>
+          <svg class="text-surface-400 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold text-gray-900">{stats.pendingApprovals}</div>
-          <span class="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">처리 필요</span>
+          <div class="text-surface-900 text-2xl font-bold">{stats.pendingApprovals}</div>
+          <span class="rounded-full bg-orange-50 px-2 py-1 text-xs text-orange-600">처리 필요</span>
         </div>
       </div>
     </div>
@@ -194,20 +202,20 @@
     <!-- Main Content Grid -->
     <div class="grid gap-6 lg:grid-cols-2">
       <!-- Recent Activities -->
-      <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div class="border-surface-100 bg-surface-50/10 rounded-xl border shadow-sm">
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
-            <h3 class="text-lg font-semibold text-gray-900">최근 활동</h3>
-            <a href="/hq/users" class="text-sm text-blue-600 hover:text-blue-800 font-medium"> 모두 보기 </a>
+            <h3 class="text-surface-900 text-lg font-semibold">최근 활동</h3>
+            <a href="/hq/users" class="text-primary-600 hover:text-primary-800 text-sm font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each recentActivities as activity}
               <div
-                class="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                class="hover:bg-surface-50 border-surface-50 flex items-center justify-between rounded-lg border p-4 transition-colors"
               >
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium text-gray-900">{activity.id}</span>
+                    <span class="text-surface-900 font-medium">{activity.id}</span>
                     <span
                       class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(activity.status)}`}
                     >
@@ -220,13 +228,13 @@
                             : '완료'}
                     </span>
                   </div>
-                  <div class="text-sm text-gray-600">
+                  <div class="text-surface-600 text-sm">
                     {activity.storeName} · {activity.managerName}
                   </div>
-                  <div class="text-sm text-gray-600">
+                  <div class="text-surface-600 text-sm">
                     {activity.action}
                   </div>
-                  <div class="text-xs text-gray-400">
+                  <div class="text-surface-400 text-xs">
                     {activity.createdAt}
                   </div>
                 </div>
@@ -237,30 +245,30 @@
       </div>
 
       <!-- Active Stores -->
-      <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div class="bg-surface-50/10 border-surface-100 rounded-xl border shadow-sm">
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
-            <h3 class="text-lg font-semibold text-gray-900">가맹점 현황</h3>
-            <a href="/hq/stores" class="text-sm text-blue-600 hover:text-blue-800 font-medium"> 모두 보기 </a>
+            <h3 class="text-surface-900 text-lg font-semibold">가맹점 현황</h3>
+            <a href="/hq/stores" class="text-primary-600 hover:text-primary-800 text-sm font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each activeStores as store}
               <div
-                class="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                class="hover:bg-surface-50 border-surface-50 flex items-center justify-between rounded-lg border p-4 transition-colors"
               >
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium text-gray-900">{store.name}</span>
+                    <span class="text-surface-900 font-medium">{store.name}</span>
                     <span
                       class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(store.status)}`}
                     >
                       {store.status === 'active' ? '운영중' : '대기중'}
                     </span>
                   </div>
-                  <div class="text-sm text-gray-600">
+                  <div class="text-surface-600 text-sm">
                     {store.manager} · {store.location}
                   </div>
-                  <div class="text-xs text-gray-400">
+                  <div class="text-surface-400 text-xs">
                     월 매출: {formatCurrency(store.monthlyRevenue)} · 발주건수: {store.orderCount}건
                   </div>
                 </div>
@@ -272,11 +280,11 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="border-surface-100 bg-surface-50/10 rounded-xl border shadow-sm">
       <div class="p-6">
-        <h3 class="text-lg font-semibold text-gray-900 pb-4">빠른 액션</h3>
+        <h3 class="text-surface-900 pb-4 text-lg font-semibold">빠른 액션</h3>
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <a href="/hq/users" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+          <a href="/hq/users" class="flex items-center rounded-lg bg-blue-50 p-4 transition-colors hover:bg-blue-100">
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -288,14 +296,14 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-900">사용자 관리</p>
-              <p class="text-sm text-gray-500">가맹점주 승인</p>
+              <p class="text-surface-900 text-sm font-medium">사용자 관리</p>
+              <p class="text-surface-500 text-sm">가맹점주 승인</p>
             </div>
           </a>
 
           <a
             href="/hq/stores"
-            class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+            class="flex items-center rounded-lg bg-green-50 p-4 transition-colors hover:bg-green-100"
           >
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,14 +316,14 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-900">매장 관리</p>
-              <p class="text-sm text-gray-500">가맹점 현황</p>
+              <p class="text-surface-900 text-sm font-medium">매장 관리</p>
+              <p class="text-surface-500 text-sm">가맹점 현황</p>
             </div>
           </a>
 
           <a
             href="/hq/products"
-            class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+            class="flex items-center rounded-lg bg-purple-50 p-4 transition-colors hover:bg-purple-100"
           >
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,14 +336,14 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-900">상품 관리</p>
-              <p class="text-sm text-gray-500">재고 및 상품</p>
+              <p class="text-surface-900 text-sm font-medium">상품 관리</p>
+              <p class="text-surface-500 text-sm">재고 및 상품</p>
             </div>
           </a>
 
           <a
             href="/hq/purchases"
-            class="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+            class="flex items-center rounded-lg bg-orange-50 p-4 transition-colors hover:bg-orange-100"
           >
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -348,8 +356,8 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-900">발주 관리</p>
-              <p class="text-sm text-gray-500">발주 승인</p>
+              <p class="text-surface-900 text-sm font-medium">발주 관리</p>
+              <p class="text-surface-500 text-sm">발주 승인</p>
             </div>
           </a>
         </div>
