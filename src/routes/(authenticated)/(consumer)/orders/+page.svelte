@@ -197,7 +197,7 @@
         {#each statusOptions as status}
           <button
             class={selectedStatus === status
-              ? 'bg-primary-500 rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap text-white'
+              ? 'bg-primary-500 text-surface-50 rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap'
               : 'border-surface-200 text-surface-700 hover:bg-surface-50 dark:text-surface-700 dark:hover:bg-surface-50 rounded-full border bg-white px-3 py-1 text-sm font-medium whitespace-nowrap transition-colors dark:bg-white'}
             onclick={() => (selectedStatus = status)}
           >

@@ -147,7 +147,7 @@
     <h1 class="text-surface-900 text-2xl font-bold">가맹점 관리</h1>
   </div>
   <button
-    class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+    class="bg-primary-500 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
   >
     새 매장 등록
   </button>
@@ -174,7 +174,7 @@
       {#each statusOptions as option}
         <button
           class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
-            ? 'bg-primary-300 text-primary-contrast shadow-sm'
+            ? 'bg-primary-500 text-primary-50 shadow-sm'
             : 'text-surface-600 hover:text-surface-800'}"
           on:click={() => (selectedStatus = option.value)}
         >

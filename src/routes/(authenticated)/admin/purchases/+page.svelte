@@ -1,66 +1,76 @@
 <script lang="ts">
   let purchases = [
     {
-      id: 'PUR-001',
+      id: null,
       supplier: '농협 안성팜',
       supplierPhone: '031-123-4567',
       product: '유기농 쌀 20kg',
-      quantity: 100,
+      quantity: 0,
+      unit: 'Box',
       unitPrice: 40000,
-      totalAmount: 4000000,
-      status: 'pending',
-      orderDate: '2024-12-18',
+      totalAmount: 0,
+      status: null,
+      paymentPoint: 0,
+      orderDate: '',
       expectedDelivery: '2024-12-25',
       category: '곡물',
     },
     {
-      id: 'PUR-002',
+      id: 'PUR-001',
       supplier: '제주 귤농장',
       supplierPhone: '064-987-6543',
       product: '제주 감귤 10kg',
       quantity: 50,
+      unit: 'Box',
       unitPrice: 25000,
       totalAmount: 1250000,
-      status: 'completed',
+      status: 'requested',
+      paymentPoint: 25000,
       orderDate: '2024-12-15',
       expectedDelivery: '2024-12-20',
       category: '과일',
     },
     {
-      id: 'PUR-003',
+      id: 'PUR-002',
       supplier: '강원도 감자마을',
       supplierPhone: '033-456-7890',
       product: '감자 15kg',
       quantity: 80,
+      unit: 'Box',
       unitPrice: 18000,
       totalAmount: 1440000,
-      status: 'processing',
+      status: 'confirmed',
+      paymentPoint: 0,
       orderDate: '2024-12-19',
       expectedDelivery: '2024-12-26',
       category: '채소',
     },
     {
-      id: 'PUR-004',
+      id: 'PUR-003',
       supplier: '부여 대추농장',
       supplierPhone: '041-555-1234',
       product: '건대추 2kg',
       quantity: 30,
+      unit: 'Box',
       unitPrice: 35000,
       totalAmount: 1050000,
-      status: 'approved',
+      status: 'delivery_started',
+      paymentPoint: 35000,
       orderDate: '2024-12-20',
       expectedDelivery: '2024-12-28',
       category: '과일',
     },
     {
-      id: 'PUR-005',
+      id: 'PUR-004',
       supplier: '충북 콩마을',
       supplierPhone: '043-777-8888',
       product: '백태 500g',
       quantity: 200,
+      unit: 'Box',
       unitPrice: 12000,
       totalAmount: 2400000,
       status: 'rejected',
+      paymentPoint: 0,
       orderDate: '2024-12-17',
       expectedDelivery: '2024-12-30',
       category: '곡물',
@@ -93,20 +103,37 @@
     { value: '유제품', label: '유제품' },
   ]
 
-  type PurchaseStatus = 'pending' | 'approved' | 'processing' | 'completed' | 'rejected'
+  type PurchaseStatus = 'requested' | 'confirmed' | 'delivery_started' | 'delivered' | 'rejected'
 
-  function getStatusText(status: string) {
+  function getStatusBadge(status: string | null) {
+    switch (status as PurchaseStatus) {
+      case 'requested':
+        return 'bg-yellow-100 text-yellow-700'
+      case 'confirmed':
+        return 'bg-emerald-100 text-emerald-700'
+      case 'delivery_started':
+        return 'bg-blue-100 text-blue-700'
+      case 'delivered':
+        return 'bg-green-100 text-green-700'
+      case 'rejected':
+        return 'bg-red-100 text-red-700'
+      default:
+        return 'bg-surface-100 text-surface-800'
+    }
+  }
+
+  function getStatusText(status: string | null) {
+    if (!status) return '-'
+
     const statusTextMap: Record<PurchaseStatus, string> = {
-      pending: '검토 중',
-      approved: '승인됨',
-      processing: '처리 중',
-      completed: '완료',
+      requested: '발주 요청',
+      confirmed: '승인됨',
+      delivery_started: '배송 시작',
+      delivered: '배송 완료',
       rejected: '거부됨',
     }
-    if (status in statusTextMap) {
-      return statusTextMap[status as PurchaseStatus]
-    }
-    return status
+
+    return statusTextMap[status as PurchaseStatus]
   }
 
   // Filtered purchases based on filters
@@ -133,7 +160,7 @@
 <!-- Header -->
 <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
   <div class="flex items-center space-x-4">
-    <h1 class="text-surface-900 text-2xl font-bold">발주관리</h1>
+    <h1 class="text-surface-900 text-2xl font-bold">발주 관리</h1>
   </div>
 </div>
 
@@ -168,7 +195,7 @@
         {#each categoryOptions as option}
           <button
             class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedCategory === option.value
-              ? 'bg-primary-300 text-primary-contrast shadow-sm'
+              ? 'bg-primary-500 text-primary-50 shadow-sm'
               : 'text-surface-600 hover:text-surface-800'}"
             on:click={() => (selectedCategory = option.value)}
           >
@@ -183,7 +210,7 @@
       {#each statusOptions as option}
         <button
           class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
-            ? 'bg-primary-300 text-primary-contrast shadow-sm'
+            ? 'bg-primary-500 text-primary-50 shadow-sm'
             : 'text-surface-600 hover:text-surface-800'}"
           on:click={() => (selectedStatus = option.value)}
         >
@@ -194,19 +221,21 @@
   </div>
 
   <div class="border-surface-100 overflow-hidden rounded-lg border bg-white">
-    <table class="min-w-full">
+    <table class="w-full table-auto">
       <thead class="bg-surface-50/50 border-surface-100 border-b">
         <tr>
           <th class="w-8 px-4 py-3 text-center">
             <span class="text-surface-500 text-xs font-medium">#</span>
           </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 발주 ID </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 공급업체 </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 상품명 </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 총액 </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 상태 </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> 발주일 </th>
-          <th class="w-8 px-4 py-3"></th>
+          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 발주 ID </th>
+          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 발주 상태 </th>
+          <th class="text-surface-500 w-[25%] px-4 py-3 text-sm font-bold"> 상품명 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 발주 수량 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 단가 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 총액 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 사용 포인트 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 발주일 </th>
+          <th class="px-4 py-3"></th>
         </tr>
       </thead>
       <tbody class="bg-white">
@@ -215,60 +244,43 @@
             <td class="text-surface-500 px-4 py-4 text-center text-sm">
               {index + 1}
             </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{purchase.id}</div>
+            <td class="text-surface-900 px-4 py-4 text-center text-sm">{purchase.id || '-'}</td>
+            <td class="px-4 py-4 text-center text-sm">
+              <span class="{getStatusBadge(purchase.status)} inline-block rounded-full px-3 py-1 text-xs font-medium">
+                {getStatusText(purchase.status) || '-'}
+              </span>
             </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{purchase.supplier}</div>
-              <div class="text-surface-500 text-sm">{purchase.supplierPhone}</div>
+            <td class="px-4 py-4 text-left">
+              <div class="flex flex-col items-start">
+                <span class="text-surface-900 text-sm font-medium">{purchase.product}</span>
+                <span class="text-surface-400 mt-1 text-xs">{purchase.category}</span>
+              </div>
             </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{purchase.product}</div>
-              <div class="text-surface-500 text-sm">{purchase.category}</div>
-            </td>
-            <td class="text-surface-700 px-4 py-4 text-sm">
-              ₩{purchase.totalAmount.toLocaleString()}
-            </td>
-            <td class="px-4 py-4">
-              {#if purchase.status === 'completed'}
-                <div class="flex items-center">
-                  <div class="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
-                  <span class="text-surface-700 text-sm">완료</span>
-                </div>
-              {:else if purchase.status === 'processing'}
-                <div class="flex items-center">
-                  <div class="mr-2 h-2 w-2 rounded-full bg-blue-500"></div>
-                  <span class="text-surface-700 text-sm">처리 중</span>
-                </div>
-              {:else if purchase.status === 'approved'}
-                <div class="flex items-center">
-                  <div class="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
-                  <span class="text-surface-700 text-sm">승인됨</span>
-                </div>
-              {:else if purchase.status === 'pending'}
-                <div class="flex items-center">
-                  <div class="mr-2 h-2 w-2 rounded-full bg-yellow-500"></div>
-                  <span class="text-surface-700 text-sm">검토 중</span>
-                </div>
+            <td class="text-surface-900 px-4 py-4 text-center text-sm font-medium whitespace-nowrap">
+              {#if purchase.quantity === 0}
+                -
               {:else}
-                <div class="flex items-center">
-                  <div class="bg-surface-400 mr-2 h-2 w-2 rounded-full"></div>
-                  <span class="text-surface-700 text-sm">{getStatusText(purchase.status)}</span>
-                </div>
+                {purchase.quantity.toLocaleString()}
+                {purchase.unit}
               {/if}
             </td>
-            <td class="text-surface-700 px-4 py-4 text-sm">
-              {purchase.orderDate}
+            <td class="text-surface-900 px-4 py-4 text-center text-sm font-medium whitespace-nowrap">
+              {purchase.unitPrice.toLocaleString()} 원
             </td>
-            <td class="px-4 py-4 text-center">
-              <button class="text-surface-400 hover:text-surface-600" aria-label="더보기 옵션">
-                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
-                  />
-                </svg>
-              </button>
+            <td class="text-surface-900 px-4 py-4 text-center text-sm font-medium whitespace-nowrap">
+              {#if purchase.quantity === 0}
+                -
+              {:else}
+                {purchase.totalAmount.toLocaleString()} 원
+              {/if}
             </td>
+            <td class="text-surface-900 px-4 py-4 text-center text-sm font-medium whitespace-nowrap">
+              {purchase.paymentPoint.toLocaleString()} P
+            </td>
+            <td class="text-surface-700 px-4 py-4 text-left text-sm whitespace-nowrap">
+              {purchase.orderDate || '-'}
+            </td>
+            <td class="px-4 py-4"></td>
           </tr>
         {/each}
       </tbody>

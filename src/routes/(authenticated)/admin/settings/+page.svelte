@@ -353,7 +353,7 @@
       class={`rounded-lg px-6 py-2 font-medium transition-colors ${
         saveStatus === 'saving'
           ? 'text-surface-500 bg-surface-300 cursor-not-allowed'
-          : 'bg-primary-600 hover:bg-primary-700 text-white'
+          : 'bg-primary-500 hover:bg-primary-700 text-white'
       }`}
     >
       설정 저장

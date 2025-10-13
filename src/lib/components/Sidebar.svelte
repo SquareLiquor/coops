@@ -59,14 +59,14 @@
             href={item.href}
             class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
               {currentPath === item.href
-              ? 'bg-primary-100 text-primary-900 border-primary-200 border'
+              ? 'bg-primary-500 text-primary-50 border-primary-200 border'
               : 'text-surface-700 hover:bg-surface-100'}"
             on:click={handleMenuClick}
           >
             <svg
               class="h-4 w-4 {currentPath === item.href
-                ? 'text-primary-700'
-                : 'text-surface-500 group-hover:text-surface-700'}"
+                ? 'text-primary-50'
+                : 'text-surface-700 group-hover:text-surface-700'}"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -86,7 +86,7 @@
       href={settingsPath}
       class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
         {currentPath === settingsPath
-        ? 'bg-primary-100 text-primary-900 border-primary-200 border'
+        ? 'bg-primary-500 text-primary-50 border-primary-200 border'
         : 'text-surface-700 hover:bg-surface-100'}"
       on:click={handleMenuClick}
     >

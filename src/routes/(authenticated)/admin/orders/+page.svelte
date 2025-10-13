@@ -5,6 +5,7 @@
       customerName: '김농부',
       customerPhone: '010-1234-5678',
       product: '유기농 쌀 10kg',
+      itemsCount: 0,
       category: '곡물',
       quantity: 2,
       amount: 90000,
@@ -17,6 +18,7 @@
       customerName: '이농부',
       customerPhone: '010-2345-6789',
       product: '사과 5kg',
+      itemsCount: 1,
       category: '과일',
       quantity: 1,
       amount: 25000,
@@ -29,6 +31,7 @@
       customerName: '박농부',
       customerPhone: '010-3456-7890',
       product: '친환경 배추 10포기',
+      itemsCount: 2,
       category: '채소',
       quantity: 1,
       amount: 18000,
@@ -41,6 +44,7 @@
       customerName: '정농부',
       customerPhone: '010-4567-8901',
       product: '제주 감귤 5kg',
+      itemsCount: 0,
       category: '과일',
       quantity: 3,
       amount: 75000,
@@ -53,6 +57,7 @@
       customerName: '최농부',
       customerPhone: '010-5678-9012',
       product: '청양고추 1kg',
+      itemsCount: 3,
       category: '채소',
       quantity: 2,
       amount: 24000,
@@ -139,7 +144,7 @@
 <!-- Header -->
 <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
   <div class="flex items-center space-x-4">
-    <h1 class="text-surface-900 text-2xl font-bold">주문관리</h1>
+    <h1 class="text-surface-900 text-2xl font-bold">주문 관리</h1>
   </div>
 </div>
 
@@ -175,7 +180,7 @@
           <button
             class="flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedCategory ===
             option.value
-              ? 'bg-primary-300 text-primary-contrast shadow-sm'
+              ? 'bg-primary-500 text-primary-50 shadow-sm'
               : 'text-surface-600 hover:text-surface-800'}"
             on:click={() => (selectedCategory = option.value)}
           >
@@ -202,7 +207,7 @@
       {#each statusOptions as option}
         <button
           class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
-            ? 'bg-primary-300 text-primary-contrast shadow-sm'
+            ? 'bg-primary-500 text-primary-50 shadow-sm'
             : 'text-surface-600 hover:text-surface-800'}"
           on:click={() => (selectedStatus = option.value)}
         >
@@ -213,19 +218,19 @@
   </div>
 
   <div class="border-surface-100 overflow-hidden rounded-lg border bg-white">
-    <table class="min-w-full">
+    <table class="w-full table-auto">
       <thead class="bg-surface-50/50 border-surface-100 border-b">
         <tr>
           <th class="w-8 px-4 py-3 text-center">
             <span class="text-surface-500 text-xs font-medium">#</span>
           </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Header </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Section Type </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Status </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Target </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Limit </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium"> Reviewer </th>
-          <th class="w-8 px-4 py-3"></th>
+          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 주문 번호 </th>
+          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 주문 상태 </th>
+          <th class="text-surface-500 w-[25%] px-4 py-3 text-sm font-bold"> 상품명 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 주문 금액 </th>
+          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 구매자 </th>
+          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 구매일자 </th>
+          <th class="px-4 py-3"></th>
         </tr>
       </thead>
       <tbody class="bg-white">
@@ -234,48 +239,29 @@
             <td class="text-surface-500 px-4 py-4 text-center text-sm">
               {index + 1}
             </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{order.product}</div>
+            <td class="text-surface-900 px-4 py-4 text-center text-sm">{order.id}</td>
+            <td class="px-4 py-4 text-center text-sm">
+              <span class="{getStatusBadge(order.status)} inline-block rounded-full px-3 py-1 text-xs font-medium">
+                {getStatusText(order.status)}
+              </span>
             </td>
-            <td class="px-4 py-4">
-              <span class="text-surface-700 text-sm">{order.category}</span>
+            <td class="px-4 py-4 text-left">
+              <div class="flex flex-col items-start">
+                <span class="text-surface-900 text-sm font-medium"
+                  >{order.product}
+                  {#if order.itemsCount && order.itemsCount > 0}
+                    외 {order.itemsCount}건
+                  {/if}
+                </span>
+              </div>
             </td>
-            <td class="px-4 py-4">
-              {#if order.status === 'completed'}
-                <div class="flex items-center">
-                  <div class="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
-                  <span class="text-surface-700 text-sm">Done</span>
-                </div>
-              {:else if order.status === 'processing'}
-                <div class="flex items-center">
-                  <div class="mr-2 h-2 w-2 rounded-full bg-yellow-500"></div>
-                  <span class="text-surface-700 text-sm">In Progress</span>
-                </div>
-              {:else}
-                <div class="flex items-center">
-                  <div class="bg-surface-400 mr-2 h-2 w-2 rounded-full"></div>
-                  <span class="text-surface-700 text-sm">{getStatusText(order.status)}</span>
-                </div>
-              {/if}
-            </td>
-            <td class="text-surface-700 px-4 py-4 text-sm">
-              {Math.floor(Math.random() * 30) + 1}
-            </td>
-            <td class="text-surface-700 px-4 py-4 text-sm">
-              {Math.floor(Math.random() * 15) + 5}
-            </td>
-            <td class="text-surface-700 px-4 py-4 text-sm">
-              {order.customerName}
-            </td>
-            <td class="px-4 py-4 text-center">
-              <button class="text-surface-400 hover:text-surface-600" aria-label="주문 옵션 더보기">
-                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
-                  />
-                </svg>
-              </button>
-            </td>
+            <td class="text-surface-900 px-4 py-4 text-center text-sm font-medium whitespace-nowrap"
+              >{order.amount.toLocaleString()} 원</td
+            >
+            <td class="text-surface-700 px-4 py-4 text-center text-sm">{order.customerName}</td>
+            <td class="text-surface-700 px-4 py-4 text-center text-sm whitespace-nowrap">{order.createdAt}</td>
+
+            <td class="px-4 py-4"></td>
           </tr>
         {/each}
       </tbody>

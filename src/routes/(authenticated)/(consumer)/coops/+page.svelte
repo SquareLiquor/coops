@@ -188,7 +188,7 @@
         {#each categories as category}
           <button
             class={selectedCategory === category
-              ? 'bg-primary-500 rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap text-white'
+              ? 'bg-primary-500 text-surface-50 rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap'
               : 'border-surface-200 text-surface-700 hover:bg-surface-50 dark:text-surface-700 dark:hover:bg-surface-50 rounded-full border bg-white px-3 py-1 text-sm font-medium whitespace-nowrap transition-colors dark:bg-white'}
             onclick={() => (selectedCategory = category)}
           >
@@ -344,7 +344,7 @@
     </div>
 
     <button
-      class="bg-primary-500 hover:bg-primary-600 rounded-lg px-6 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+      class="bg-primary-500 hover:bg-primary-600 text-surface-50 rounded-lg px-6 py-2 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       onclick={() => (isCartOpen = true)}
       disabled={cartItemsCount === 0}
     >
@@ -422,7 +422,7 @@
               >총 {cartTotal.toLocaleString()}원</span
             >
             <button
-              class="bg-primary-500 hover:bg-primary-600 rounded-lg px-6 py-2 font-medium text-white transition-colors"
+              class="bg-primary-500 hover:bg-primary-600 text-surface-50 rounded-lg px-6 py-2 font-medium transition-colors"
               >주문하기</button
             >
           </div>

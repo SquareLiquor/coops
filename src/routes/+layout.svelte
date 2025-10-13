@@ -27,7 +27,6 @@
 </svelte:head>
 
 <div class="from-surface-50/50 to-surface-50/10 min-h-screen bg-gradient-to-br">
-  <!-- <div class="bg-surface-100 flex h-screen"> -->
   {@render children?.()}
   <Notifications />
   <!-- </div> -->

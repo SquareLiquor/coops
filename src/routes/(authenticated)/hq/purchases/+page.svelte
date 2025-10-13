@@ -258,7 +258,7 @@
         {#each storeOptions as option}
           <button
             class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStore === option.value
-              ? 'bg-primary-300 text-primary-contrast shadow-sm'
+              ? 'bg-primary-500 text-primary-50 shadow-sm'
               : 'text-surface-600 hover:text-surface-800'}"
             on:click={() => (selectedStore = option.value)}
           >
@@ -273,7 +273,7 @@
       {#each statusOptions as option}
         <button
           class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
-            ? 'bg-primary-300 text-primary-contrast shadow-sm'
+            ? 'bg-primary-500 text-primary-50 shadow-sm'
             : 'text-surface-600 hover:text-surface-800'}"
           on:click={() => (selectedStatus = option.value)}
         >

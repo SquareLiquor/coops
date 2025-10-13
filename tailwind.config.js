@@ -1,5 +1,3 @@
-import { skeleton } from '@skeletonlabs/skeleton/plugin'
-import * as themes from '@skeletonlabs/skeleton/themes'
 import forms from '@tailwindcss/forms'
 import typography from '@tailwindcss/typography'
 
@@ -15,8 +13,8 @@ export default {
   plugins: [
     forms(),
     typography(),
-    skeleton({
-      themes: [themes.legacy],
-    }),
+    // skeleton({
+    //   themes: [themes.legacy],
+    // }),
   ],
 }
