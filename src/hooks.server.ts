@@ -1,6 +1,6 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createServerClient } from '@supabase/ssr'
-import { type Handle } from '@sveltejs/kit'
+import { redirect, type Handle } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
 const supabase: Handle = async ({ event, resolve }) => {
@@ -70,7 +70,21 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.session = session
   event.locals.user = user
 
-  console.log('hooks', session, user)
+  const { app_metadata } = user || {}
+  const { role, status } = app_metadata || {}
+
+  if (status === 'pending' && !event.url.pathname.startsWith('/auth/admin/pending')) {
+    redirect(303, '/auth/admin/pending')
+  }
+
+  if (role === 'branch' && !event.url.pathname.startsWith('/admin')) {
+    redirect(303, '/admin')
+  }
+
+  if (role === 'hq' && !event.url.pathname.startsWith('/hq')) {
+    redirect(303, '/hq')
+  }
+
   // if (!event.locals.session && event.url.pathname.startsWith('/')) {
   //   redirect(303, '/auth')
   // }
