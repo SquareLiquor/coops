@@ -7,7 +7,7 @@ import type { RemoteFormInput } from '@sveltejs/kit'
  */
 export const getFormData = async <T = string, K extends string = string>(
   data: RemoteFormInput,
-  ...items: K[]
+  items: K[]
 ): Promise<{ [key in K]: T }> => {
   const result: { [key: string]: T } = {}
 
@@ -30,7 +30,7 @@ export const getFormData = async <T = string, K extends string = string>(
  */
 export const getRequestFormData = async <T = string, K extends string = string>(
   request: Request,
-  ...items: K[]
+  items: K[]
 ): Promise<{ [key in K]: T }> => {
   const formData = await request.formData()
 
