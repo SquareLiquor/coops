@@ -1,18 +1,19 @@
 <script lang="ts">
-  import type { StorePublic } from '$lib/types/store.js'
-  import { onlyEmailInput, onlyNumberInput } from '$lib/utils/input'
+  import { enhance } from '$app/forms'
+  import { onlyEmailInput, onlyNumberInput } from '$lib/utils'
+  import type { PageProps } from './$types'
 
-  let { data, form } = $props()
+  let { data, form }: PageProps = $props()
+  let { stores } = $derived(data)
 
   let isSignUp = $state(false)
-  const stores: StorePublic[] = data.stores || []
 </script>
 
 <!-- 가맹점/본사 관리자 로그인 페이지 - Skeleton UI 컨셉 -->
-<div class="bg-surface-100 flex min-h-screen items-center justify-center p-4">
+<div class="flex min-h-screen items-center justify-center p-4">
   <div class="w-full max-w-md">
     <!-- Main Content Card -->
-    <div class="card preset-outlined-surface-200-800 bg-surface-50 space-y-5 p-8 shadow-lg">
+    <div class="card preset-outlined-surface-200-800 bg-surface-50/10 space-y-5 p-8 shadow-lg">
       <!-- Login Form -->
       <header class="mb-6 space-y-2 text-center">
         <h2 class="h3 font-bold">{isSignUp ? '회원가입' : '로그인'}</h2>
@@ -31,42 +32,33 @@
       </div>
 
       {#if !isSignUp}
-        <!-- Login Error Display -->
-        {#if form?.error && !isSignUp}
-          <div class="alert variant-filled-error mb-4">
-            <div class="alert-message">
-              <p>{form.error}</p>
-            </div>
-          </div>
-        {/if}
-
-        <form class="space-y-4" method="POST" action="?/signin">
+        <form class="space-y-4" method="POST" action="?/signin" use:enhance>
           <label class="label">
             <span>관리자 이메일</span>
             <input
-              class="input placeholder:text-surface-200 {form?.errors?.email ? 'input-error' : ''}"
+              class="input placeholder:text-surface-200 {form?.error?.email ? 'input-error' : ''}"
               type="email"
               name="email"
               placeholder="관리자 이메일을 입력하세요"
               required
               oninput={onlyEmailInput}
             />
-            {#if form?.errors?.email}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.email}</span>
+            {#if form?.error?.email}
+              <span class="text-error-500 mt-1 text-sm">{form.error.email}</span>
             {/if}
           </label>
 
           <label class="label">
             <span>비밀번호</span>
             <input
-              class="input placeholder:text-surface-200 {form?.errors?.password ? 'input-error' : ''}"
+              class="input placeholder:text-surface-200 {form?.error?.password ? 'input-error' : ''}"
               type="password"
               name="password"
               placeholder="비밀번호를 입력하세요"
               required
             />
-            {#if form?.errors?.password}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.password}</span>
+            {#if form?.error?.password}
+              <span class="text-error-500 mt-1 text-sm">{form.error.password}</span>
             {/if}
           </label>
 
@@ -82,47 +74,26 @@
           >
         </form>
       {:else}
-        <!-- Signup Error Display -->
-        {#if form?.error && isSignUp}
-          <div class="alert variant-filled-error mb-4">
-            <div class="alert-message">
-              <p>{form.error}</p>
-            </div>
-          </div>
-        {/if}
-
-        <!-- Signup Success Display -->
-        {#if form?.success && isSignUp}
-          <div class="alert variant-filled-success mb-4">
-            <div class="alert-message">
-              <p>{form.message || '회원가입이 완료되었습니다.'}</p>
-            </div>
-          </div>
-        {/if}
-
-        <form class="space-y-4" method="POST" action="?/signup">
+        <form class="space-y-4" method="POST" action="?/signup" use:enhance>
           <label class="label">
             <span>매장 선택</span>
-            <select class="select h-9 px-4 {form?.errors?.storeId ? 'input-error' : ''}" name="store" required>
+            <select class="select h-9 px-4 {form?.error?.storeId ? 'input-error' : ''}" name="storeId" required>
               <option value="" disabled selected>선택</option>
               {#each stores as store}
-                <option
-                  value={[store.type, store.id].join('|')}
-                  class={store.type === 'hq' ? 'pl-2 font-bold' : 'pl-2'}
-                >
+                <option value={store.id} class={store.type === 'hq' ? 'pl-2 font-bold' : 'pl-2'}>
                   {store.name}
                 </option>
               {/each}
             </select>
-            {#if form?.errors?.storeId}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.storeId}</span>
+            {#if form?.error?.storeId}
+              <span class="text-error-500 mt-1 text-sm">{form.error.storeId}</span>
             {/if}
           </label>
 
           <label class="label">
             <span>관리자 이메일</span>
             <input
-              class="input placeholder:text-surface-200 {form?.errors?.email ? 'input-error' : ''}"
+              class="input placeholder:text-surface-200 {form?.error?.email ? 'input-error' : ''}"
               type="email"
               name="email"
               placeholder="관리자 이메일을 입력하세요"
@@ -130,34 +101,30 @@
               oninput={onlyEmailInput}
               value="aaa@aaa.com"
             />
-            {#if form?.errors?.email}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.email}</span>
+            {#if form?.error?.email}
+              <span class="text-error-500 mt-1 text-sm">{form.error.email}</span>
             {/if}
           </label>
 
           <label class="label">
             <span>이름</span>
             <input
-              class="input placeholder:text-surface-200 {form?.errors?.name ? 'input-error' : ''}"
+              class="input placeholder:text-surface-200 {form?.error?.name ? 'input-error' : ''}"
               type="text"
               name="name"
               placeholder="이름을 입력하세요"
               required
               value="김강남"
             />
-            {#if form?.errors?.name}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.name}</span>
+            {#if form?.error?.name}
+              <span class="text-error-500 mt-1 text-sm">{form.error.name}</span>
             {/if}
           </label>
 
           <label class="label">
             <span>전화번호</span>
             <div class="flex gap-2">
-              <select
-                class="select w-16 text-center {form?.errors?.phone1 ? 'input-error' : ''}"
-                name="phone1"
-                required
-              >
+              <select class="select w-16 text-center {form?.error?.phone1 ? 'input-error' : ''}" name="phone1" required>
                 <option value="" disabled selected>선택</option>
                 <option value="010">010</option>
                 <option value="011">011</option>
@@ -168,7 +135,7 @@
               </select>
               <span class="self-center">-</span>
               <input
-                class="input w-20 text-center {form?.errors?.phone2 ? 'input-error' : ''}"
+                class="input w-20 text-center {form?.error?.phone2 ? 'input-error' : ''}"
                 type="tel"
                 name="phone2"
                 placeholder=""
@@ -179,7 +146,7 @@
               />
               <span class="self-center">-</span>
               <input
-                class="input w-20 text-center {form?.errors?.phone3 ? 'input-error' : ''}"
+                class="input w-20 text-center {form?.error?.phone3 ? 'input-error' : ''}"
                 type="tel"
                 name="phone3"
                 placeholder=""
@@ -189,19 +156,19 @@
                 value="1111"
               />
             </div>
-            {#if form?.errors?.phone1}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.phone1}</span>
-            {:else if form?.errors?.phone2}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.phone2}</span>
-            {:else if form?.errors?.phone3}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.phone3}</span>
+            {#if form?.error?.phone1}
+              <span class="text-error-500 mt-1 text-sm">{form.error.phone1}</span>
+            {:else if form?.error?.phone2}
+              <span class="text-error-500 mt-1 text-sm">{form.error.phone2}</span>
+            {:else if form?.error?.phone3}
+              <span class="text-error-500 mt-1 text-sm">{form.error.phone3}</span>
             {/if}
           </label>
 
           <label class="label">
             <span>비밀번호</span>
             <input
-              class="input placeholder:text-surface-200 {form?.errors?.password ? 'input-error' : ''}"
+              class="input placeholder:text-surface-200 {form?.error?.password ? 'input-error' : ''}"
               type="password"
               name="password"
               placeholder="8자 이상"
@@ -209,22 +176,22 @@
               required
               value="11111111"
             />
-            {#if form?.errors?.password}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.password}</span>
+            {#if form?.error?.password}
+              <span class="text-error-500 mt-1 text-sm">{form.error.password}</span>
             {/if}
           </label>
           <label class="label">
             <span>비밀번호 확인</span>
             <input
-              class="input placeholder:text-surface-200 {form?.errors?.confirmPassword ? 'input-error' : ''}"
+              class="input placeholder:text-surface-200 {form?.error?.confirmPassword ? 'input-error' : ''}"
               type="password"
               name="confirmPassword"
               placeholder="재입력"
               required
               value="11111111"
             />
-            {#if form?.errors?.confirmPassword}
-              <span class="text-error-500 mt-1 text-sm">{form.errors.confirmPassword}</span>
+            {#if form?.error?.confirmPassword}
+              <span class="text-error-500 mt-1 text-sm">{form.error.confirmPassword}</span>
             {/if}
           </label>
 

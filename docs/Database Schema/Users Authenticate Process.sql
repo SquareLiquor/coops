@@ -25,13 +25,56 @@
 -- for each row
 -- execute function public.handle_user_signup();
 
+-- ==============================
+-- 2) app_metadata 업데이트 Edge Function
+-- ==============================
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
+
+Deno.serve(async (req)=>{
+  try {
+    const { user_id, user_type } = await req.json();
+    
+    let approve_status = user_type === 'consumer' ? 'approved' : 'pending';
+    
+    // app_metadata 업데이트
+    const { data: userData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
+      app_metadata: {
+        user_type,
+        approve_status
+      }
+    });
+    
+    if (updateError) throw updateError;
+    
+    return new Response(JSON.stringify({
+      success: true
+    }), {
+      status: 200
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({
+      error: err.message
+    }), {
+      status: 500
+    });
+  }
+});
+
 
 
 -- ==============================
--- 2) 승인 처리 Edge Function
+-- 3) 승인 처리 Edge Function
 -- ==============================
 import { serve } from "https://deno.land/x/sift/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
 serve(async (req) => {
   try {
@@ -40,15 +83,14 @@ serve(async (req) => {
 
     if (!user_id) return new Response("user_id required", { status: 400 });
 
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
-
     // app_metadata 업데이트
     const { error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
-      app_metadata: { status: "approved", role: "branch/hq" },
+      app_metadata: { approve_status: "approved" },
     });
+
+    // 승인 요청 테이블 업데이트
+
+    // store_members 테이블 업데이트
 
     if (error) return new Response(error.message, { status: 500 });
 

@@ -66,32 +66,30 @@ const supabase: Handle = async ({ event, resolve }) => {
 }
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  const { session, user } = await event.locals.safeGetSession()
-  event.locals.session = session
-  event.locals.user = user
+  const { locals, url, route } = event
+  const { session, user } = await locals.safeGetSession()
+  locals.session = session
+  locals.user = user
 
-  const { app_metadata } = user || {}
-  const { role, status } = app_metadata || {}
+  const { role, app_metadata } = user || {}
+  const { approve_status, user_type } = app_metadata || {}
 
-  if (status === 'pending' && !event.url.pathname.startsWith('/auth/admin/pending')) {
-    redirect(303, '/auth/admin/pending')
+  console.log('hooks', role, approve_status, route.id)
+
+  // authenticated guard
+  if (role !== 'authenticated' && (url.pathname === '/' || route.id?.includes('(authenticated)'))) {
+    throw redirect(303, '/auth')
   }
 
-  if (role === 'branch' && !event.url.pathname.startsWith('/admin')) {
-    redirect(303, '/admin')
+  // approve status guard
+  if (approve_status === 'pending' && !url.pathname.startsWith('/auth/pending')) {
+    redirect(303, '/auth/pending')
   }
 
-  if (role === 'hq' && !event.url.pathname.startsWith('/hq')) {
-    redirect(303, '/hq')
+  // TO-DO: user type guard
+  if (user_type === 'consumer' && url.pathname === '/') {
+    redirect(303, '/coops')
   }
-
-  // if (!event.locals.session && event.url.pathname.startsWith('/')) {
-  //   redirect(303, '/auth')
-  // }
-
-  // if (event.locals.session && event.url.pathname === '/auth') {
-  //   redirect(303, '/')
-  // }
 
   return resolve(event)
 }

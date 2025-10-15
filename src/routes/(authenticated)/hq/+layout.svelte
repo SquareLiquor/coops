@@ -2,6 +2,7 @@
   import Sidebar from '$lib/components/Sidebar.svelte'
   import { onMount } from 'svelte'
 
+  let { children } = $props()
   let mobileMenuOpen = $state(false)
 
   function closeMobileMenu() {
@@ -54,7 +55,7 @@
   <!-- Mobile menu button -->
   <button
     class="border-surface-200 fixed top-4 left-4 z-50 rounded-md border bg-white p-2 shadow-sm lg:hidden"
-    on:click={() => (mobileMenuOpen = !mobileMenuOpen)}
+    onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
     aria-label="메뉴 토글"
   >
     <svg class="text-surface-600 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,21 +84,19 @@
 
   <!-- Overlay for mobile -->
   {#if mobileMenuOpen}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
+    <button
+      type="button"
       class="bg-opacity-75 bg-surface-600 fixed inset-0 z-30 lg:hidden"
-      on:click={() => (mobileMenuOpen = false)}
-      role="button"
-      tabindex="0"
-    ></div>
+      onclick={() => (mobileMenuOpen = false)}
+      aria-label="모바일 메뉴 닫기"
+    ></button>
   {/if}
 
   <div class="flex flex-1 flex-col overflow-hidden">
     <!-- Main content area -->
     <main class="flex-1 p-6">
       <div class="border-surface-100 rounded-lg border bg-white shadow-sm md:h-[calc(100vh-3rem)] md:overflow-auto">
-        <slot />
+        {@render children?.()}
       </div>
     </main>
   </div>

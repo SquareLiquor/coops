@@ -1,9 +1,9 @@
 import type { StorePublic } from '$lib/types'
-import { getRequestFormData } from '$lib/utils/form'
+import { getRequestFormData } from '$lib/utils'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-const signupFields = ['email', 'name', 'phone1', 'phone2', 'phone3', 'password', 'confirmPassword', 'store']
+const signupFields = ['email', 'name', 'phone1', 'phone2', 'phone3', 'password', 'confirmPassword', 'storeId']
 const signinFields = ['email', 'password']
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
@@ -27,33 +27,31 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 export const actions: Actions = {
   signup: async ({ request, locals: { supabase } }) => {
-    const { email, name, phone1, phone2, phone3, password, confirmPassword, store } = await getRequestFormData(
+    const { email, name, phone1, phone2, phone3, password, confirmPassword, storeId } = await getRequestFormData(
       request,
       signupFields
     )
 
-    const [store_type, store_id] = store.split('|')
-
     // Business logic validation only
-    const errors: Record<string, string> = {}
+    const error: Record<string, string> = {}
 
     // Only validate phone number format (business logic)
     if (phone2 && phone2.length !== 4) {
-      errors.phone2 = '전화번호 두 번째 부분은 4자리여야 합니다.'
+      error.phone2 = '전화번호 두 번째 부분은 4자리여야 합니다.'
     }
 
     if (phone3 && phone3.length !== 4) {
-      errors.phone3 = '전화번호 세 번째 부분은 4자리여야 합니다.'
+      error.phone3 = '전화번호 세 번째 부분은 4자리여야 합니다.'
     }
 
     // Only validate password confirmation match (business logic)
     if (password !== confirmPassword) {
-      errors.confirmPassword = '비밀번호가 일치하지 않습니다.'
+      error.confirmPassword = '비밀번호가 일치하지 않습니다.'
     }
 
     // Return errors if any exist
-    if (Object.keys(errors).length > 0) {
-      return fail(400, { errors })
+    if (Object.keys(error).length > 0) {
+      return fail(400, { errors: error })
     }
 
     const { data: signupData, error: signupError } = await supabase.auth.signUp({
@@ -81,8 +79,7 @@ export const actions: Actions = {
       method: 'POST',
       body: {
         user_id: signupData.user.id,
-        store_type,
-        store_id,
+        user_type: storeId ? 'admin' : 'consumer',
       },
     })
 
@@ -91,17 +88,13 @@ export const actions: Actions = {
       return fail(400, { error: '회원가입 실패: ' + (grantError?.message ?? '알 수 없는 오류') })
     }
 
-    return {
-      success: true,
-      message: '회원가입이 완료되었습니다. 승인 후 서비스를 이용할 수 있습니다.',
-    }
+    throw redirect(303, '/')
   },
 
   signin: async ({ request, locals: { supabase } }) => {
     const { email, password } = await getRequestFormData(request, signinFields)
 
     // No validation needed - HTML handles required fields and email format
-
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error || !data.session) {

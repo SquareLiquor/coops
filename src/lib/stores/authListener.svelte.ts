@@ -1,7 +1,7 @@
 import { invalidate } from '$app/navigation'
+import { clearAuth, setAuth } from '$lib/stores'
+import { createBrowserClient } from '$lib/supabase'
 import type { Session, User } from '@supabase/supabase-js'
-import { clearAuth, setAuth } from '$lib/stores/auth.svelte'
-import { createBrowserClient } from '$lib/supabase/browser'
 
 let lastSession = $state<Session | null>(null)
 
@@ -29,10 +29,8 @@ export function initAuthListener() {
       newSession: newSession?.expires_at,
     })
 
-    if (!user) {
-      syncAuthFromUser(user)
-      return
-    }
+    // 사용자 상태를 store에 동기화
+    syncAuthFromUser(user)
   })
   return () => subscription.unsubscribe
 }

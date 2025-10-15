@@ -1,15 +1,17 @@
 <script lang="ts">
   import favicon from '$lib/assets/favicon.svg'
   import Notifications from '$lib/components/Notifications.svelte'
-  import { initAuthListener, syncAuthFromUser } from '$lib/stores/authListener.svelte'
+  import { initAuthListener, syncAuthFromUser } from '$lib/stores'
   import { onMount } from 'svelte'
   import '../app.css'
 
   let { data, children } = $props()
   let { user } = data
 
-  // 서버 세션 정보로 초기 상태 설정 (SSR 지원)
-  syncAuthFromUser(user)
+  // 서버 세션 정보 변경 시에만 store 동기화 (SSR 지원 + 효율적)
+  $effect(() => {
+    syncAuthFromUser(user)
+  })
 
   onMount(() => {
     // initAuthListener를 즉시 호출하여 실시간 인증 상태 감지
