@@ -1,6 +1,7 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { approvalStatusGuard, authenticatedGuard, userTypeGuard } from '$lib/guards'
 import { createServerClient } from '@supabase/ssr'
-import { redirect, type Handle } from '@sveltejs/kit'
+import { type Handle } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
 const supabase: Handle = async ({ event, resolve }) => {
@@ -66,32 +67,13 @@ const supabase: Handle = async ({ event, resolve }) => {
 }
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  const { locals, url, route } = event
-  const { session, user } = await locals.safeGetSession()
-  locals.session = session
-  locals.user = user
-
-  const { role, app_metadata } = user || {}
-  const { approve_status, user_type } = app_metadata || {}
-
-  console.log('hooks', role, approve_status, route.id)
-
-  // authenticated guard
-  if (role !== 'authenticated' && (url.pathname === '/' || route.id?.includes('(authenticated)'))) {
-    throw redirect(303, '/auth')
-  }
-
-  // approve status guard
-  if (approve_status === 'pending' && !url.pathname.startsWith('/auth/pending')) {
-    redirect(303, '/auth/pending')
-  }
-
-  // TO-DO: user type guard
-  if (user_type === 'consumer' && url.pathname === '/') {
-    redirect(303, '/coops')
-  }
+  const { session, user } = await event.locals.safeGetSession()
+  event.locals.session = session
+  event.locals.user = user
 
   return resolve(event)
 }
 
-export const handle: Handle = sequence(supabase, authGuard)
+const customGuards = [authenticatedGuard, userTypeGuard, approvalStatusGuard]
+
+export const handle: Handle = sequence(supabase, authGuard, ...customGuards)

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { auth } from '$lib/stores'
+  import { getAuth } from '$lib/stores'
   import { createBrowserClient } from '$lib/supabase'
 
   const supabase = createBrowserClient()
 
-  const user = $derived(auth.user)
+  const user = $derived(getAuth().user)
   const store = {
     name: '강남점',
     logo: '🏪',

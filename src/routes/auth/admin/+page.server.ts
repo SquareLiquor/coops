@@ -1,5 +1,8 @@
-import type { StorePublic } from '$lib/types'
-import { getRequestFormData } from '$lib/utils'
+import { SignUpError } from '$lib/errors'
+import { signupHook } from '$lib/hooks/'
+import type { SignupContext, SignupFormData, StorePublic } from '$lib/types'
+import { extractFormFields } from '$lib/utils/form'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
@@ -27,72 +30,33 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 export const actions: Actions = {
   signup: async ({ request, locals: { supabase } }) => {
-    const { email, name, phone1, phone2, phone3, password, confirmPassword, storeId } = await getRequestFormData(
-      request,
-      signupFields
-    )
+    const formData = (await extractFormFields(request, signupFields)) as SignupFormData
 
-    // Business logic validation only
-    const error: Record<string, string> = {}
+    try {
+      await signupHook.runBefore({ formData })
 
-    // Only validate phone number format (business logic)
-    if (phone2 && phone2.length !== 4) {
-      error.phone2 = '전화번호 두 번째 부분은 4자리여야 합니다.'
+      const { data } = await signUp(formData, supabase)
+
+      await signupHook.runAfter({ formData, createdUser: data.user })
+
+      return redirect(303, '/')
+    } catch (error) {
+      if (error instanceof SignUpError) {
+        console.error(error.message)
+        // await supabase.auth.admin.deleteUser(data?.user?.id ?? '')
+        signupHook.runCleanup({ formData })
+
+        const { status, details } = error
+
+        return fail(status, { error: details })
+      }
+
+      return fail(400, { error: '회원 가입 중 오류가 발생하였습니다.' })
     }
-
-    if (phone3 && phone3.length !== 4) {
-      error.phone3 = '전화번호 세 번째 부분은 4자리여야 합니다.'
-    }
-
-    // Only validate password confirmation match (business logic)
-    if (password !== confirmPassword) {
-      error.confirmPassword = '비밀번호가 일치하지 않습니다.'
-    }
-
-    // Return errors if any exist
-    if (Object.keys(error).length > 0) {
-      return fail(400, { errors: error })
-    }
-
-    const { data: signupData, error: signupError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          phone: `${phone1}-${phone2}-${phone3}`,
-        },
-      },
-    })
-
-    if (signupError) {
-      console.log('signup error', signupError)
-      return fail(400, { error: '회원가입 실패: ' + (signupError?.message ?? '알 수 없는 오류') })
-    }
-
-    if (!signupData.user || !signupData.user.id) {
-      console.log('signup error', signupError)
-      return fail(400, { error: '회원가입 실패: ' + '권한 부여 에러' })
-    }
-
-    const { data: grantData, error: grantError } = await supabase.functions.invoke('grant_user_role', {
-      method: 'POST',
-      body: {
-        user_id: signupData.user.id,
-        user_type: storeId ? 'admin' : 'consumer',
-      },
-    })
-
-    if (grantError) {
-      console.log('grant error', grantError)
-      return fail(400, { error: '회원가입 실패: ' + (grantError?.message ?? '알 수 없는 오류') })
-    }
-
-    throw redirect(303, '/')
   },
 
   signin: async ({ request, locals: { supabase } }) => {
-    const { email, password } = await getRequestFormData(request, signinFields)
+    const { email, password } = await extractFormFields(request, signinFields)
 
     // No validation needed - HTML handles required fields and email format
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
@@ -105,3 +69,38 @@ export const actions: Actions = {
     throw redirect(303, '/admin')
   },
 }
+
+const signUp = async (formData: SignupFormData, supabase: SupabaseClient) => {
+  const { email, name, phone1, phone2, phone3, password } = formData
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        display_name: name,
+        phone: `${phone1}-${phone2}-${phone3}`,
+      },
+    },
+  })
+
+  if (error) {
+    throw new SignUpError(`회원가입 실패: ${error?.message ?? '알 수 없는 오류'}`, {
+      status: 400,
+      code: 'signup_error',
+      details: { error: '' },
+    })
+  }
+
+  if (!data.user || !data.user.id) {
+    throw new SignUpError('회원가입 실패: 사용자 없음', {
+      status: 400,
+      code: 'no_user_error',
+      details: { error: '' },
+    })
+  }
+
+  return { data }
+}
+
+const signIn = async ({ formData }: SignupContext, supabase: SupabaseClient) => {}

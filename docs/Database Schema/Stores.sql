@@ -188,3 +188,26 @@ FROM public.stores;
 
 -- anon 사용자에게 SELECT 권한 부여
 GRANT SELECT ON public.stores_public TO anon;
+
+
+
+
+
+
+
+
+
+
+
+- 승인 요청 정보를 관리하는 테이블 생성
+  - 상태 관리 enum 필요
+  - 사유 필드 필요(default값 필요)
+  - 요청자는 회원가입 사용자 (auth.users)
+  - 승인자는 본사 사용자(auth.users)
+  - store_id 필요
+- 관리자가 회원가입 시에 승인 요청 edge functions를 호출 (그냥 테이블에 insert로 처리가 나은가?)
+  - 승인 요청 테이블에 데이터 생성
+  - 승인은 본사 사용자가 처리함.
+- 승인을 처리하는 edge function을 호출
+  - 승인 요청 테이블을 업데이트
+  - store_members에 데이터 생성

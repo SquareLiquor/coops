@@ -1,45 +1,69 @@
+import type { FormData } from '$lib/types'
 import type { RemoteFormInput } from '@sveltejs/kit'
 
 /**
- * Returns the formData items you request.
+ * RemoteFormInput 데이터에서 지정된 필드들을 추출합니다.
  *
- * @example const { email, password } = await getFormData(data, 'email', 'password')
+ * @template T 필드 값의 타입 (기본값: string)
+ * @template K 필드 이름들의 유니온 타입
+ * @param data SvelteKit RemoteFormInput 객체
+ * @param items 추출할 필드 이름들의 배열
+ * @returns 추출된 필드들을 포함하는 FormData 객체
+ *
+ * @example
+ * ```typescript
+ * const userData = await extractRemoteFormFields(data, ['email', 'name'])
+ * console.log(userData.email) // 타입 안전한 접근
+ * ```
  */
-export const getFormData = async <T = string, K extends string = string>(
+export const extractRemoteFormFields = async <T = string, K extends string = string>(
   data: RemoteFormInput,
   items: K[]
-): Promise<{ [key in K]: T }> => {
+): Promise<FormData<T, K>> => {
   const result: { [key: string]: T } = {}
 
   for (const i of items.values()) {
     if (data[i] !== null) result[i] = data[i] as T
   }
 
-  return result as { [key in K]: T }
+  return result as FormData<T, K>
 }
 
 /**
- * Extracts specified fields from a Request's form data.
+ * HTTP Request의 FormData에서 지정된 필드들을 추출합니다.
  *
- * @param request - The Request object containing form data.
- * @param fields - The names of the fields to extract.
- * @returns An object mapping field names to their string values.
+ * @template T 필드 값의 타입 (기본값: string)
+ * @template K 필드 이름들의 유니온 타입
+ * @param request HTTP Request 객체 (FormData 포함)
+ * @param items 추출할 필드 이름들의 배열
+ * @returns 추출된 필드들을 포함하는 FormData 객체
  *
  * @example
- * const { email, password } = await getRequestFormData(request, 'email', 'password');
+ * ```typescript
+ * // 기본 사용법
+ * const loginData = await extractFormFields(request, ['email', 'password'])
+ *
+ * // 타입 지정
+ * const signupData = await extractFormFields<string, 'email' | 'name'>(
+ *   request,
+ *   ['email', 'name']
+ * )
+ * ```
  */
-export const getRequestFormData = async <T = string, K extends string = string>(
+export const extractFormFields = async <T = string, K extends string = string>(
   request: Request,
   items: K[]
-): Promise<{ [key in K]: T }> => {
-  const formData = await request.formData()
+): Promise<FormData<T, K>> => {
+  const formDataRaw = await request.formData()
 
   const result: { [key: string]: T } = {}
 
-  for (const i of items.values()) {
-    const value = formData.get(i)
-    if (value !== null) result[i] = formData.get(i) as T
+  for (const item of items) {
+    const value = formDataRaw.get(item)
+    if (value !== null) {
+      result[item] = value as T
+    }
   }
 
-  return result as { [key in K]: T }
+  return result as FormData<T, K>
 }

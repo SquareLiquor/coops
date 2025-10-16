@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { notifications, removeNotification } from '$lib/stores/notifications.svelte'
+  import { notifications, removeNotification } from '$lib/stores'
 </script>
 
 <div class="notifications">

@@ -1,7 +1,7 @@
 // Store type enum
 export type StoreType = 'hq' | 'branch'
 
-// Complete stores table interface
+// 스토어 기본 정보
 export interface Store {
   id: string
   name: string
