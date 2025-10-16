@@ -1,6 +1,6 @@
 import { getRequestEvent } from '$app/server'
 // import { SUPABASE_SECRET_KEY } from '$env/static/private'
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import {
   createServerClient as _createServerClient,
   type CookieMethodsServer,
@@ -20,7 +20,7 @@ export const createServerClient = (
 ) => {
   const event = getRequestEvent()
 
-  return _createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+  return _createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll: () => event.cookies.getAll(),
       setAll: (cookies) => {

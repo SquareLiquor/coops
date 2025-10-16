@@ -1,4 +1,4 @@
-import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 import type { UserType } from '../entities/user'
 import type { SigninFormData, SignupFormData } from './form'
 
@@ -18,12 +18,16 @@ export interface AuthState {
   error: string | null
 }
 
-export interface SignupContext {
-  formData: SignupFormData
-  createdUser?: User | null
+export interface HookContext {
+  supabase: SupabaseClient // CSR/SSR 양쪽에서 사용 가능하도록 supabase 클라이언트 포함
 }
 
-export interface SigninContext {
+export interface SignupHookContext extends HookContext {
+  formData: SignupFormData
+  userId?: string
+}
+
+export interface SigninHookContext extends HookContext {
   formData: SigninFormData
   user?: User | null
 }

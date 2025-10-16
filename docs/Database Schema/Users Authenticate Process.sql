@@ -36,9 +36,7 @@ const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("S
 Deno.serve(async (req)=>{
   try {
     const { user_id, user_type } = await req.json();
-    
     let approve_status = user_type === 'consumer' ? 'approved' : 'pending';
-    
     // app_metadata 업데이트
     const { data: userData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
       app_metadata: {
@@ -46,9 +44,7 @@ Deno.serve(async (req)=>{
         approve_status
       }
     });
-    
     if (updateError) throw updateError;
-    
     return new Response(JSON.stringify({
       success: true
     }), {
@@ -62,6 +58,7 @@ Deno.serve(async (req)=>{
     });
   }
 });
+
 
 
 
@@ -84,15 +81,15 @@ serve(async (req) => {
     if (!user_id) return new Response("user_id required", { status: 400 });
 
     // app_metadata 업데이트
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
       app_metadata: { approve_status: "approved" },
     });
 
     // 승인 요청 테이블 업데이트
 
     // store_members 테이블 업데이트
-
-    if (error) return new Response(error.message, { status: 500 });
+    
+    if (updateError) throw updateError;
 
     return new Response("User approved", { status: 200 });
   } catch (err) {

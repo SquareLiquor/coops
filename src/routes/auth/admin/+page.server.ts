@@ -1,6 +1,6 @@
 import { SignUpError } from '$lib/errors'
 import { signupHook } from '$lib/hooks/'
-import type { SignupContext, SignupFormData, StorePublic } from '$lib/types'
+import type { SignupFormData, SignupHookContext, StorePublic } from '$lib/types'
 import { extractFormFields } from '$lib/utils/form'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
@@ -17,7 +17,6 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     .order('name', { ascending: true }) // 이름순 정렬
 
   if (error) {
-    console.error('Error loading stores:', error)
     return {
       stores: [] as StorePublic[],
     }
@@ -30,23 +29,25 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 export const actions: Actions = {
   signup: async ({ request, locals: { supabase } }) => {
-    const formData = (await extractFormFields(request, signupFields)) as SignupFormData
+    const formData = (await extractFormFields(request, signupFields)) as SignupHookContext['formData']
+    let userId = {} as SignupHookContext['userId']
 
     try {
-      await signupHook.runBefore({ formData })
+      await signupHook.runBefore({ supabase, formData })
 
-      const { data } = await signUp(formData, supabase)
+      await signUp(formData, supabase).then(({ user }) => {
+        userId = user.id
+      })
 
-      await signupHook.runAfter({ formData, createdUser: data.user })
+      await signupHook.runAfter({ supabase, formData, userId })
 
-      return redirect(303, '/')
+      throw redirect(303, '/')
     } catch (error) {
       if (error instanceof SignUpError) {
-        console.error(error.message)
-        // await supabase.auth.admin.deleteUser(data?.user?.id ?? '')
-        signupHook.runCleanup({ formData })
-
         const { status, details } = error
+
+        console.error(error.message, error)
+        await signupHook.runCleanup({ supabase, formData, userId })
 
         return fail(status, { error: details })
       }
@@ -71,15 +72,19 @@ export const actions: Actions = {
 }
 
 const signUp = async (formData: SignupFormData, supabase: SupabaseClient) => {
-  const { email, name, phone1, phone2, phone3, password } = formData
+  const { email, name, phone1, phone2, phone3, password, storeId } = formData
 
-  const { data, error } = await supabase.auth.signUp({
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         display_name: name,
         phone: `${phone1}-${phone2}-${phone3}`,
+        store_id: storeId || null,
       },
     },
   })
@@ -92,7 +97,7 @@ const signUp = async (formData: SignupFormData, supabase: SupabaseClient) => {
     })
   }
 
-  if (!data.user || !data.user.id) {
+  if (!user || !user.id) {
     throw new SignUpError('회원가입 실패: 사용자 없음', {
       status: 400,
       code: 'no_user_error',
@@ -100,7 +105,7 @@ const signUp = async (formData: SignupFormData, supabase: SupabaseClient) => {
     })
   }
 
-  return { data }
+  return { user }
 }
 
-const signIn = async ({ formData }: SignupContext, supabase: SupabaseClient) => {}
+const signIn = async ({ formData }: SignupHookContext, supabase: SupabaseClient) => {}

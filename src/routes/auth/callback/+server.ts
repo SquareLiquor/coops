@@ -1,3 +1,7 @@
+import { SignUpError } from '$lib/errors/index.js'
+import { signupHook } from '$lib/hooks/index.js'
+import type { Profile, SignupHookContext } from '$lib/types'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
 export const GET = async ({ url, locals: { supabase } }) => {
@@ -14,22 +18,39 @@ export const GET = async ({ url, locals: { supabase } }) => {
   if (error) redirect(303, '/')
   if (!user) redirect(303, '/')
 
-  const { app_metadata } = user
-  const { approve_status, user_type } = app_metadata || {}
+  const status = await getApprovalStatus(supabase, user.id)
 
-  if (!approve_status) {
-    const { data: grantData, error: grantError } = await supabase.functions.invoke('grant_user_role', {
-      method: 'POST',
-      body: {
-        user_id: user.id,
-        user_type: 'consumer', // TO-DO: consumer / admin
-      },
-    })
+  const { user_metadata } = user
+  const { email, storeId, name } = user_metadata
 
-    if (grantError) {
-      console.error('역할 부여 실패:', grantError)
-      redirect(303, '/')
+  const formData = { email, name, storeId } as SignupHookContext['formData']
+  const userId = user.id
+
+  try {
+    // 회원 가입 처리 시에만 hook 실행
+    if (!status) {
+      await signupHook.runAfter({ supabase, formData, userId })
     }
+  } catch (error) {
+    if (error instanceof SignUpError) {
+      console.error(error.message, error)
+    }
+    await signupHook.runCleanup({ supabase, formData, userId })
+    return redirect(303, '/auth')
   }
-  redirect(303, `/${next.slice(1)}`)
+  // 성공 시 리디렉션은 try/catch 밖에서 처리
+  return redirect(303, `/${next.slice(1)}`)
+}
+
+// signup_approval_requests 테이블에서 승인 상태 조회 함수
+const getApprovalStatus = async (supabase: SupabaseClient, userId: string): Promise<Profile | null> => {
+  const { data } = await supabase
+    .from('signup_approval_requests')
+    .select('id, email, role, status')
+    .eq('applicant_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  return data
 }

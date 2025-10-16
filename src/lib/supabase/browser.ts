@@ -1,5 +1,5 @@
 // src/lib/supabaseClient.ts
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import {
   createBrowserClient as _createBrowserClient,
   type CookieMethodsBrowser,
@@ -18,5 +18,5 @@ export const createBrowserClient = (
     isSingleton?: boolean
   }
 ) => {
-  return _createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, { ...options })
+  return _createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, { ...options })
 }

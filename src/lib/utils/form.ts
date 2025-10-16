@@ -9,12 +9,6 @@ import type { RemoteFormInput } from '@sveltejs/kit'
  * @param data SvelteKit RemoteFormInput 객체
  * @param items 추출할 필드 이름들의 배열
  * @returns 추출된 필드들을 포함하는 FormData 객체
- *
- * @example
- * ```typescript
- * const userData = await extractRemoteFormFields(data, ['email', 'name'])
- * console.log(userData.email) // 타입 안전한 접근
- * ```
  */
 export const extractRemoteFormFields = async <T = string, K extends string = string>(
   data: RemoteFormInput,
@@ -37,18 +31,6 @@ export const extractRemoteFormFields = async <T = string, K extends string = str
  * @param request HTTP Request 객체 (FormData 포함)
  * @param items 추출할 필드 이름들의 배열
  * @returns 추출된 필드들을 포함하는 FormData 객체
- *
- * @example
- * ```typescript
- * // 기본 사용법
- * const loginData = await extractFormFields(request, ['email', 'password'])
- *
- * // 타입 지정
- * const signupData = await extractFormFields<string, 'email' | 'name'>(
- *   request,
- *   ['email', 'name']
- * )
- * ```
  */
 export const extractFormFields = async <T = string, K extends string = string>(
   request: Request,

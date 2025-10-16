@@ -8,13 +8,25 @@ import { type Handle, redirect } from '@sveltejs/kit'
  */
 export const approvalStatusGuard: Handle = async ({ event, resolve }) => {
   const {
-    locals: { user },
+    locals: { user, supabase },
     url,
   } = event
 
-  const { app_metadata: { approve_status = undefined } = {} } = user || {}
+  const { user_metadata } = user || {}
 
-  if (approve_status === ApprovalStatus.PENDING && !url.pathname.startsWith('/auth/pending')) {
+  // 해당 사용자의 최신 승인 요청 상태 조회
+  const {
+    data: { status },
+    error,
+  } = await supabase
+    .from('signup_approval_requests')
+    .select('status')
+    .eq('applicant_id', user?.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (status === ApprovalStatus.PENDING && !url.pathname.startsWith('/auth/pending')) {
     throw redirect(303, '/auth/pending')
   }
 

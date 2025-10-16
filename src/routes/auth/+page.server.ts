@@ -11,7 +11,6 @@ export const actions: Actions = {
 
     if (error) {
       const errors: Record<string, string> = { general: '카카오 인증에 실패하였습니다.' }
-      console.error(error?.message)
 
       return fail(401, { errors })
     }

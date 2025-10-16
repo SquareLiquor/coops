@@ -1,9 +1,19 @@
+// TODO: HookWithMeta<T> 타입을 도입하여 hook에 priority, condition 등 메타데이터를 지원할 것
+// type HookWithMeta<T> = {
+//   hook: HookFn<T>
+//   priority?: number
+//   condition?: (context: T) => boolean
+// }
 type HookFn<T> = (context: T) => Promise<void> | void
 type CleanupFn<T> = (context: T) => Promise<void> | void
 
 export type HookContext<T> = {
-  hook: HookFn<T>
+  hook?: HookFn<T>
   cleanup?: CleanupFn<T>
+}
+
+const addIfNotExists = <F extends Function>(arr: F[], fn?: F) => {
+  if (fn && !arr.includes(fn)) arr.push(fn)
 }
 
 export const createHook = <T>() => {
@@ -13,12 +23,15 @@ export const createHook = <T>() => {
 
   return {
     before: ({ hook: fn, cleanup: cleanupFn }: HookContext<T>) => {
-      before.push(fn)
-      cleanupFn && cleanup.push(cleanupFn)
+      addIfNotExists(before, fn)
+      addIfNotExists(cleanup, cleanupFn)
     },
     after: ({ hook: fn, cleanup: cleanupFn }: HookContext<T>) => {
-      after.push(fn)
-      cleanupFn && cleanup.push(cleanupFn)
+      addIfNotExists(after, fn)
+      addIfNotExists(cleanup, cleanupFn)
+    },
+    cleanup: ({ cleanup: cleanupFn }: HookContext<T>) => {
+      addIfNotExists(cleanup, cleanupFn)
     },
     runBefore: async (context: T) => {
       for (const fn of before) await fn(context)

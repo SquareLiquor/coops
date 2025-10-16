@@ -6,7 +6,7 @@ export enum UserType {
 }
 
 // 사용자 기본 정보
-export interface UserProfile {
+export interface Profile {
   id: string
   email: string
   name?: string

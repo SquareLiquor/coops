@@ -1,11 +1,11 @@
 import { SignUpError } from '$lib/errors'
 import type { HookContext } from '$lib/hooks/hooksManager'
-import type { SignupContext } from '$lib/types'
+import type { SignupHookContext } from '$lib/types'
 
 /**
  * 회원가입 폼 데이터 검증
  */
-const validate = async ({ formData }: SignupContext) => {
+const validate = async ({ formData }: SignupHookContext) => {
   const error: Record<string, string> = {}
 
   const { phone2, phone3, password, confirmPassword } = formData
@@ -31,6 +31,7 @@ const validate = async ({ formData }: SignupContext) => {
   }
 }
 
-export const validateSignupHook: HookContext<SignupContext> = {
+// TODO: HookContext 중복, 네이밍 변경 필요
+export const validateSignupHook: HookContext<SignupHookContext> = {
   hook: validate,
 }
