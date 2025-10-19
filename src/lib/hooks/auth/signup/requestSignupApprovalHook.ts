@@ -4,8 +4,8 @@ import type { SignupHookContext } from '$lib/types'
 
 // const supabase = createBrowserClient()
 
-const requestSignupApproval = async ({ formData, userId, supabase }: SignupHookContext) => {
-  const { storeId } = formData
+const requestSignupApproval = async ({ signupData, userId, supabase }: SignupHookContext) => {
+  const { storeId } = signupData
 
   const payload = {
     applicant_id: userId,

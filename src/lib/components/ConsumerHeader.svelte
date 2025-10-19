@@ -54,17 +54,20 @@
               class="absolute top-full right-0 mt-2 w-48 rounded-lg border bg-white shadow-lg"
               style="border-color: #a6adc8;"
             >
-              <div class="py-2">
-                <a href="/orders" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 주문 내역 </a>
-                <a href="/settings" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 설정 </a>
-                <hr class="my-2" style="border-color: #a6adc8;" />
-                <button
-                  class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                  onclick={() => supabase.auth.signOut()}
-                >
-                  로그아웃
-                </button>
-              </div>
+              <form method="POST">
+                <div class="py-2">
+                  <a href="/orders" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 주문 내역 </a>
+                  <a href="/settings" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 설정 </a>
+                  <hr class="my-2" style="border-color: #a6adc8;" />
+                  <button
+                    class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                    type="submit"
+                    formaction="/auth/signout?redirectTo=/auth"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              </form>
             </div>
           {/if}
         {/if}

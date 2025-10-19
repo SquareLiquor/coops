@@ -15,10 +15,7 @@ export const approvalStatusGuard: Handle = async ({ event, resolve }) => {
   const { user_metadata } = user || {}
 
   // 해당 사용자의 최신 승인 요청 상태 조회
-  const {
-    data: { status },
-    error,
-  } = await supabase
+  const { data, error } = await supabase
     .from('signup_approval_requests')
     .select('status')
     .eq('applicant_id', user?.id)
@@ -26,7 +23,7 @@ export const approvalStatusGuard: Handle = async ({ event, resolve }) => {
     .limit(1)
     .single()
 
-  if (status === ApprovalStatus.PENDING && !url.pathname.startsWith('/auth/pending')) {
+  if (data?.status === ApprovalStatus.PENDING && !url.pathname.startsWith('/auth/pending')) {
     throw redirect(303, '/auth/pending')
   }
 

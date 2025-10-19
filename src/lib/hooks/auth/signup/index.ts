@@ -4,7 +4,6 @@ import { createProfileHook } from './createProfileHook'
 import { deleteUserHook } from './deleteUserHook'
 import { requestSignupApprovalHook } from './requestSignupApprovalHook'
 import { updateAppMetadataHook } from './updateAppMetadataHook'
-import { validateSignupHook } from './validateSignupHook'
 
 export const signupHook = createHook<SignupHookContext>()
 
@@ -12,7 +11,6 @@ export const signupHook = createHook<SignupHookContext>()
 signupHook.cleanup(deleteUserHook)
 
 // Add before sign up hooks & cleanup
-signupHook.before(validateSignupHook)
 
 // Add after sign up hooks & cleanup
 signupHook.after(updateAppMetadataHook)

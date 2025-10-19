@@ -110,30 +110,34 @@
   </div>
 
   <!-- 사용자 프로필 -->
-  <div class="mb-6 px-4 py-4">
-    <div class="flex items-center gap-3">
-      <!-- Avatar Component (Skeleton UI Style) -->
-      <div class="relative">
-        <Avatar src={userInfo.avatar || 'https://i.pravatar.cc/35'} name="skeleton" />
+  <form method="POST">
+    <div class="mb-6 px-4 py-4">
+      <div class="flex items-center gap-3">
+        <!-- Avatar Component (Skeleton UI Style) -->
+        <div class="relative">
+          <Avatar src={userInfo.avatar || 'https://i.pravatar.cc/35'} name="skeleton" />
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-surface-900 truncate text-sm font-medium">{userInfo.name}</p>
+          <p class="text-surface-500 truncate text-xs">{userInfo.email}</p>
+        </div>
+        <button
+          class="text-surface-400 hover:text-surface-600 hover:bg-surface-200 focus:ring-surface-300 inline-flex items-center justify-center rounded-lg p-2 transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          title="로그아웃"
+          aria-label="로그아웃"
+          type="submit"
+          formaction="/auth/signout?redirectTo=/auth/admin"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+        </button>
       </div>
-      <div class="min-w-0 flex-1">
-        <p class="text-surface-900 truncate text-sm font-medium">{userInfo.name}</p>
-        <p class="text-surface-500 truncate text-xs">{userInfo.email}</p>
-      </div>
-      <button
-        class="text-surface-400 hover:text-surface-600 hover:bg-surface-200 focus:ring-surface-300 inline-flex items-center justify-center rounded-lg p-2 transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
-        title="로그아웃"
-        aria-label="로그아웃"
-      >
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-          />
-        </svg>
-      </button>
     </div>
-  </div>
+  </form>
 </aside>

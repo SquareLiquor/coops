@@ -1,7 +1,8 @@
-import { SignUpError } from '$lib/errors'
+import { signinFormConverter, signupFormConverter } from '$lib/converters'
+import { SignInError, SignUpError } from '$lib/errors'
 import { signupHook } from '$lib/hooks/'
-import type { SignupFormData, SignupHookContext, StorePublic } from '$lib/types'
-import { extractFormFields } from '$lib/utils/form'
+import type { SigninFormData, SignupFormData, StorePublic } from '$lib/types'
+import { extractFormData } from '$lib/utils/form'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
@@ -9,6 +10,11 @@ import type { PageServerLoad } from './$types'
 const signupFields = ['email', 'name', 'phone1', 'phone2', 'phone3', 'password', 'confirmPassword', 'storeId']
 const signinFields = ['email', 'password']
 
+/**
+ *
+ * @param param0
+ * @returns
+ */
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
   const { data: stores, error } = await supabase
     .from('stores_public')
@@ -28,58 +34,77 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 }
 
 export const actions: Actions = {
+  /**
+   *
+   * @param param0
+   * @returns
+   */
   signup: async ({ request, locals: { supabase } }) => {
-    const formData = (await extractFormFields(request, signupFields)) as SignupHookContext['formData']
-    let userId = {} as SignupHookContext['userId']
+    const rawForm = await extractFormData(request, signupFields)
+    const signupData: SignupFormData = signupFormConverter(rawForm)
+    let userId = null
 
     try {
-      await signupHook.runBefore({ supabase, formData })
+      await signupHook.runBefore({ supabase, signupData })
 
-      await signUp(formData, supabase).then(({ user }) => {
-        userId = user.id
-      })
+      const { user } = await signup(supabase, signupData)
+      userId = user.id
 
-      await signupHook.runAfter({ supabase, formData, userId })
+      await signupHook.runAfter({ supabase, signupData, userId })
 
       throw redirect(303, '/')
     } catch (error) {
       if (error instanceof SignUpError) {
-        const { status, details } = error
+        error.errorHandler()
+        await signupHook.runCleanup({ supabase, signupData, userId })
 
-        console.error(error.message, error)
-        await signupHook.runCleanup({ supabase, formData, userId })
-
-        return fail(status, { error: details })
+        return fail(error.status, { error: error.details })
       }
 
       return fail(400, { error: '회원 가입 중 오류가 발생하였습니다.' })
     }
   },
 
+  /**
+   *
+   * @param param0
+   * @returns
+   */
   signin: async ({ request, locals: { supabase } }) => {
-    const { email, password } = await extractFormFields(request, signinFields)
+    const rawForm = await extractFormData(request, signinFields)
+    const signinData: SigninFormData = signinFormConverter(rawForm)
 
-    // No validation needed - HTML handles required fields and email format
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      await signin(supabase, signinData)
 
-    if (error || !data.session) {
-      console.log('signin error', error)
-      return fail(401, { error: '이메일 또는 비밀번호가 올바르지 않습니다.' })
+      throw redirect(303, '/admin')
+    } catch (error) {
+      if (error instanceof SignInError) {
+        error.errorHandler()
+
+        return fail(error.status, { error: error.details })
+      }
+
+      return fail(400, { error: '로그인 중 오류가 발생하였습니다.' })
     }
-
-    throw redirect(303, '/admin')
   },
 }
 
-const signUp = async (formData: SignupFormData, supabase: SupabaseClient) => {
-  const { email, name, phone1, phone2, phone3, password, storeId } = formData
+/**
+ *
+ * @param supabase
+ * @param signupData
+ * @returns
+ */
+const signup = async (supabase: SupabaseClient, signupData: SignupFormData) => {
+  const { email, name, phone1, phone2, phone3, password, storeId } = signupData
 
   const {
     data: { user },
     error,
   } = await supabase.auth.signUp({
     email,
-    password,
+    password: password ?? '',
     options: {
       data: {
         display_name: name,
@@ -108,4 +133,20 @@ const signUp = async (formData: SignupFormData, supabase: SupabaseClient) => {
   return { user }
 }
 
-const signIn = async ({ formData }: SignupHookContext, supabase: SupabaseClient) => {}
+/**
+ *
+ * @param supabase
+ * @param signinData
+ */
+const signin = async (supabase: SupabaseClient, signinData: SigninFormData) => {
+  const { data, error } = await supabase.auth.signInWithPassword({ ...signinData })
+
+  if (error || !data.session) {
+    console.log('signin error', error)
+    throw new SignInError(error?.message || 'Invalid credentials', {
+      status: 400,
+      code: 'signin_error',
+      details: { error: '이메일 또는 비밀번호가 올바르지 않습니다.' },
+    })
+  }
+}

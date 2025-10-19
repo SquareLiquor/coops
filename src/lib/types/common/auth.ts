@@ -23,13 +23,13 @@ export interface HookContext {
 }
 
 export interface SignupHookContext extends HookContext {
-  formData: SignupFormData
-  userId?: string
+  signupData: SignupFormData
+  userId?: string | null
 }
 
 export interface SigninHookContext extends HookContext {
-  formData: SigninFormData
-  user?: User | null
+  signinData: SigninFormData
+  userId?: string | null
 }
 
 export enum ApprovalStatus {

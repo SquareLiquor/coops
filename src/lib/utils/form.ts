@@ -1,5 +1,9 @@
-import type { FormData } from '$lib/types'
 import type { RemoteFormInput } from '@sveltejs/kit'
+
+// 제네릭 FormData 타입
+export type FormDataObject<K extends string> = {
+  [key in K]: string | undefined
+}
 
 /**
  * RemoteFormInput 데이터에서 지정된 필드들을 추출합니다.
@@ -10,17 +14,23 @@ import type { RemoteFormInput } from '@sveltejs/kit'
  * @param items 추출할 필드 이름들의 배열
  * @returns 추출된 필드들을 포함하는 FormData 객체
  */
-export const extractRemoteFormFields = async <T = string, K extends string = string>(
+export const extractRemoteFormData = async <K extends string>(
   data: RemoteFormInput,
   items: K[]
-): Promise<FormData<T, K>> => {
-  const result: { [key: string]: T } = {}
+): Promise<FormDataObject<K>> => {
+  const result = {} as FormDataObject<K>
 
-  for (const i of items.values()) {
-    if (data[i] !== null) result[i] = data[i] as T
+  for (const field of items) {
+    const value = data[field]
+
+    if (value !== undefined && value !== null) {
+      result[field] = typeof value === 'string' ? value : String(value)
+    } else {
+      result[field] = undefined
+    }
   }
 
-  return result as FormData<T, K>
+  return result
 }
 
 /**
@@ -32,20 +42,19 @@ export const extractRemoteFormFields = async <T = string, K extends string = str
  * @param items 추출할 필드 이름들의 배열
  * @returns 추출된 필드들을 포함하는 FormData 객체
  */
-export const extractFormFields = async <T = string, K extends string = string>(
-  request: Request,
-  items: K[]
-): Promise<FormData<T, K>> => {
+export const extractFormData = async <K extends string>(request: Request, items: K[]): Promise<FormDataObject<K>> => {
   const formDataRaw = await request.formData()
-
-  const result: { [key: string]: T } = {}
+  const result = {} as FormDataObject<K>
 
   for (const item of items) {
     const value = formDataRaw.get(item)
-    if (value !== null) {
-      result[item] = value as T
+
+    if (value !== undefined && value !== null) {
+      result[item] = typeof value === 'string' ? value : String(value)
+    } else {
+      result[item] = undefined
     }
   }
 
-  return result as FormData<T, K>
+  return result
 }

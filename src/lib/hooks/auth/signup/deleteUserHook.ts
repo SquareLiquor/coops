@@ -5,7 +5,6 @@ import type { SignupHookContext } from '$lib/types'
 const deleteUser = async ({ userId }: SignupHookContext) => {
   if (userId) {
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
-    console.error('Delete User Cleanup Error', error, userId)
   }
 }
 

@@ -1,6 +1,6 @@
 import { SignUpError } from '$lib/errors/index.js'
 import { signupHook } from '$lib/hooks/index.js'
-import type { Profile, SignupHookContext } from '$lib/types'
+import type { Profile, SignupFormData } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -23,23 +23,24 @@ export const GET = async ({ url, locals: { supabase } }) => {
   const { user_metadata } = user
   const { email, storeId, name } = user_metadata
 
-  const formData = { email, name, storeId } as SignupHookContext['formData']
+  const signupData: SignupFormData = { email, name, storeId }
   const userId = user.id
 
   try {
     // 회원 가입 처리 시에만 hook 실행
     if (!status) {
-      await signupHook.runAfter({ supabase, formData, userId })
+      await signupHook.runAfter({ supabase, signupData, userId })
     }
   } catch (error) {
+    console.error('Error during signup hook after:', error)
     if (error instanceof SignUpError) {
-      console.error(error.message, error)
+      error.errorHandler()
     }
-    await signupHook.runCleanup({ supabase, formData, userId })
-    return redirect(303, '/auth')
+    await signupHook.runCleanup({ supabase, signupData, userId })
+    throw redirect(303, '/auth')
   }
   // 성공 시 리디렉션은 try/catch 밖에서 처리
-  return redirect(303, `/${next.slice(1)}`)
+  throw redirect(303, `/${next.slice(1)}`)
 }
 
 // signup_approval_requests 테이블에서 승인 상태 조회 함수

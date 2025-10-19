@@ -11,6 +11,11 @@ export abstract class AppError extends Error {
     this.code = options?.code
     this.details = options?.details
   }
+
+  errorHandler() {
+    const { status, details } = this
+    console.error(this.message, this)
+  }
 }
 
 // Authentication related errors
