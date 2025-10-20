@@ -69,10 +69,10 @@ ALTER TABLE public.signup_approval_requests ENABLE ROW LEVEL SECURITY;
 -- ==============================
 -- profiles: (필요시 정책 추가)
 -- 사용자는 자신의 프로필만 조회 가능
-CREATE POLICY "users can select their profile"
+CREATE POLICY "all users can select profile"
 ON public.profiles
 FOR SELECT
-USING (id = auth.uid());
+USING (true);
 -- 사용자는 자신의 프로필만 생성 가능
 CREATE POLICY "users can insert their profiles"
   ON public.profiles

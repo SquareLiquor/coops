@@ -114,16 +114,10 @@ ALTER TABLE public.store_members ENABLE ROW LEVEL SECURITY;
 -- store_members: 자신이 속한 store 조회 가능
 -- store.owner: 자신이 owner인 store 조회 가능
 -- store.type = 'hq': 모든 store 조회 가능
-CREATE POLICY "store select for members or owner or HQ"
+CREATE POLICY "store select for all"
 ON public.stores
 FOR SELECT
-USING (
-    type = 'hq'  -- HQ는 모든 조회 가능
-    OR owner_id = auth.uid()  -- 자신이 owner인 store
-    OR id IN (
-        SELECT store_id FROM public.store_members WHERE user_id = auth.uid()
-    )
-);
+USING (true);
 
 -- store 생성 정책
 -- store.type = 'hq' 사용자는 store 생성 가능
