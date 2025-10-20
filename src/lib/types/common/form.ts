@@ -7,6 +7,7 @@ export interface SignupFormData {
   password?: string
   confirmPassword?: string
   storeId?: string
+  storeType?: string
 }
 
 export interface SigninFormData {

@@ -14,7 +14,7 @@ export abstract class AppError extends Error {
 
   errorHandler() {
     const { status, details } = this
-    console.error(this.message, this)
+    console.error(this.message)
   }
 }
 

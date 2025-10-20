@@ -27,5 +27,12 @@ export const userTypeGuard: Handle = async ({ event, resolve }) => {
     throw redirect(303, '/hq')
   }
 
+  if (user_type !== UserType.BRANCH && url.pathname.startsWith('/admin')) {
+    throw redirect(303, '/')
+  }
+
+  if (user_type !== UserType.HQ && url.pathname.startsWith('/hq')) {
+    throw redirect(303, '/')
+  }
   return resolve(event)
 }

@@ -2,7 +2,7 @@ import type { SignupFormData } from '$lib/types'
 
 // form to context
 export const signupFormConverter = (raw: Record<string, string | undefined>): SignupFormData => {
-  const { email, name, phone1, phone2, phone3, password, confirmPassword, storeId } = raw
+  const { email, name, phone1, phone2, phone3, password, confirmPassword, store } = raw
 
   return {
     email: email ?? '',
@@ -12,7 +12,8 @@ export const signupFormConverter = (raw: Record<string, string | undefined>): Si
     phone3: phone3 ?? '',
     password: password ?? '',
     confirmPassword: confirmPassword ?? '',
-    storeId: storeId ?? '',
+    storeId: store?.split('|')[0] ?? '',
+    storeType: store?.split('|')[1] ?? '',
   }
 }
 

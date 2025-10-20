@@ -1,5 +1,5 @@
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import { approvalStatusGuard, authenticatedGuard, userTypeGuard } from '$lib/guards'
+import { authenticatedGuard, userTypeGuard } from '$lib/guards'
 import { createServerClient } from '@supabase/ssr'
 import { type Handle } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
@@ -75,6 +75,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
   return resolve(event)
 }
 
-const customGuards = [authenticatedGuard, userTypeGuard, approvalStatusGuard]
+// const customGuards = [authenticatedGuard, userTypeGuard, approvalStatusGuard]
+const customGuards = [authenticatedGuard, userTypeGuard]
 
 export const handle: Handle = sequence(supabase, authGuard, ...customGuards)

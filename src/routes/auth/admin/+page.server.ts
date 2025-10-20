@@ -4,10 +4,10 @@ import { signupHook } from '$lib/hooks/'
 import type { SigninFormData, SignupFormData, StorePublic } from '$lib/types'
 import { extractFormData } from '$lib/utils/form'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { fail, redirect, type Actions } from '@sveltejs/kit'
+import { fail, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-const signupFields = ['email', 'name', 'phone1', 'phone2', 'phone3', 'password', 'confirmPassword', 'storeId']
+const signupFields = ['email', 'name', 'phone1', 'phone2', 'phone3', 'password', 'confirmPassword', 'store']
 const signinFields = ['email', 'password']
 
 /**
@@ -52,17 +52,20 @@ export const actions: Actions = {
 
       await signupHook.runAfter({ supabase, signupData, userId })
 
-      throw redirect(303, '/')
+      return { success: true, redirectTo: '/' } // redirect 대신 반환
+      // throw redirect(303, '/')
     } catch (error) {
       if (error instanceof SignUpError) {
         error.errorHandler()
         await signupHook.runCleanup({ supabase, signupData, userId })
 
-        return fail(error.status, { error: error.details })
+        return fail(error.status, { code: error.code, message: error.details?.message })
       }
 
-      return fail(400, { error: '회원 가입 중 오류가 발생하였습니다.' })
+      return fail(400, { code: 'signup_error', message: '회원 가입 중 오류가 발생하였습니다.' })
     }
+
+    // throw redirect(303, '/')
   },
 
   /**
@@ -77,16 +80,19 @@ export const actions: Actions = {
     try {
       await signin(supabase, signinData)
 
-      throw redirect(303, '/admin')
+      return { success: true, redirectTo: '/' } // redirect 대신 반환
+      // throw redirect(303, '/admin')
     } catch (error) {
       if (error instanceof SignInError) {
         error.errorHandler()
 
-        return fail(error.status, { error: error.details })
+        return fail(error.status, { code: error.code, message: error.details?.message })
       }
 
-      return fail(400, { error: '로그인 중 오류가 발생하였습니다.' })
+      return fail(400, { code: 'signin_error', message: '로그인 중 오류가 발생하였습니다.' })
     }
+
+    // throw redirect(303, '/')
   },
 }
 
@@ -115,18 +121,20 @@ const signup = async (supabase: SupabaseClient, signupData: SignupFormData) => {
   })
 
   if (error) {
-    throw new SignUpError(`회원가입 실패: ${error?.message ?? '알 수 없는 오류'}`, {
+    throw new SignUpError(error?.code || 'signup_error', {
       status: 400,
-      code: 'signup_error',
-      details: { error: '' },
+      code: error.code,
+      details: {
+        message: error.message,
+      },
     })
   }
 
   if (!user || !user.id) {
-    throw new SignUpError('회원가입 실패: 사용자 없음', {
+    throw new SignUpError('no_user_error', {
       status: 400,
       code: 'no_user_error',
-      details: { error: '' },
+      details: { message: '회원가입에 실패했습니다.' },
     })
   }
 
@@ -142,11 +150,10 @@ const signin = async (supabase: SupabaseClient, signinData: SigninFormData) => {
   const { data, error } = await supabase.auth.signInWithPassword({ ...signinData })
 
   if (error || !data.session) {
-    console.log('signin error', error)
-    throw new SignInError(error?.message || 'Invalid credentials', {
+    throw new SignInError(error?.code || 'invalid_credentials', {
       status: 400,
-      code: 'signin_error',
-      details: { error: '이메일 또는 비밀번호가 올바르지 않습니다.' },
+      code: error?.code,
+      details: { message: '이메일 또는 비밀번호가 올바르지 않습니다.' },
     })
   }
 }

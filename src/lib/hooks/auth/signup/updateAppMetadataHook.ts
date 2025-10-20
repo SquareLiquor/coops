@@ -9,7 +9,7 @@ import type { SignupHookContext } from '$lib/types'
  * TODO: Edge function에서 직접 업데이트로 변경, 이 부분 변경되면 Edge function 삭제
  */
 const updateAppMetadata = async ({ signupData, userId }: SignupHookContext) => {
-  const { storeId } = signupData
+  const { storeId, storeType } = signupData
   const supabase = createServerClient()
 
   if (!userId) {
@@ -24,7 +24,7 @@ const updateAppMetadata = async ({ signupData, userId }: SignupHookContext) => {
     method: 'POST',
     body: {
       user_id: userId,
-      user_type: storeId ? 'admin' : 'consumer',
+      user_type: !storeType ? 'consummer' : storeType,
     },
   })
 
