@@ -1,8 +1,10 @@
+import type { ProfileData } from './user'
+
 // Store type enum
 export type StoreType = 'hq' | 'branch'
 
 // 스토어 기본 정보
-export interface Store {
+export interface StoreData {
   id: string
   name: string
   type: StoreType
@@ -13,6 +15,7 @@ export interface Store {
   place_id?: string
   phone?: string
   owner_id?: string
+  owner?: ProfileData
   created_at?: string
   updated_at?: string
 }

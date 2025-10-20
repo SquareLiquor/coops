@@ -6,17 +6,14 @@
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-
-  let formEl: HTMLFormElement | null = null
-
   let stores = $derived(data.stores)
-
   let isSignUp = $state(false)
-
   let errors = $state<{ message: string | null; fieldErrors: Record<string, string> }>({
     message: null,
     fieldErrors: {},
   })
+
+  let formEl: HTMLFormElement | null = null
 
   $effect(() => {
     if (isSignUp !== undefined) {

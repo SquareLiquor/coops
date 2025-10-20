@@ -1,71 +1,9 @@
 <script lang="ts">
-  let users = [
-    {
-      id: 'USER-001',
-      name: '김철수',
-      email: 'kim@store1.com',
-      phone: '010-1234-5678',
-      storeName: '강남점',
-      storeAddress: '서울시 강남구 테헤란로 123',
-      businessNumber: '123-45-67890',
-      status: 'pending',
-      appliedDate: '2024-10-12',
-      approvedDate: null,
-      note: '신규 가맹점 신청',
-    },
-    {
-      id: 'USER-002',
-      name: '이영희',
-      email: 'lee@store2.com',
-      phone: '010-2345-6789',
-      storeName: '홍대점',
-      storeAddress: '서울시 마포구 홍익로 456',
-      businessNumber: '234-56-78901',
-      status: 'approved',
-      appliedDate: '2024-10-10',
-      approvedDate: '2024-10-11',
-      note: '',
-    },
-    {
-      id: 'USER-003',
-      name: '박민수',
-      email: 'park@store3.com',
-      phone: '010-3456-7890',
-      storeName: '잠실점',
-      storeAddress: '서울시 송파구 잠실로 789',
-      businessNumber: '345-67-89012',
-      status: 'rejected',
-      appliedDate: '2024-10-08',
-      approvedDate: null,
-      note: '서류 미비로 거부',
-    },
-    {
-      id: 'USER-004',
-      name: '최지현',
-      email: 'choi@store4.com',
-      phone: '010-4567-8901',
-      storeName: '명동점',
-      storeAddress: '서울시 중구 명동길 321',
-      businessNumber: '456-78-90123',
-      status: 'pending',
-      appliedDate: '2024-10-11',
-      approvedDate: null,
-      note: '추가 서류 검토 중',
-    },
-    {
-      id: 'USER-005',
-      name: '정민호',
-      email: 'jung@store5.com',
-      phone: '010-5678-9012',
-      storeName: '신촌점',
-      storeAddress: '서울시 서대문구 신촌로 654',
-      businessNumber: '567-89-01234',
-      status: 'approved',
-      appliedDate: '2024-10-09',
-      approvedDate: '2024-10-10',
-      note: '',
-    },
-  ]
+  import dayjs from 'dayjs'
+  import type { PageProps } from './$types'
+
+  let { data }: PageProps = $props()
+  let requests = $derived(data.requests)
 
   let selectedStatus = 'all'
   let searchName = ''
@@ -73,34 +11,24 @@
   let dateTo = ''
 
   const statusOptions = [
-    { value: 'all', label: '전체', count: users.length },
+    { value: 'all', label: '전체' },
     {
       value: 'pending',
       label: '승인대기',
-      count: users.filter((u) => u.status === 'pending').length,
     },
     {
       value: 'approved',
       label: '승인완료',
-      count: users.filter((u) => u.status === 'approved').length,
     },
     {
       value: 'rejected',
       label: '거부됨',
-      count: users.filter((u) => u.status === 'rejected').length,
     },
   ]
 
-  $: filteredUsers = users.filter((user) => {
-    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus
-    const matchesName =
-      !searchName ||
-      user.name.toLowerCase().includes(searchName.toLowerCase()) ||
-      user.storeName.toLowerCase().includes(searchName.toLowerCase())
-    const matchesDateFrom = !dateFrom || user.appliedDate >= dateFrom
-    const matchesDateTo = !dateTo || user.appliedDate <= dateTo
-    return matchesStatus && matchesName && matchesDateFrom && matchesDateTo
-  })
+  // TODO: filter
+  // TODO: do action
+  // TODO: pagination
 
   function getStatusBadge(status: string) {
     switch (status) {
@@ -126,20 +54,6 @@
       default:
         return status
     }
-  }
-
-  function approveUser(userId: string) {
-    users = users.map((user) =>
-      user.id === userId ? { ...user, status: 'approved', approvedDate: new Date().toISOString().split('T')[0] } : user
-    )
-  }
-
-  function rejectUser(userId: string) {
-    users = users.map((user) => (user.id === userId ? { ...user, status: 'rejected', note: '본사에서 거부됨' } : user))
-  }
-
-  function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('ko-KR')
   }
 </script>
 
@@ -198,7 +112,7 @@
           class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
             ? 'bg-primary-500 text-primary-50 shadow-sm'
             : 'text-surface-600 hover:text-surface-800'}"
-          on:click={() => (selectedStatus = option.value)}
+          onclick={() => (selectedStatus = option.value)}
         >
           {option.label}
         </button>
@@ -214,70 +128,66 @@
           <th class="w-8 px-4 py-3 text-center">
             <span class="text-surface-500 text-xs font-medium">#</span>
           </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">신청자 정보</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">매장 정보</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">신청일</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">상태</th>
-          <th class="text-surface-500 w-32 px-4 py-3 text-center text-xs font-medium">액션</th>
+          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">신청자 정보</th>
+          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">매장 정보</th>
+          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">상태</th>
+          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">신청일</th>
+          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">승인일/취소일</th>
+          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">사유</th>
+          <th class="text-surface-500 w-32 px-4 py-3 text-center text-xs font-medium"></th>
         </tr>
       </thead>
       <tbody class="divide-surface-100 divide-y bg-white">
-        {#each filteredUsers as user, index}
-          <tr class="hover:bg-surface-50">
-            <td class="text-surface-500 px-4 py-4 text-center text-sm">
+        {#each requests as request, index}
+          <tr class="hover:bg-surface-50 text-center">
+            <td class="text-surface-500 px-4 py-4 text-sm">
               {index + 1}
             </td>
             <td class="px-4 py-4">
-              <div class="flex items-center">
-                <div class="h-10 w-10 flex-shrink-0">
-                  <div class="bg-surface-200 flex h-10 w-10 items-center justify-center rounded-full">
-                    <span class="text-surface-700 text-sm font-medium">{user.name.charAt(0)}</span>
-                  </div>
-                </div>
+              <div class="flex items-center justify-center">
                 <div class="ml-4">
-                  <div class="text-surface-900 text-sm font-medium">{user.name}</div>
-                  <div class="text-surface-500 text-sm">{user.email}</div>
-                  <div class="text-surface-400 text-xs">{user.phone}</div>
+                  <div class="text-surface-900 text-sm font-medium">{request.applicant?.name}</div>
+                  <div class="text-surface-400 text-xs">{request.applicant?.email}</div>
                 </div>
               </div>
             </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{user.storeName}</div>
-              <div class="text-surface-500 text-sm">{user.storeAddress}</div>
-              <div class="text-surface-400 text-xs">사업자번호: {user.businessNumber}</div>
+            <td class="items-center px-4 py-4">
+              <div class="text-surface-900 text-sm font-medium">{request.store?.name}</div>
             </td>
             <td class="px-4 py-4">
-              <div class="text-surface-700 text-sm">{formatDate(user.appliedDate)}</div>
-              {#if user.approvedDate}
-                <div class="text-xs text-green-600">승인: {formatDate(user.approvedDate)}</div>
-              {/if}
-            </td>
-            <td class="px-4 py-4">
-              <span class={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${getStatusBadge(user.status)}`}>
-                {getStatusText(user.status)}
+              <span class={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${getStatusBadge(request.status)}`}>
+                {getStatusText(request.status)}
               </span>
-              {#if user.note}
-                <div class="text-surface-500 mt-1 text-xs">{user.note}</div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-surface-700 text-sm">{dayjs(request.requested_at).format('YYYY-MM-DD')}</div>
+              <div class="text-surface-500 text-xs">{dayjs(request.requested_at).format('HH:mm:ss')}</div>
+            </td>
+            <td class="px-4 py-4">
+              {#if request.approved_at}
+                <div class="text-primary-600 text-sm">{dayjs(request.approved_at).format('YYYY-MM-DD')}</div>
+                <div class="text-surface-500 text-xs">{dayjs(request.approved_at).format('HH:mm:ss')}</div>
+              {/if}
+              {#if request.cancelled_at}
+                <div class="text-sm text-red-600">{dayjs(request.cancelled_at).format('YYYY-MM-DD')}</div>
+                <div class="text-surface-500 text-xs">{dayjs(request.cancelled_at).format('HH:mm:ss')}</div>
               {/if}
             </td>
-            <td class="px-4 py-4 text-center">
-              {#if user.status === 'pending'}
+            <td class="px-4 py-4">
+              <div class="text-sm {request.cancelled_at ? 'text-red-600' : 'text-primary-600'}">{request.reason}</div>
+            </td>
+            <td class="px-4 py-4">
+              {#if request.status === 'pending'}
                 <div class="flex items-center justify-center gap-1">
-                  <button
-                    on:click={() => approveUser(user.id)}
-                    class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200"
-                  >
+                  <button class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200">
                     승인
                   </button>
-                  <button
-                    on:click={() => rejectUser(user.id)}
-                    class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
-                  >
+                  <button class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200">
                     거부
                   </button>
                 </div>
               {:else}
-                <span class="text-surface-400 text-xs">-</span>
+                <span class="text-surface-400 text-xs"> - </span>
               {/if}
             </td>
           </tr>
@@ -285,7 +195,7 @@
       </tbody>
     </table>
 
-    {#if filteredUsers.length === 0}
+    {#if requests.length === 0}
       <div class="py-12 text-center">
         <svg class="text-surface-400 mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

@@ -1,7 +1,7 @@
-import { signinFormConverter, signupFormConverter } from '$lib/converters'
+import { signinFormConverter, signupFormConverter, storeDataConverter } from '$lib/converters'
 import { SignInError, SignUpError } from '$lib/errors'
 import { signupHook } from '$lib/hooks/'
-import type { SigninFormData, SignupFormData, StorePublic } from '$lib/types'
+import type { SigninFormData, SignupFormData } from '$lib/types'
 import { extractFormData } from '$lib/utils/form'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail, type Actions } from '@sveltejs/kit'
@@ -16,21 +16,17 @@ const signinFields = ['email', 'password']
  * @returns
  */
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  const { data: stores, error } = await supabase
+  const { data, error } = await supabase
     .from('stores_public')
     .select('*')
     .order('type', { ascending: true }) // 'hq' 먼저
     .order('name', { ascending: true }) // 이름순 정렬
 
-  if (error) {
-    return {
-      stores: [] as StorePublic[],
-    }
-  }
+  if (error) return { stores: [] }
 
-  return {
-    stores: (stores || []) as StorePublic[],
-  }
+  const { convertAll } = storeDataConverter()
+
+  return { stores: convertAll(data) }
 }
 
 export const actions: Actions = {

@@ -1,6 +1,6 @@
 import { SignUpError } from '$lib/errors/index.js'
 import { signupHook } from '$lib/hooks/index.js'
-import type { Profile, SignupFormData } from '$lib/types'
+import type { ProfileData, SignupFormData } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -44,7 +44,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 }
 
 // signup_approval_requests 테이블에서 승인 상태 조회 함수
-const getApprovalStatus = async (supabase: SupabaseClient, userId: string): Promise<Profile | null> => {
+const getApprovalStatus = async (supabase: SupabaseClient, userId: string): Promise<ProfileData | null> => {
   const { data } = await supabase
     .from('signup_approval_requests')
     .select('id, email, role, status')

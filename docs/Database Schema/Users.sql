@@ -20,11 +20,11 @@ END$$;
 CREATE TABLE public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name text NOT NULL,
+  email text UNIQUE NOT NULL,
   phone text,
   profile_image_url text,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-  last_sign_in_at timestamptz
+  updated_at timestamptz DEFAULT now()
 );
 
 COMMENT ON TABLE public.profiles IS '사용자 프로필';
@@ -32,17 +32,17 @@ COMMENT ON TABLE public.profiles IS '사용자 프로필';
 -- signup_approval_requests 테이블: 회원가입 등 승인 요청 관리
 CREATE TABLE public.signup_approval_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  applicant_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- 요청자
-  approver_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,          -- 승인자(본사)
+  applicant_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE, -- 요청자
+  approver_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,          -- 승인자(본사)
   store_id uuid REFERENCES public.stores(id) ON DELETE CASCADE,
   status approval_status NOT NULL DEFAULT 'pending',
   reason text NOT NULL DEFAULT '신규 가입 승인 요청',
-  cancel_reason text,
   requested_at timestamptz,
+  approved_at timestamptz,
+  cancelled_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
-
 COMMENT ON TABLE public.signup_approval_requests IS '회원가입 승인 요청 관리 테이블';
 
 -- ==============================

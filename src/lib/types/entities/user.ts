@@ -6,14 +6,12 @@ export enum UserType {
 }
 
 // 사용자 기본 정보
-export interface Profile {
+export interface ProfileData {
   id: string
+  name: string
   email: string
-  name?: string
   phone?: string
-  avatar_url?: string
-  role: UserType
-  store_id?: string
+  profile_image?: string
   created_at?: string
   updated_at?: string
 }

@@ -6,11 +6,12 @@ import type { SignupHookContext } from '$lib/types'
  * 사용자 프로필 생성
  */
 const createProfile = async ({ signupData, userId, supabase }: SignupHookContext) => {
-  const { name, phone1, phone2, phone3 } = signupData
+  const { name, email, phone1, phone2, phone3 } = signupData
 
   let payload = {
     id: userId,
     name,
+    email,
     phone: '',
   }
 

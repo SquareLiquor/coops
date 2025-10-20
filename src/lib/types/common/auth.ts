@@ -1,6 +1,12 @@
-import type { SupabaseClient, User } from '@supabase/supabase-js'
-import type { UserType } from '../entities/user'
-import type { SigninFormData, SignupFormData } from './form'
+import type { User } from '@supabase/supabase-js'
+import type { StoreData } from '../entities'
+import type { ProfileData, UserType } from '../entities/user'
+
+export enum ApprovalStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
 
 export interface AuthState {
   // 기본 인증 상태
@@ -18,22 +24,19 @@ export interface AuthState {
   error: string | null
 }
 
-export interface HookContext {
-  supabase: SupabaseClient // CSR/SSR 양쪽에서 사용 가능하도록 supabase 클라이언트 포함
-}
-
-export interface SignupHookContext extends HookContext {
-  signupData: SignupFormData
-  userId?: string | null
-}
-
-export interface SigninHookContext extends HookContext {
-  signinData: SigninFormData
-  userId?: string | null
-}
-
-export enum ApprovalStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
+export interface SignupApprovalRequestData {
+  id: string
+  applicant_id: string
+  approver_id?: string
+  store_id?: string
+  status: ApprovalStatus
+  reason?: string
+  applicant?: ProfileData
+  approver?: ProfileData
+  store?: StoreData
+  requested_at?: string | null
+  approved_at?: string | null
+  cancelled_at?: string | null
+  created_at?: string | null
+  updated_at?: string | null
 }
