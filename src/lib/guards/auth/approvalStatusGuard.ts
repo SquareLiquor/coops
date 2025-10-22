@@ -11,15 +11,10 @@ export const approvalStatusGuard: Handle = async ({ event, resolve }) => {
   const supabase = createServerClient()
   const {
     url,
-    locals: { session },
+    locals: { user },
   } = event
 
-  // TODO: user id??
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
   const { id } = user || {}
-  console.log('Approval Status Guard - User:', session)
 
   // 해당 사용자의 최신 승인 요청 상태 조회
   const { data, error } = await supabase
@@ -30,8 +25,7 @@ export const approvalStatusGuard: Handle = async ({ event, resolve }) => {
     .limit(1)
     .single()
 
-  console.log('Approval Status Guard:', { data, error })
-  if (data?.status === ApprovalStatus.PENDING && !url.pathname.startsWith('/auth/pending')) {
+  if (data?.status === ApprovalStatus.PENDING.code && !url.pathname.startsWith('/auth/pending')) {
     throw redirect(303, '/auth/pending')
   }
 

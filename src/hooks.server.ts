@@ -72,10 +72,9 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.session = session
   event.locals.user = user
 
-  console.log('Auth Guard - User:', user)
   return resolve(event)
 }
 
-const customGuards = [authenticatedGuard, userTypeGuard, approvalStatusGuard]
+const customGuards = [authenticatedGuard, approvalStatusGuard, userTypeGuard]
 
 export const handle: Handle = sequence(supabase, authGuard, ...customGuards)

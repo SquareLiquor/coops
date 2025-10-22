@@ -34,5 +34,6 @@ export const userTypeGuard: Handle = async ({ event, resolve }) => {
   if (user_type !== UserType.HQ && url.pathname.startsWith('/hq')) {
     throw redirect(303, '/')
   }
+
   return resolve(event)
 }

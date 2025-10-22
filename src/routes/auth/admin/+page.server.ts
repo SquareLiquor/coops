@@ -41,27 +41,25 @@ export const actions: Actions = {
     let userId = null
 
     try {
-      await signupHook.runBefore({ supabase, signupData })
+      await signupHook.runBefore({ signupData })
 
       const { user } = await signup(supabase, signupData)
       userId = user.id
 
-      await signupHook.runAfter({ supabase, signupData, userId })
+      await signupHook.runAfter({ signupData, userId })
 
       return { success: true, redirectTo: '/' } // redirect 대신 반환
       // throw redirect(303, '/')
     } catch (error) {
       if (error instanceof SignUpError) {
         error.errorHandler()
-        await signupHook.runCleanup({ supabase, signupData, userId })
+        await signupHook.runCleanup({ signupData, userId })
 
         return fail(error.status, { code: error.code, message: error.details?.message })
       }
 
       return fail(400, { code: 'signup_error', message: '회원 가입 중 오류가 발생하였습니다.' })
     }
-
-    // throw redirect(303, '/')
   },
 
   /**
@@ -76,8 +74,8 @@ export const actions: Actions = {
     try {
       await signin(supabase, signinData)
 
-      return { success: true, redirectTo: '/' } // redirect 대신 반환
-      // throw redirect(303, '/admin')
+      return { success: true, redirectTo: '/admin' } // redirect 대신 반환
+      // throw redirect(303, '/')
     } catch (error) {
       if (error instanceof SignInError) {
         error.errorHandler()
@@ -87,8 +85,6 @@ export const actions: Actions = {
 
       return fail(400, { code: 'signin_error', message: '로그인 중 오류가 발생하였습니다.' })
     }
-
-    // throw redirect(303, '/')
   },
 }
 

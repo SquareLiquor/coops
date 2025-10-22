@@ -46,7 +46,10 @@
     }
   }
 
-  // TODO: enhance, validate 분리
+  /**
+   * TODO: SSR 갱신, CSR 페이지 변경 이슈로 enhance가 아니라 form actions 직접 처리하도록 변경해야 됨
+   *  - form actions에서 throw redirect
+   */
   const handleEnhance = ({ formData, cancel }: { formData: FormData; cancel: () => void }) => {
     const error = validate(formData)
 
@@ -62,8 +65,7 @@
 
       // TODO: goto로 변경, SSR 문제로 인해 location.href 사용
       if (result?.type === 'success') {
-        location.href = result.data?.redirectTo || '/'
-        // goto(result.data?.redirectTo || '/admin')
+        location.href = result.data?.redirectTo || '/admin'
       }
     }
   }
