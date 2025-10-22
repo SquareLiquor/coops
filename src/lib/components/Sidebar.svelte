@@ -1,19 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
   import { getAuth } from '$lib/stores'
-  import { createEventDispatcher } from 'svelte'
 
-  // Props
-  let { mobileMenuOpen, menuItems, settingsPath } = $props()
+  let { mobileMenuOpen, menuItems, settingsPath, onCloseMobile } = $props()
+
+  const currentPath = $derived(page.url.pathname)
   const user = $derived(getAuth().user)
 
-  // Event dispatcher
-  const dispatch = createEventDispatcher()
-
-  const currentPath = $page.url.pathname
-
   function handleMenuClick() {
-    dispatch('closeMobile')
+    onCloseMobile()
   }
 </script>
 

@@ -65,18 +65,7 @@
   </button>
 
   <!-- Unified Sidebar Component -->
-  <Sidebar
-    {mobileMenuOpen}
-    menuItems={adminMenuItems}
-    settingsPath="/admin/settings"
-    brandTitle="공동구매 관리자"
-    brandSubtitle="신선마트 강남점"
-    userInfo={{
-      name: '김관리자',
-      email: 'admin@coops.com',
-    }}
-    on:closeMobile={closeMobileMenu}
-  />
+  <Sidebar {mobileMenuOpen} menuItems={adminMenuItems} settingsPath="/admin/settings" onCloseMobile={closeMobileMenu} />
 
   <!-- Overlay for mobile -->
   {#if mobileMenuOpen}

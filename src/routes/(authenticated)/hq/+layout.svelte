@@ -69,7 +69,7 @@
   </button>
 
   <!-- Unified Sidebar Component -->
-  <Sidebar {mobileMenuOpen} menuItems={hqMenuItems} settingsPath="/hq/settings" on:closeMobile={closeMobileMenu} />
+  <Sidebar {mobileMenuOpen} menuItems={hqMenuItems} settingsPath="/hq/settings" onCloseMobile={closeMobileMenu} />
 
   <!-- Overlay for mobile -->
   {#if mobileMenuOpen}
