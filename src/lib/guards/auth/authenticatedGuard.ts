@@ -8,12 +8,17 @@ import { type Handle, redirect } from '@sveltejs/kit'
 export const authenticatedGuard: Handle = async ({ event, resolve }) => {
   const {
     locals: { session },
+    url,
     route,
   } = event
 
   const auth_protected_path = '(authenticated)'
 
   if (!session && route.id?.includes(auth_protected_path)) {
+    if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/hq')) {
+      throw redirect(303, '/auth/admin')
+    }
+
     throw redirect(303, '/auth')
   }
 
