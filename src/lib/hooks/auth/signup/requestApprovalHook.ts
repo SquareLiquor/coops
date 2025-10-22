@@ -1,10 +1,12 @@
 import { SignUpError } from '$lib/errors'
 import type { HookContext } from '$lib/hooks/hooksManager'
+import { createServerClient } from '$lib/supabase'
 import type { SignupHookContext } from '$lib/types'
 
 // const supabase = createBrowserClient()
 
-const requestSignupApproval = async ({ signupData, userId, supabase }: SignupHookContext) => {
+const requestSignupApproval = async ({ signupData, userId }: SignupHookContext) => {
+  const supabase = createServerClient()
   const { storeId } = signupData
 
   const payload = {
@@ -26,6 +28,6 @@ const requestSignupApproval = async ({ signupData, userId, supabase }: SignupHoo
   }
 }
 
-export const requestSignupApprovalHook: HookContext<SignupHookContext> = {
+export const requestApprovalHook: HookContext<SignupHookContext> = {
   hook: requestSignupApproval,
 }

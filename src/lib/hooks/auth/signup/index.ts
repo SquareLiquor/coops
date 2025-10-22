@@ -1,10 +1,10 @@
 import { createHook } from '$lib/hooks/hooksManager'
 import type { SignupHookContext } from '$lib/types'
+import { addStoreMemberHook } from './addStoreMemberHook'
 import { createProfileHook } from './createProfileHook'
-import { addStoreMemberHook } from './createStoreMemberHook'
 import { deleteUserHook } from './deleteUserHook'
-import { requestSignupApprovalHook } from './requestSignupApprovalHook'
-import { updateAppMetadataHook } from './updateAppMetadataHook'
+import { requestApprovalHook } from './requestApprovalHook'
+import { updateAppMetadataHook } from './updateMetadataHook'
 
 export const signupHook = createHook<SignupHookContext>()
 
@@ -17,4 +17,4 @@ signupHook.cleanup(deleteUserHook)
 signupHook.after(updateAppMetadataHook)
 signupHook.after(createProfileHook)
 signupHook.after(addStoreMemberHook)
-signupHook.after(requestSignupApprovalHook)
+signupHook.after(requestApprovalHook)

@@ -1,11 +1,13 @@
 import { SignUpError } from '$lib/errors'
 import type { HookContext } from '$lib/hooks/hooksManager'
+import { createServerClient } from '$lib/supabase'
 import type { SignupHookContext } from '$lib/types'
 
 /**
  * 사용자 프로필 생성
  */
-const createProfile = async ({ signupData, userId, supabase }: SignupHookContext) => {
+const createProfile = async ({ signupData, userId }: SignupHookContext) => {
+  const supabase = createServerClient()
   const { name, email, phone1, phone2, phone3 } = signupData
 
   let payload = {
