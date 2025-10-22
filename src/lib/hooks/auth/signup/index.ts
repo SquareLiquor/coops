@@ -1,6 +1,5 @@
 import { createHook } from '$lib/hooks/hooksManager'
 import type { SignupHookContext } from '$lib/types'
-import { addStoreMemberHook } from './addStoreMemberHook'
 import { createProfileHook } from './createProfileHook'
 import { deleteUserHook } from './deleteUserHook'
 import { requestApprovalHook } from './requestApprovalHook'
@@ -16,5 +15,4 @@ signupHook.cleanup(deleteUserHook)
 // Add after sign up hooks & cleanup
 signupHook.after(updateAppMetadataHook)
 signupHook.after(createProfileHook)
-signupHook.after(addStoreMemberHook)
 signupHook.after(requestApprovalHook)
