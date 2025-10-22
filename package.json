@@ -48,6 +48,7 @@
     "@skeletonlabs/skeleton-svelte": "^1.5.3",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.75.0",
-    "dayjs": "^1.11.18"
+    "dayjs": "^1.11.18",
+    "immer": "^10.1.3"
   }
 }
