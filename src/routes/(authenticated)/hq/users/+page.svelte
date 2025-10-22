@@ -1,28 +1,61 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import { ApprovalStatus } from '$lib/types'
+  import { extractFormData } from '$lib/utils'
+  import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
+  import { produce } from 'immer'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
   let requests = $derived(data.requests)
   let statusOptions = $derived([{ code: 'all', label: '전체' }, ...data.statusOptions])
-
-  let searchForm = {
+  let loadingRequests: string[] = $state([])
+  let searchForm = $state({
     status: 'all',
-    name: '',
-    date_from: '',
-    date_to: '',
-  }
-
-  // TODO: filter
-  // TODO: do action
-  // TODO: pagination
+    name: undefined,
+    date_from: undefined,
+    date_to: undefined,
+  })
 
   /**
-   * filter 설정
+   * TODO: filter 설정
    * - 날짜 필터, 이름 검색 필터는 실제 데이터 재조회
    * - 상태 필터는 상태변경으로 관리
    */
+  let filteredRequests = $derived(
+    requests.filter((request) => {
+      const matchesStatus = searchForm.status === 'all' ? true : request.status === searchForm.status
+      const matchesName = !searchForm.name ? true : request.applicant?.name.includes(searchForm.name)
+      const matchesStore = !searchForm.name ? true : request.store?.name.includes(searchForm.name)
+      const matchesDateFrom = !searchForm.date_from
+        ? true
+        : dayjs(request.created_at).isAfter(dayjs(searchForm.date_from))
+      const matchesDateTo = !searchForm.date_to
+        ? true
+        : dayjs(request.created_at).isBefore(dayjs(searchForm.date_to).add(1, 'day'))
+
+      return matchesStatus && (matchesName || matchesStore) && matchesDateFrom && matchesDateTo
+    })
+  )
+
+  const requestEnhance = async ({ formData }: { formData: FormData }) => {
+    const { id } = await extractFormData(formData, ['id'])
+    if (!!id) loadingRequests = [...loadingRequests, id]
+
+    return ({ result }: { result: ActionResult }) => {
+      loadingRequests = loadingRequests.filter((_id) => _id !== id) || []
+
+      if (result?.type === 'success') {
+        const updatedRequest = result?.data?.request
+
+        requests = produce(requests, (draft) => {
+          const idx = draft.findIndex((req) => req.id === updatedRequest.id)
+          if (idx !== -1) draft[idx] = updatedRequest
+        })
+      }
+    }
+  }
 
   function getStatusBadge(status: string) {
     switch (status) {
@@ -127,12 +160,12 @@
           <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">상태</th>
           <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">신청일</th>
           <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">승인일/취소일</th>
-          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">사유</th>
+          <!-- <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">사유</th> -->
           <th class="text-surface-500 w-32 px-4 py-3 text-center text-xs font-medium"></th>
         </tr>
       </thead>
       <tbody class="divide-surface-100 divide-y bg-white">
-        {#each requests as request, index}
+        {#each filteredRequests as request, index}
           <tr class="hover:bg-surface-50 text-center">
             <td class="text-surface-500 px-4 py-4 text-sm">
               {index + 1}
@@ -158,16 +191,19 @@
               <div class="text-surface-500 text-xs">{dayjs(request.requested_at).format('HH:mm:ss')}</div>
             </td>
             <td class="px-4 py-4">
-              {#if request.approved_at}
+              {#if request.status === ApprovalStatus.PENDING.code}
+                -
+              {/if}
+              {#if request.status === ApprovalStatus.APPROVED.code}
                 <div class="text-primary-600 text-sm">{dayjs(request.approved_at).format('YYYY-MM-DD')}</div>
                 <div class="text-surface-500 text-xs">{dayjs(request.approved_at).format('HH:mm:ss')}</div>
               {/if}
-              {#if request.cancelled_at}
+              {#if request.status === ApprovalStatus.REJECTED.code}
                 <div class="text-sm text-red-600">{dayjs(request.cancelled_at).format('YYYY-MM-DD')}</div>
                 <div class="text-surface-500 text-xs">{dayjs(request.cancelled_at).format('HH:mm:ss')}</div>
               {/if}
             </td>
-            <td class="px-4 py-4">
+            <!-- <td class="px-4 py-4">
               <div
                 class="text-sm {request.cancelled_at
                   ? 'text-red-600'
@@ -177,27 +213,43 @@
               >
                 {request.reason}
               </div>
-            </td>
+            </td> -->
             <td class="px-4 py-4">
-              {#if request.status === ApprovalStatus.PENDING.code}
-                <div class="flex items-center justify-center gap-1">
-                  <button class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200">
-                    승인
-                  </button>
-                  <button class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200">
-                    거부
-                  </button>
+              <form method="POST" use:enhance={requestEnhance}>
+                <input type="hidden" name="id" value={request.id} />
+                <div class="relative flex items-center justify-center gap-1">
+                  {#if loadingRequests.includes(request.id)}
+                    <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+                      <span class="loader"></span>
+                    </div>
+                  {/if}
+                  {#if request.status !== ApprovalStatus.APPROVED.code}
+                    <button
+                      class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200"
+                      formaction="?/approve"
+                      disabled={loadingRequests.includes(request.id)}
+                    >
+                      승인
+                    </button>
+                  {/if}
+                  {#if request.status !== ApprovalStatus.REJECTED.code}
+                    <button
+                      class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
+                      formaction="?/reject"
+                      disabled={loadingRequests.includes(request.id)}
+                    >
+                      거부
+                    </button>
+                  {/if}
                 </div>
-              {:else}
-                <span class="text-surface-400 text-xs"> - </span>
-              {/if}
+              </form>
             </td>
           </tr>
         {/each}
       </tbody>
     </table>
 
-    {#if requests.length === 0}
+    {#if filteredRequests.length === 0}
       <div class="py-12 text-center">
         <svg class="text-surface-400 mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -213,3 +265,24 @@
     {/if}
   </div>
 </div>
+
+<style>
+  .loader {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>

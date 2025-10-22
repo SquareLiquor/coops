@@ -74,6 +74,10 @@ CREATE TRIGGER trg_update_stores_updated_at
 BEFORE UPDATE ON public.stores
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
+CREATE TRIGGER trg_update_store_members_updated_at
+BEFORE UPDATE ON public.store_members
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ==============================
 -- 6) Realtime publication (supabase_realtime)

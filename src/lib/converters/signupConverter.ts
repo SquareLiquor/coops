@@ -29,7 +29,7 @@ export const signinFormConverter = (raw: Record<string, string | undefined>) => 
   }
 }
 
-export const signupApprovalRequestDataConverter = () => {
+export const approvalRequestDataConverter = () => {
   const convert = (data: any): SignupApprovalRequestData | undefined => {
     if (!data) return undefined
 
@@ -67,6 +67,7 @@ export const signupApprovalRequestDataConverter = () => {
       store: storeDataConverter().convert(store),
     }
   }
+
   const convertAll = (datas: any[]): SignupApprovalRequestData[] => {
     if (!datas) return []
 

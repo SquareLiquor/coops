@@ -36,7 +36,7 @@ export const actions: Actions = {
    * @returns
    */
   signup: async ({ request, locals: { supabase } }) => {
-    const rawForm = await extractFormData(request, signupFields)
+    const rawForm = await extractFormData(await request.formData(), signupFields)
     const signupData: SignupFormData = signupFormConverter(rawForm)
     let userId = null
 
@@ -68,7 +68,7 @@ export const actions: Actions = {
    * @returns
    */
   signin: async ({ request, locals: { supabase } }) => {
-    const rawForm = await extractFormData(request, signinFields)
+    const rawForm = await extractFormData(await request.formData(), signinFields)
     const signinData: SigninFormData = signinFormConverter(rawForm)
 
     try {

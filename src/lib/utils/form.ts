@@ -42,12 +42,11 @@ export const extractRemoteFormData = async <K extends string>(
  * @param items 추출할 필드 이름들의 배열
  * @returns 추출된 필드들을 포함하는 FormData 객체
  */
-export const extractFormData = async <K extends string>(request: Request, items: K[]): Promise<FormDataObject<K>> => {
-  const formDataRaw = await request.formData()
+export const extractFormData = async <K extends string>(data: FormData, items: K[]): Promise<FormDataObject<K>> => {
   const result = {} as FormDataObject<K>
 
   for (const item of items) {
-    const value = formDataRaw.get(item)
+    const value = data.get(item)
 
     if (value !== undefined && value !== null) {
       result[item] = typeof value === 'string' ? value : String(value)

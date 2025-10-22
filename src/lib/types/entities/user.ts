@@ -36,7 +36,7 @@ export interface SignupApprovalRequestData {
   applicant_id: string
   approver_id?: string
   store_id?: string
-  status: 'pending' | 'approved' | 'rejected'
+  status: ApprovalStatus['code']
   reason?: string
   applicant?: ProfileData
   approver?: ProfileData
