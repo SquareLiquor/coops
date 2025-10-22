@@ -1,31 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { Avatar } from '@skeletonlabs/skeleton-svelte'
+  import { getAuth } from '$lib/stores'
   import { createEventDispatcher } from 'svelte'
 
   // Props
-  export let mobileMenuOpen: boolean = false
-  export let menuItems: Array<{
-    href: string
-    label: string
-    icon: string
-  }> = []
-  export let settingsPath: string = '/settings'
-  export let brandTitle: string = '공동구매 관리자'
-  export let brandSubtitle: string = '신선마트 강남점'
-  export let userInfo: {
-    name: string
-    email: string
-    avatar?: string
-  } = {
-    name: '김관리자',
-    email: 'admin@coops.com',
-  }
+  let { mobileMenuOpen, menuItems, settingsPath } = $props()
+  const user = $derived(getAuth().user)
 
   // Event dispatcher
   const dispatch = createEventDispatcher()
 
-  $: currentPath = $page.url.pathname
+  const currentPath = $page.url.pathname
 
   function handleMenuClick() {
     dispatch('closeMobile')
@@ -45,8 +30,8 @@
   <div class="mt-5 flex items-center gap-2 px-6 py-4">
     <div class="text-2xl">🏪</div>
     <div>
-      <h1 class="text-surface-900 text-lg font-bold">{brandTitle}</h1>
-      <p class="text-surface-500 text-xs">{brandSubtitle}</p>
+      <h1 class="text-surface-900 text-lg font-bold">공동구매 관리자</h1>
+      <p class="text-surface-500 text-xs">강남점</p>
     </div>
   </div>
 
@@ -61,7 +46,7 @@
               {currentPath === item.href
               ? 'bg-primary-500 text-primary-50 border-primary-200 border'
               : 'text-surface-700 hover:bg-surface-100'}"
-            on:click={handleMenuClick}
+            onclick={handleMenuClick}
           >
             <svg
               class="h-4 w-4 {currentPath === item.href
@@ -88,7 +73,7 @@
         {currentPath === settingsPath
         ? 'bg-primary-500 text-primary-50 border-primary-200 border'
         : 'text-surface-700 hover:bg-surface-100'}"
-      on:click={handleMenuClick}
+      onclick={handleMenuClick}
     >
       <svg
         class="h-4 w-4 {currentPath === settingsPath
@@ -114,12 +99,12 @@
     <div class="mb-6 px-4 py-4">
       <div class="flex items-center gap-3">
         <!-- Avatar Component (Skeleton UI Style) -->
-        <div class="relative">
-          <Avatar src={userInfo.avatar || 'https://i.pravatar.cc/35'} name="skeleton" />
-        </div>
+        <!-- <div class="relative">
+          <Avatar src={user.ima || 'https://i.pravatar.cc/35'} name="skeleton" />
+        </div> -->
         <div class="min-w-0 flex-1">
-          <p class="text-surface-900 truncate text-sm font-medium">{userInfo.name}</p>
-          <p class="text-surface-500 truncate text-xs">{userInfo.email}</p>
+          <p class="text-surface-900 truncate text-sm font-medium">{user?.user_metadata.name}</p>
+          <p class="text-surface-500 truncate text-xs">{user?.email}</p>
         </div>
         <button
           class="text-surface-400 hover:text-surface-600 hover:bg-surface-200 focus:ring-surface-300 inline-flex items-center justify-center rounded-lg p-2 transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"

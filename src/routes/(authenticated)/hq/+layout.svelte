@@ -69,18 +69,7 @@
   </button>
 
   <!-- Unified Sidebar Component -->
-  <Sidebar
-    {mobileMenuOpen}
-    menuItems={hqMenuItems}
-    settingsPath="/hq/settings"
-    brandTitle="공동구매 본사"
-    brandSubtitle="신선마트 본부"
-    userInfo={{
-      name: '박본부장',
-      email: 'hq@coops.com',
-    }}
-    on:closeMobile={closeMobileMenu}
-  />
+  <Sidebar {mobileMenuOpen} menuItems={hqMenuItems} settingsPath="/hq/settings" on:closeMobile={closeMobileMenu} />
 
   <!-- Overlay for mobile -->
   {#if mobileMenuOpen}
