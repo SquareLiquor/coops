@@ -1,34 +1,28 @@
 <script lang="ts">
+  import { ApprovalStatus } from '$lib/types'
   import dayjs from 'dayjs'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
   let requests = $derived(data.requests)
+  let statusOptions = $derived([{ code: 'all', label: '전체' }, ...data.statusOptions])
 
-  let selectedStatus = 'all'
-  let searchName = ''
-  let dateFrom = ''
-  let dateTo = ''
-
-  const statusOptions = [
-    { value: 'all', label: '전체' },
-    {
-      value: 'pending',
-      label: '승인대기',
-    },
-    {
-      value: 'approved',
-      label: '승인완료',
-    },
-    {
-      value: 'rejected',
-      label: '거부됨',
-    },
-  ]
+  let searchForm = {
+    status: 'all',
+    name: '',
+    date_from: '',
+    date_to: '',
+  }
 
   // TODO: filter
   // TODO: do action
   // TODO: pagination
+
+  /**
+   * filter 설정
+   * - 날짜 필터, 이름 검색 필터는 실제 데이터 재조회
+   * - 상태 필터는 상태변경으로 관리
+   */
 
   function getStatusBadge(status: string) {
     switch (status) {
@@ -77,8 +71,8 @@
       <div class="flex items-center gap-2">
         <input
           type="date"
-          bind:value={dateFrom}
-          class="border-0 border-b px-3 py-1.5 text-sm {dateFrom
+          bind:value={searchForm.date_from}
+          class="border-0 border-b px-3 py-1.5 text-sm {searchForm.date_from
             ? 'border-primary-500 text-primary-700'
             : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
           placeholder="From"
@@ -86,8 +80,8 @@
         <span class="text-surface-400">~</span>
         <input
           type="date"
-          bind:value={dateTo}
-          class="border-0 border-b px-3 py-1.5 text-sm {dateTo
+          bind:value={searchForm.date_to}
+          class="border-0 border-b px-3 py-1.5 text-sm {searchForm.date_to
             ? 'border-primary-500 text-primary-700'
             : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
           placeholder="To"
@@ -97,9 +91,9 @@
       <!-- 검색 필터 -->
       <input
         type="text"
-        bind:value={searchName}
+        bind:value={searchForm.name}
         placeholder="이름 또는 매장명 검색"
-        class="border-0 border-b px-3 py-1.5 text-sm {searchName
+        class="border-0 border-b px-3 py-1.5 text-sm {searchForm.name
           ? 'border-primary-500 text-primary-700'
           : 'border-surface-100'} focus:border-primary-500 w-64 bg-transparent focus:outline-none"
       />
@@ -109,10 +103,10 @@
     <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
       {#each statusOptions as option}
         <button
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {searchForm.status === option.code
             ? 'bg-primary-500 text-primary-50 shadow-sm'
             : 'text-surface-600 hover:text-surface-800'}"
-          onclick={() => (selectedStatus = option.value)}
+          onclick={() => (searchForm.status = option.code)}
         >
           {option.label}
         </button>
@@ -174,10 +168,18 @@
               {/if}
             </td>
             <td class="px-4 py-4">
-              <div class="text-sm {request.cancelled_at ? 'text-red-600' : 'text-primary-600'}">{request.reason}</div>
+              <div
+                class="text-sm {request.cancelled_at
+                  ? 'text-red-600'
+                  : request.approved_at
+                    ? 'text-green-600'
+                    : 'text-yellow-600'}"
+              >
+                {request.reason}
+              </div>
             </td>
             <td class="px-4 py-4">
-              {#if request.status === 'pending'}
+              {#if request.status === ApprovalStatus.PENDING.code}
                 <div class="flex items-center justify-center gap-1">
                   <button class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200">
                     승인

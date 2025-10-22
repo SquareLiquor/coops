@@ -1,5 +1,5 @@
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import { authenticatedGuard, userTypeGuard } from '$lib/guards'
+import { approvalStatusGuard, authenticatedGuard, userTypeGuard } from '$lib/guards'
 import { createServerClient } from '@supabase/ssr'
 import { type Handle } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
@@ -72,10 +72,10 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.session = session
   event.locals.user = user
 
+  console.log('Auth Guard - User:', user)
   return resolve(event)
 }
 
-// const customGuards = [authenticatedGuard, userTypeGuard, approvalStatusGuard]
-const customGuards = [authenticatedGuard, userTypeGuard]
+const customGuards = [authenticatedGuard, userTypeGuard, approvalStatusGuard]
 
 export const handle: Handle = sequence(supabase, authGuard, ...customGuards)

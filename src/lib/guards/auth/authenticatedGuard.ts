@@ -1,3 +1,4 @@
+import { UserType } from '$lib/types'
 import { type Handle, redirect } from '@sveltejs/kit'
 
 /**
@@ -7,11 +8,12 @@ import { type Handle, redirect } from '@sveltejs/kit'
  */
 export const authenticatedGuard: Handle = async ({ event, resolve }) => {
   const {
-    locals: { session },
+    locals: { session, user },
     url,
     route,
   } = event
 
+  const { app_metadata: { user_type } = {} } = user || {}
   const auth_protected_path = '(authenticated)'
 
   if (!session && route.id?.includes(auth_protected_path)) {
@@ -20,6 +22,10 @@ export const authenticatedGuard: Handle = async ({ event, resolve }) => {
     }
 
     throw redirect(303, '/auth')
+  }
+
+  if (session && ['/auth', '/auth/admin'].includes(url.pathname)) {
+    throw redirect(303, user_type === UserType.CONSUMER ? '/' : user_type === UserType.BRANCH ? '/admin' : '/hq')
   }
 
   return resolve(event)

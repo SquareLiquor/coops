@@ -34,5 +34,7 @@ export interface StoreMember {
   id: string
   store_id: string
   user_id: string
+  store?: StoreData
+  user?: ProfileData
   created_at?: string
 }

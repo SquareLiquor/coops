@@ -1,8 +1,9 @@
 import { signupApprovalRequestDataConverter } from '$lib/converters'
+import { ApprovalStatus } from '$lib/types'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const { data, error } = await locals.supabase
+  const { data } = await locals.supabase
     .from('signup_approval_requests')
     .select(
       `
@@ -14,10 +15,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     )
     .not('store_id', 'is', null)
 
-  if (error) return { requests: [] }
-
   const { convertAll } = signupApprovalRequestDataConverter()
 
-  console.log(data)
-  return { requests: convertAll(data) }
+  return {
+    requests: data ? convertAll(data) : [],
+    statusOptions: Object.values(ApprovalStatus),
+  }
 }
