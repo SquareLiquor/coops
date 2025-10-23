@@ -74,7 +74,7 @@ export const actions: Actions = {
     try {
       await signin(supabase, signinData)
 
-      return { success: true, redirectTo: '/admin' } // redirect 대신 반환
+      return { success: true, redirectTo: '/' } // redirect 대신 반환
       // throw redirect(303, '/')
     } catch (error) {
       if (error instanceof SignInError) {

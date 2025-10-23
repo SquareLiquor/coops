@@ -1,4 +1,4 @@
-import { equalsEnum, UserType } from '$lib/types'
+import { UserType } from '$lib/types'
 import { redirect, type Handle } from '@sveltejs/kit'
 
 /**
@@ -15,23 +15,23 @@ export const userTypeGuard: Handle = async ({ event, resolve }) => {
   const { app_metadata } = user || {}
   const { user_type } = app_metadata || {}
 
-  if (equalsEnum(UserType.CONSUMER, user_type) && url.pathname === '/') {
+  if (UserType.CONSUMER.code === user_type && url.pathname === '/') {
     throw redirect(303, '/coops')
   }
 
-  if (equalsEnum(UserType.BRANCH, user_type) && url.pathname === '/') {
+  if (UserType.BRANCH.code === user_type && url.pathname === '/') {
     throw redirect(303, '/admin')
   }
 
-  if (equalsEnum(UserType.HQ, user_type) && url.pathname === '/') {
+  if (UserType.HQ.code === user_type && url.pathname === '/') {
     throw redirect(303, '/hq')
   }
 
-  if (equalsEnum(UserType.BRANCH, user_type) && url.pathname.startsWith('/admin')) {
+  if (UserType.BRANCH.code !== user_type && url.pathname.startsWith('/admin')) {
     throw redirect(303, '/')
   }
 
-  if (equalsEnum(UserType.HQ, user_type) && url.pathname.startsWith('/hq')) {
+  if (UserType.HQ.code !== user_type && url.pathname.startsWith('/hq')) {
     throw redirect(303, '/')
   }
 
