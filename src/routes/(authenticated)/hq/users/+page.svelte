@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { ApprovalStatus } from '$lib/types'
+  import { ApprovalStatus, equalsEnum } from '$lib/types'
   import { extractFormData } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
@@ -78,7 +78,7 @@
           type="date"
           bind:value={searchForm.date_from}
           class="border-0 border-b px-3 py-1.5 text-sm {searchForm.date_from
-            ? 'border-primary-500 text-primary-700'
+            ? 'border-primary-500 text-surface-700'
             : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
           placeholder="From"
         />
@@ -87,7 +87,7 @@
           type="date"
           bind:value={searchForm.date_to}
           class="border-0 border-b px-3 py-1.5 text-sm {searchForm.date_to
-            ? 'border-primary-500 text-primary-700'
+            ? 'border-primary-500 text-surface-700'
             : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
           placeholder="To"
         />
@@ -109,8 +109,8 @@
       {#each statusOptions as option}
         <button
           class="rounded px-3 py-1.5 text-sm font-medium transition-colors {searchForm.status === option.code
-            ? 'bg-primary-500 text-primary-50 shadow-sm'
-            : 'text-surface-600 hover:text-surface-800'}"
+            ? 'bg-primary-500 text-white shadow-sm'
+            : 'text-surface-600 hover:bg-surface-100'}"
           onclick={() => (searchForm.status = option.code)}
         >
           {option.label}
@@ -124,25 +124,25 @@
     <table class="min-w-full">
       <thead class="bg-surface-50 border-surface-100 border-b">
         <tr>
-          <th class="w-8 px-4 py-3 text-center">
-            <span class="text-surface-500 text-xs font-medium">#</span>
+          <th class="w-8 px-4 py-4 text-center">
+            <span class="text-surface-500 ont-bold">#</span>
           </th>
-          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">신청자 정보</th>
-          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">매장 정보</th>
-          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">상태</th>
-          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">신청일</th>
-          <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">승인일/취소일</th>
-          <!-- <th class="text-surface-500 px-4 py-3 text-center text-xs font-medium">사유</th> -->
-          <th class="text-surface-500 w-32 px-4 py-3 text-center text-xs font-medium"></th>
+          <th class="text-surface-500 px-4 text-center font-bold">신청자 정보</th>
+          <th class="text-surface-500 px-4 text-center font-bold">매장 정보</th>
+          <th class="text-surface-500 px-4 text-center font-bold">상태</th>
+          <th class="text-surface-500 px-4 text-center font-bold">신청일</th>
+          <th class="text-surface-500 px-4 text-center font-bold">승인일/취소일</th>
+          <!-- <th class="text-surface-500  text-center font-bold">사유</th> -->
+          <th class="text-surface-500 w-32 px-6 text-center font-bold"></th>
         </tr>
       </thead>
       <tbody class="divide-surface-100 divide-y bg-white">
         {#each filteredRequests as request, index}
           <tr class="hover:bg-surface-50 text-center">
-            <td class="text-surface-500 px-4 py-4 text-sm">
+            <td class="text-surface-500 py-4 text-sm">
               {index + 1}
             </td>
-            <td class="px-4 py-4">
+            <td>
               <div class="flex items-center justify-center">
                 <div class="ml-4">
                   <div class="text-surface-900 text-sm font-medium">{request.applicant?.name}</div>
@@ -153,31 +153,46 @@
             <td class="items-center px-4 py-4">
               <div class="text-surface-900 text-sm font-medium">{request.store?.name}</div>
             </td>
-            <td class="px-4 py-4">
+            <td class="text-surface-500 px-6 py-4 text-sm">
               <span
-                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium bg-${request.status?.color || 'surface'}-100 text-${request.status?.color || 'surface'}-800`}
+                class="inline-flex rounded-full px-2 py-1 text-xs font-medium text-white"
+                class:bg-success-500={equalsEnum(ApprovalStatus.APPROVED, request.status)}
+                class:bg-error-500={equalsEnum(ApprovalStatus.REJECTED, request.status)}
+                class:bg-warning-500={equalsEnum(ApprovalStatus.PENDING, request.status)}
               >
                 {request.status?.label}
               </span>
             </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-700 text-sm">{dayjs(request.requested_at).format('YYYY-MM-DD')}</div>
-              <div class="text-surface-500 text-xs">{dayjs(request.requested_at).format('HH:mm:ss')}</div>
+            <td>
+              <div class="text-surface-700 text-xs">{dayjs(request.requested_at).format('YYYY-MM-DD')}</div>
+              <div class="text-surface-300 text-xs">{dayjs(request.requested_at).format('HH:mm:ss')}</div>
             </td>
-            <td class="px-4 py-4">
-              {#if request.status?.code === ApprovalStatus.PENDING.code}
+            <td>
+              {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
                 -
+              {:else}
+                <div
+                  class="text-xs"
+                  class:text-success-500={equalsEnum(ApprovalStatus.APPROVED, request.status)}
+                  class:text-error-500={equalsEnum(ApprovalStatus.REJECTED, request.status)}
+                  class:text-warning-500={equalsEnum(ApprovalStatus.PENDING, request.status)}
+                >
+                  {dayjs(request.approved_at).format('YYYY-MM-DD')}
+                </div>
+                <div class="text-surface-300 text-xs">
+                  {dayjs(request.approved_at).format('HH:mm:ss')}
+                </div>
               {/if}
-              {#if request.status?.code === ApprovalStatus.APPROVED.code}
+              <!-- {#if request.status?.code === ApprovalStatus.APPROVED.code}
                 <div class="text-primary-600 text-sm">{dayjs(request.approved_at).format('YYYY-MM-DD')}</div>
-                <div class="text-surface-500 text-xs">{dayjs(request.approved_at).format('HH:mm:ss')}</div>
+                <div class="text-surface-200 text-xs">{dayjs(request.approved_at).format('HH:mm:ss')}</div>
               {/if}
               {#if request.status?.code === ApprovalStatus.REJECTED.code}
                 <div class="text-sm text-red-600">{dayjs(request.cancelled_at).format('YYYY-MM-DD')}</div>
-                <div class="text-surface-500 text-xs">{dayjs(request.cancelled_at).format('HH:mm:ss')}</div>
-              {/if}
+                <div class="text-surface-200 text-xs">{dayjs(request.cancelled_at).format('HH:mm:ss')}</div>
+              {/if} -->
             </td>
-            <!-- <td class="px-4 py-4">
+            <!-- <td>
               <div
                 class="text-sm {request.cancelled_at
                   ? 'text-red-600'
@@ -188,35 +203,36 @@
                 {request.reason}
               </div>
             </td> -->
-            <td class="px-4 py-4">
-              <form method="POST" use:enhance={requestEnhance}>
-                <input type="hidden" name="id" value={request.id} />
-                <div class="relative flex items-center justify-center gap-1">
-                  {#if loadingRequests.includes(request.id)}
-                    <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-                      <span class="loader"></span>
-                    </div>
-                  {/if}
-                  {#if request.status?.code !== ApprovalStatus.APPROVED.code}
+            <td>
+              {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
+                <form method="POST" use:enhance={requestEnhance}>
+                  <input type="hidden" name="id" value={request.id} />
+                  <div class="relative flex items-center justify-center gap-1">
+                    {#if loadingRequests.includes(request.id)}
+                      <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+                        <span class="loader"></span>
+                      </div>
+                    {/if}
                     <button
-                      class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200"
+                      class="bg-success-500 hover:bg-success-200 rounded px-4 py-2 text-xs font-medium text-white"
                       formaction="?/approve"
                       disabled={loadingRequests.includes(request.id)}
                     >
                       승인
                     </button>
-                  {/if}
-                  {#if request.status?.code !== ApprovalStatus.REJECTED.code}
+
                     <button
-                      class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
+                      class="bg-error-500 hover:bg-error-200 rounded px-4 py-2 text-xs font-medium text-white"
                       formaction="?/reject"
                       disabled={loadingRequests.includes(request.id)}
                     >
                       거부
                     </button>
-                  {/if}
-                </div>
-              </form>
+                  </div>
+                </form>
+              {:else}
+                -
+              {/if}
             </td>
           </tr>
         {/each}

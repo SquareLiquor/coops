@@ -1,4 +1,4 @@
-import { UserType } from '$lib/types'
+import { lookupEnum, UserType } from '$lib/types'
 import type { User } from '@supabase/supabase-js'
 
 interface params {
@@ -15,8 +15,8 @@ export const getUserType = ({ user, user_type }: params): UserType | undefined =
   if (!user && !user_type) return undefined
 
   let userType = undefined
-  !!user && (userType = UserType[user?.app_metadata?.user_type.toUpperCase()])
-  !!user_type && (userType = UserType[user_type.toUpperCase()])
+  !!user && (userType = lookupEnum(UserType, user?.app_metadata?.user_type))
+  !!user_type && (userType = lookupEnum(UserType, user_type))
 
   return userType
 }

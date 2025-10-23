@@ -1,4 +1,4 @@
-import { ApprovalStatus, type SignupApprovalRequestData, type SignupFormData } from '$lib/types'
+import { ApprovalStatus, lookupEnum, type ApprovalRequestData, type SignupFormData } from '$lib/types'
 import dayjs from 'dayjs'
 import { profileDataConverter } from './profileConverter'
 import { storeDataConverter } from './storeConverter'
@@ -30,7 +30,7 @@ export const signinFormConverter = (raw: Record<string, string | undefined>) => 
 }
 
 export const approvalRequestDataConverter = () => {
-  const convert = (data: any): SignupApprovalRequestData | undefined => {
+  const convert = (data: any): ApprovalRequestData | undefined => {
     if (!data) return undefined
 
     const {
@@ -55,7 +55,7 @@ export const approvalRequestDataConverter = () => {
       applicant_id,
       approver_id,
       store_id,
-      status: ApprovalStatus[(status as string).toUpperCase()],
+      status: lookupEnum(ApprovalStatus, status),
       reason,
       requested_at: dayjs(requested_at).isValid() ? dayjs(requested_at).format('YYYY-MM-DD HH:mm:ss') : null,
       approved_at: dayjs(approved_at).isValid() ? dayjs(approved_at).format('YYYY-MM-DD HH:mm:ss') : null,
@@ -68,10 +68,10 @@ export const approvalRequestDataConverter = () => {
     }
   }
 
-  const convertAll = (datas: any[]): SignupApprovalRequestData[] => {
+  const convertAll = (datas: any[]): ApprovalRequestData[] => {
     if (!datas) return []
 
-    return datas.map(convert).filter((item): item is SignupApprovalRequestData => item !== null)
+    return datas.map(convert).filter((item): item is ApprovalRequestData => item !== null)
   }
 
   return { convert, convertAll }

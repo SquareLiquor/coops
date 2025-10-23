@@ -11,12 +11,12 @@ export interface ProfileData {
   updated_at?: string
 }
 
-export interface SignupApprovalRequestData {
+export interface ApprovalRequestData {
   id: string
   applicant_id: string
   approver_id?: string
   store_id?: string
-  status: ApprovalStatus
+  status?: ApprovalStatus
   reason?: string
   applicant?: ProfileData
   approver?: ProfileData

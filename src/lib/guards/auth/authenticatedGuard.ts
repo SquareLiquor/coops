@@ -1,4 +1,4 @@
-import { UserType } from '$lib/types'
+import { equalsEnum, UserType } from '$lib/types'
 import { type Handle, redirect } from '@sveltejs/kit'
 
 /**
@@ -27,7 +27,7 @@ export const authenticatedGuard: Handle = async ({ event, resolve }) => {
   if (session && ['/auth', '/auth/admin'].includes(url.pathname)) {
     throw redirect(
       303,
-      user_type === UserType.CONSUMER.code ? '/' : user_type === UserType.BRANCH.code ? '/admin' : '/hq'
+      equalsEnum(UserType.CONSUMER, user_type) ? '/' : equalsEnum(UserType.BRANCH, user_type) ? '/admin' : '/hq'
     )
   }
 
