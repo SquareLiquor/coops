@@ -1,48 +1,114 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { ApprovalStatus, equalsEnum } from '$lib/types'
+  import Pagination from '$lib/components/Pagination.svelte'
+  import { approvalRequestDataConverter } from '$lib/converters'
+  import { ApprovalStatus, equalsEnum, type ApprovalRequestData } from '$lib/types'
   import { extractFormData } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { produce } from 'immer'
+  import { onDestroy, onMount, tick } from 'svelte'
   import type { PageProps } from './$types'
 
+  const { convertAll } = approvalRequestDataConverter()
+
   let { data }: PageProps = $props()
-  let requests = $derived(data.requests)
-  let statusOptions = $derived([{ code: 'all', label: '전체' }, ...data.statusOptions])
-  let loadingRequests: string[] = $state([])
-  let searchForm = $state({
+  let { supabase, statusOptions } = $derived(data)
+
+  let isLoading = $state(false)
+  let isRowLoading: string[] = $state([])
+  let requests: ApprovalRequestData[] = $state([])
+  let searchCondition = $state({
     status: 'all',
     name: undefined,
     date_from: undefined,
     date_to: undefined,
+    pagination: {},
   })
 
-  /**
-   * TODO: 상태 변경이 아니라 실제 데이터 재조회로 변경 필요
-   */
-  let filteredRequests = $derived(
-    requests.filter((request) => {
-      const matchesStatus = searchForm.status === 'all' ? true : request.status?.code === searchForm.status
-      const matchesName = !searchForm.name ? true : request.applicant?.name.includes(searchForm.name)
-      const matchesStore = !searchForm.name ? true : request.store?.name.includes(searchForm.name)
-      const matchesDateFrom = !searchForm.date_from
-        ? true
-        : dayjs(request.created_at).isAfter(dayjs(searchForm.date_from))
-      const matchesDateTo = !searchForm.date_to
-        ? true
-        : dayjs(request.created_at).isBefore(dayjs(searchForm.date_to).add(1, 'day'))
+  // TODO: 삭제
+  let currentPage = $state(1)
+  const pageSize = 10
 
-      return matchesStatus && (matchesName || matchesStore) && matchesDateFrom && matchesDateTo
-    })
-  )
+  let searchFormElem: HTMLFormElement | null = null
 
-  const requestEnhance = async ({ formData }: { formData: FormData }) => {
-    const { id } = await extractFormData(formData, ['id'])
-    if (!!id) loadingRequests = [...loadingRequests, id]
+  onMount(async () => {
+    await tick()
+    if (searchFormElem) {
+      ;(searchFormElem as HTMLFormElement).requestSubmit()
+    }
+  })
+
+  // auto-submit behavior when searchCondition changes
+  // - status / date changes -> submit immediately
+  // - name changes -> debounced submit (500ms)
+  let initialFiltersEffect = false
+  let initialNameEffect = false
+  let nameDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+  function submitSearchForm() {
+    if (!searchFormElem) return
+    ;(searchFormElem as HTMLFormElement).requestSubmit?.()
+  }
+
+  $effect(() => {
+    const { status, date_from, date_to } = searchCondition
+    // skip first run (we already submit on mount)
+    if (!initialFiltersEffect) {
+      initialFiltersEffect = true
+      return
+    }
+    // immediate submit for status/date changes
+    submitSearchForm()
+  })
+
+  $effect(() => {
+    const name = searchCondition.name
+    if (!initialNameEffect) {
+      initialNameEffect = true
+      return
+    }
+
+    if (nameDebounceTimer) clearTimeout(nameDebounceTimer)
+    nameDebounceTimer = setTimeout(() => {
+      submitSearchForm()
+      nameDebounceTimer = null
+    }, 500)
+  })
+
+  onDestroy(() => {
+    if (nameDebounceTimer) clearTimeout(nameDebounceTimer)
+  })
+
+  // helper to snapshot filtered requests as an array for template use
+  function snapshotFiltered(): any[] {
+    try {
+      const val: any = requests as any
+      return Array.isArray(val) ? val : []
+    } catch (e) {
+      return []
+    }
+  }
+
+  // enhance handler for the search form: sets loading and updates `requests` when action returns
+  const searchFormEnhance = ({ formData }: { formData: FormData }) => {
+    isLoading = true
 
     return ({ result }: { result: ActionResult }) => {
-      loadingRequests = loadingRequests.filter((_id) => _id !== id) || []
+      isLoading = false
+      if (result?.type === 'success') {
+        requests = (result?.data as any)?.requests
+        currentPage = 1
+      }
+    }
+  }
+
+  const requestFormEnhance = async ({ formData }: { formData: FormData }) => {
+    const { id } = await extractFormData(formData, ['id'])
+    if (!!id) isRowLoading = [...isRowLoading, id]
+
+    return ({ result }: { result: ActionResult }) => {
+      isRowLoading = isRowLoading.filter((_id) => _id !== id) || []
 
       if (result?.type === 'success') {
         const updatedRequest = result?.data?.request
@@ -69,15 +135,22 @@
 
 <div class="p-6">
   <!-- Filter Area -->
-  <div class="mb-6 flex items-center justify-between">
+  <form
+    method="POST"
+    action="?/fetch"
+    use:enhance={searchFormEnhance}
+    bind:this={searchFormElem}
+    class="mb-6 flex items-center justify-between"
+  >
     <!-- 좌측 필터 영역 -->
     <div class="flex items-center gap-4">
       <!-- 날짜 필터 -->
       <div class="flex items-center gap-2">
         <input
           type="date"
-          bind:value={searchForm.date_from}
-          class="border-0 border-b px-3 py-1.5 text-sm {searchForm.date_from
+          name="date_from"
+          bind:value={searchCondition.date_from}
+          class="border-0 border-b px-3 py-1.5 text-sm {searchCondition.date_from
             ? 'border-primary-500 text-surface-700'
             : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
           placeholder="From"
@@ -85,8 +158,9 @@
         <span class="text-surface-400">~</span>
         <input
           type="date"
-          bind:value={searchForm.date_to}
-          class="border-0 border-b px-3 py-1.5 text-sm {searchForm.date_to
+          name="date_to"
+          bind:value={searchCondition.date_to}
+          class="border-0 border-b px-3 py-1.5 text-sm {searchCondition.date_to
             ? 'border-primary-500 text-surface-700'
             : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
           placeholder="To"
@@ -96,9 +170,10 @@
       <!-- 검색 필터 -->
       <input
         type="text"
-        bind:value={searchForm.name}
+        name="name"
+        bind:value={searchCondition.name}
         placeholder="이름 또는 매장명 검색"
-        class="border-0 border-b px-3 py-1.5 text-sm {searchForm.name
+        class="border-0 border-b px-3 py-1.5 text-sm {searchCondition.name
           ? 'border-primary-500 text-primary-700'
           : 'border-surface-100'} focus:border-primary-500 w-64 bg-transparent focus:outline-none"
       />
@@ -106,18 +181,21 @@
 
     <!-- 우측 상태 필터 영역 -->
     <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
+      <!-- hidden status input synced with searchForm.status -->
+      <input type="hidden" name="status" bind:value={searchCondition.status} />
       {#each statusOptions as option}
         <button
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {searchForm.status === option.code
+          type="button"
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {searchCondition.status === option.code
             ? 'bg-primary-500 text-white shadow-sm'
             : 'text-surface-600 hover:bg-surface-100'}"
-          onclick={() => (searchForm.status = option.code)}
+          onclick={() => (searchCondition.status = option.code)}
         >
           {option.label}
         </button>
       {/each}
     </div>
-  </div>
+  </form>
 
   <div class="border-surface-100 bg-surface-50/50 overflow-hidden rounded-lg border">
     <!-- Users Table -->
@@ -137,10 +215,10 @@
         </tr>
       </thead>
       <tbody class="divide-surface-100 divide-y bg-white">
-        {#each filteredRequests as request, index}
+        {#each requests as request, index}
           <tr class="hover:bg-surface-50 text-center">
             <td class="text-surface-500 py-4 text-sm">
-              {index + 1}
+              {(currentPage - 1) * pageSize + index + 1}
             </td>
             <td>
               <div class="flex items-center justify-center">
@@ -205,10 +283,10 @@
             </td> -->
             <td>
               {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
-                <form method="POST" use:enhance={requestEnhance}>
+                <form method="POST" use:enhance={requestFormEnhance}>
                   <input type="hidden" name="id" value={request.id} />
                   <div class="relative flex items-center justify-center gap-1">
-                    {#if loadingRequests.includes(request.id)}
+                    {#if isRowLoading.includes(request.id)}
                       <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
                         <span class="loader"></span>
                       </div>
@@ -216,7 +294,7 @@
                     <button
                       class="bg-success-500 hover:bg-success-200 rounded px-4 py-2 text-xs font-medium text-white"
                       formaction="?/approve"
-                      disabled={loadingRequests.includes(request.id)}
+                      disabled={isRowLoading.includes(request.id)}
                     >
                       승인
                     </button>
@@ -224,7 +302,7 @@
                     <button
                       class="bg-error-500 hover:bg-error-200 rounded px-4 py-2 text-xs font-medium text-white"
                       formaction="?/reject"
-                      disabled={loadingRequests.includes(request.id)}
+                      disabled={isRowLoading.includes(request.id)}
                     >
                       거부
                     </button>
@@ -239,7 +317,7 @@
       </tbody>
     </table>
 
-    {#if filteredRequests.length === 0}
+    {#if requests.length === 0}
       <div class="py-12 text-center">
         <svg class="text-surface-400 mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -254,6 +332,12 @@
       </div>
     {/if}
   </div>
+  <!-- Pagination -->
+  <Pagination
+    current={currentPage}
+    total={Math.max(1, Math.ceil(snapshotFiltered().length / pageSize))}
+    on:navigate={(e) => (currentPage = e.detail)}
+  />
 </div>
 
 <style>
