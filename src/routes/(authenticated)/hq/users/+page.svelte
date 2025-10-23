@@ -1,96 +1,47 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import Pagination from '$lib/components/Pagination.svelte'
   import { approvalRequestDataConverter } from '$lib/converters'
-  import { ApprovalStatus, equalsEnum, type ApprovalRequestData } from '$lib/types'
+  import { getAuth } from '$lib/stores'
+  import { ApprovalStatus, equalsEnum, type ApprovalRequestData, type ApprovalRequestSearchFormData } from '$lib/types'
   import { extractFormData } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { produce } from 'immer'
-  import { onDestroy, onMount, tick } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import type { PageProps } from './$types'
 
   const { convertAll } = approvalRequestDataConverter()
 
   let { data }: PageProps = $props()
-  let { supabase, statusOptions } = $derived(data)
+  let { supabase, statusOptions, stores } = $derived(data)
 
+  const user = getAuth().user
   let isLoading = $state(false)
   let isRowLoading: string[] = $state([])
   let requests: ApprovalRequestData[] = $state([])
-  let searchCondition = $state({
-    status: 'all',
-    name: undefined,
+  let searchCondition: ApprovalRequestSearchFormData = $state({
+    status: undefined,
+    store_id: undefined,
     date_from: undefined,
     date_to: undefined,
     pagination: {},
   })
 
-  // TODO: 삭제
-  let currentPage = $state(1)
-  const pageSize = 10
-
-  let searchFormElem: HTMLFormElement | null = null
+  let searchFormElement: HTMLFormElement | null = null
 
   onMount(async () => {
     await tick()
-    if (searchFormElem) {
-      ;(searchFormElem as HTMLFormElement).requestSubmit()
-    }
   })
 
-  // auto-submit behavior when searchCondition changes
-  // - status / date changes -> submit immediately
-  // - name changes -> debounced submit (500ms)
-  let initialFiltersEffect = false
-  let initialNameEffect = false
-  let nameDebounceTimer: ReturnType<typeof setTimeout> | null = null
-
-  function submitSearchForm() {
-    if (!searchFormElem) return
-    ;(searchFormElem as HTMLFormElement).requestSubmit?.()
-  }
-
   $effect(() => {
-    const { status, date_from, date_to } = searchCondition
-    // skip first run (we already submit on mount)
-    if (!initialFiltersEffect) {
-      initialFiltersEffect = true
-      return
-    }
-    // immediate submit for status/date changes
+    const { status, date_from, date_to, store_id } = searchCondition
     submitSearchForm()
   })
 
-  $effect(() => {
-    const name = searchCondition.name
-    if (!initialNameEffect) {
-      initialNameEffect = true
-      return
-    }
-
-    if (nameDebounceTimer) clearTimeout(nameDebounceTimer)
-    nameDebounceTimer = setTimeout(() => {
-      submitSearchForm()
-      nameDebounceTimer = null
-    }, 500)
-  })
-
-  onDestroy(() => {
-    if (nameDebounceTimer) clearTimeout(nameDebounceTimer)
-  })
-
-  // helper to snapshot filtered requests as an array for template use
-  function snapshotFiltered(): any[] {
-    try {
-      const val: any = requests as any
-      return Array.isArray(val) ? val : []
-    } catch (e) {
-      return []
-    }
+  function submitSearchForm() {
+    if (!searchFormElement) return
+    ;(searchFormElement as HTMLFormElement).requestSubmit?.()
   }
 
-  // enhance handler for the search form: sets loading and updates `requests` when action returns
   const searchFormEnhance = ({ formData }: { formData: FormData }) => {
     isLoading = true
 
@@ -113,11 +64,22 @@
       if (result?.type === 'success') {
         const updatedRequest = result?.data?.request
 
-        requests = produce(requests, (draft) => {
-          const idx = draft.findIndex((req) => req.id === updatedRequest.id)
-          if (idx !== -1) draft[idx] = updatedRequest
-        })
+        const idx = requests.findIndex((req) => req.id === updatedRequest.id)
+        if (idx !== -1) requests[idx] = updatedRequest
       }
+    }
+  }
+
+  // TODO: 삭제
+  let currentPage = $state(1)
+  const pageSize = 10
+
+  function snapshotFiltered(): any[] {
+    try {
+      const val: any = requests as any
+      return Array.isArray(val) ? val : []
+    } catch (e) {
+      return []
     }
   }
 </script>
@@ -133,13 +95,13 @@
   </div>
 </div>
 
-<div class="p-6">
+<div class="relative p-6">
   <!-- Filter Area -->
   <form
     method="POST"
     action="?/fetch"
     use:enhance={searchFormEnhance}
-    bind:this={searchFormElem}
+    bind:this={searchFormElement}
     class="mb-6 flex items-center justify-between"
   >
     <!-- 좌측 필터 영역 -->
@@ -167,16 +129,19 @@
         />
       </div>
 
-      <!-- 검색 필터 -->
-      <input
-        type="text"
-        name="name"
-        bind:value={searchCondition.name}
-        placeholder="이름 또는 매장명 검색"
-        class="border-0 border-b px-3 py-1.5 text-sm {searchCondition.name
+      <!-- 매장 선택 필터 -->
+      <select
+        name="store_id"
+        bind:value={searchCondition.store_id}
+        class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none {searchCondition.store_id
           ? 'border-primary-500 text-primary-700'
-          : 'border-surface-100'} focus:border-primary-500 w-64 bg-transparent focus:outline-none"
-      />
+          : 'border-surface-100'}"
+      >
+        <option value="" selected>전체</option>
+        {#each stores as store}
+          <option value={store.id}>{store.name}</option>
+        {/each}
+      </select>
     </div>
 
     <!-- 우측 상태 필터 영역 -->
@@ -197,7 +162,12 @@
     </div>
   </form>
 
-  <div class="border-surface-100 bg-surface-50/50 overflow-hidden rounded-lg border">
+  <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
+    {#if isLoading}
+      <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+        <span class="loader-giant"></span>
+      </div>
+    {/if}
     <!-- Users Table -->
     <table class="min-w-full">
       <thead class="bg-surface-50 border-surface-100 border-b">
@@ -285,6 +255,8 @@
               {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
                 <form method="POST" use:enhance={requestFormEnhance}>
                   <input type="hidden" name="id" value={request.id} />
+                  <input type="hidden" name="user_id" value={request.applicant_id} />
+                  <input type="hidden" name="store_id" value={request.store_id} />
                   <div class="relative flex items-center justify-center gap-1">
                     {#if isRowLoading.includes(request.id)}
                       <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
@@ -319,25 +291,16 @@
 
     {#if requests.length === 0}
       <div class="py-12 text-center">
-        <svg class="text-surface-400 mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
-          />
-        </svg>
         <h3 class="text-surface-900 mt-2 text-sm font-medium">사용자가 없습니다</h3>
-        <p class="text-surface-500 mt-1 text-sm">현재 조건에 맞는 사용자가 없습니다.</p>
       </div>
     {/if}
   </div>
-  <!-- Pagination -->
-  <Pagination
+  <!-- TODO: Pagination -->
+  <!-- <Pagination
     current={currentPage}
     total={Math.max(1, Math.ceil(snapshotFiltered().length / pageSize))}
     on:navigate={(e) => (currentPage = e.detail)}
-  />
+  /> -->
 </div>
 
 <style>
@@ -347,6 +310,16 @@
     border-radius: 50%;
     width: 24px;
     height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .loader-giant {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
     animation: spin 1s linear infinite;
     display: inline-block;
     vertical-align: middle;

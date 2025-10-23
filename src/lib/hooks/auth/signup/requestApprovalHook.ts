@@ -19,7 +19,6 @@ const requestSignupApproval = async ({ signupData, userId }: SignupHookContext) 
   const { data, error } = await supabase.from('signup_approval_requests').insert(payload)
 
   if (error) {
-    console.log('Error inserting signup approval request:', error)
     throw new SignUpError('Request signup approval hook Error', {
       status: 400,
       code: 'request_signup_approval_hook_error',
