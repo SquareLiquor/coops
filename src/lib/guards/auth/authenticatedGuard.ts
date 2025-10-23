@@ -25,7 +25,10 @@ export const authenticatedGuard: Handle = async ({ event, resolve }) => {
   }
 
   if (session && ['/auth', '/auth/admin'].includes(url.pathname)) {
-    throw redirect(303, user_type === UserType.CONSUMER ? '/' : user_type === UserType.BRANCH ? '/admin' : '/hq')
+    throw redirect(
+      303,
+      user_type === UserType.CONSUMER.code ? '/' : user_type === UserType.BRANCH.code ? '/admin' : '/hq'
+    )
   }
 
   return resolve(event)

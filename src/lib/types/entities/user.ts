@@ -1,26 +1,6 @@
+import type { ApprovalStatus } from '../common'
 import type { StoreData } from './store'
 
-// 사용자 역할
-export enum UserType {
-  CONSUMER = 'consumer',
-  BRANCH = 'branch',
-  HQ = 'hq',
-}
-
-// export enum ApprovalStatus {
-//   PENDING = 'pending',
-//   APPROVED = 'approved',
-//   REJECTED = 'rejected',
-// }
-export const ApprovalStatus = {
-  PENDING: { code: 'pending', label: '승인대기' },
-  APPROVED: { code: 'approved', label: '승인완료' },
-  REJECTED: { code: 'rejected', label: '거부됨' },
-} as const
-
-export type ApprovalStatus = (typeof ApprovalStatus)[keyof typeof ApprovalStatus]
-
-// 사용자 기본 정보
 export interface ProfileData {
   id: string
   name: string
@@ -36,7 +16,7 @@ export interface SignupApprovalRequestData {
   applicant_id: string
   approver_id?: string
   store_id?: string
-  status: ApprovalStatus['code']
+  status: ApprovalStatus
   reason?: string
   applicant?: ProfileData
   approver?: ProfileData

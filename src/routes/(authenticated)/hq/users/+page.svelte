@@ -19,13 +19,11 @@
   })
 
   /**
-   * TODO: filter 설정
-   * - 날짜 필터, 이름 검색 필터는 실제 데이터 재조회
-   * - 상태 필터는 상태변경으로 관리
+   * TODO: 상태 변경이 아니라 실제 데이터 재조회로 변경 필요
    */
   let filteredRequests = $derived(
     requests.filter((request) => {
-      const matchesStatus = searchForm.status === 'all' ? true : request.status === searchForm.status
+      const matchesStatus = searchForm.status === 'all' ? true : request.status?.code === searchForm.status
       const matchesName = !searchForm.name ? true : request.applicant?.name.includes(searchForm.name)
       const matchesStore = !searchForm.name ? true : request.store?.name.includes(searchForm.name)
       const matchesDateFrom = !searchForm.date_from
@@ -54,32 +52,6 @@
           if (idx !== -1) draft[idx] = updatedRequest
         })
       }
-    }
-  }
-
-  function getStatusBadge(status: string) {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'approved':
-        return 'bg-green-100 text-green-800'
-      case 'rejected':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-surface-100 text-surface-800'
-    }
-  }
-
-  function getStatusText(status: string) {
-    switch (status) {
-      case 'pending':
-        return '승인대기'
-      case 'approved':
-        return '승인완료'
-      case 'rejected':
-        return '거부됨'
-      default:
-        return status
     }
   }
 </script>
@@ -182,8 +154,10 @@
               <div class="text-surface-900 text-sm font-medium">{request.store?.name}</div>
             </td>
             <td class="px-4 py-4">
-              <span class={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${getStatusBadge(request.status)}`}>
-                {getStatusText(request.status)}
+              <span
+                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium bg-${request.status?.color || 'surface'}-100 text-${request.status?.color || 'surface'}-800`}
+              >
+                {request.status?.label}
               </span>
             </td>
             <td class="px-4 py-4">
@@ -191,14 +165,14 @@
               <div class="text-surface-500 text-xs">{dayjs(request.requested_at).format('HH:mm:ss')}</div>
             </td>
             <td class="px-4 py-4">
-              {#if request.status === ApprovalStatus.PENDING.code}
+              {#if request.status?.code === ApprovalStatus.PENDING.code}
                 -
               {/if}
-              {#if request.status === ApprovalStatus.APPROVED.code}
+              {#if request.status?.code === ApprovalStatus.APPROVED.code}
                 <div class="text-primary-600 text-sm">{dayjs(request.approved_at).format('YYYY-MM-DD')}</div>
                 <div class="text-surface-500 text-xs">{dayjs(request.approved_at).format('HH:mm:ss')}</div>
               {/if}
-              {#if request.status === ApprovalStatus.REJECTED.code}
+              {#if request.status?.code === ApprovalStatus.REJECTED.code}
                 <div class="text-sm text-red-600">{dayjs(request.cancelled_at).format('YYYY-MM-DD')}</div>
                 <div class="text-surface-500 text-xs">{dayjs(request.cancelled_at).format('HH:mm:ss')}</div>
               {/if}
@@ -223,7 +197,7 @@
                       <span class="loader"></span>
                     </div>
                   {/if}
-                  {#if request.status !== ApprovalStatus.APPROVED.code}
+                  {#if request.status?.code !== ApprovalStatus.APPROVED.code}
                     <button
                       class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200"
                       formaction="?/approve"
@@ -232,7 +206,7 @@
                       승인
                     </button>
                   {/if}
-                  {#if request.status !== ApprovalStatus.REJECTED.code}
+                  {#if request.status?.code !== ApprovalStatus.REJECTED.code}
                     <button
                       class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
                       formaction="?/reject"

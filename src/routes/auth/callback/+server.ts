@@ -47,7 +47,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 const getApprovalStatus = async (supabase: SupabaseClient, userId: string) => {
   const { data } = await supabase
     .from('signup_approval_requests')
-    .select('id, email, role, status')
+    .select('id, status')
     .eq('applicant_id', userId)
     .order('created_at', { ascending: false })
     .limit(1)

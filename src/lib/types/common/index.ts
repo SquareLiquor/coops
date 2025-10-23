@@ -6,4 +6,5 @@
 
 export * from './auth'
 export * from './context'
+export * from './enum'
 export * from './form'

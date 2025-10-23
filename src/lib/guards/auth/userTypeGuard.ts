@@ -15,23 +15,23 @@ export const userTypeGuard: Handle = async ({ event, resolve }) => {
   const { app_metadata } = user || {}
   const { user_type } = app_metadata || {}
 
-  if (user_type === UserType.CONSUMER && url.pathname === '/') {
+  if (user_type === UserType.CONSUMER.code && url.pathname === '/') {
     throw redirect(303, '/coops')
   }
 
-  if (user_type === UserType.BRANCH && url.pathname === '/') {
+  if (user_type === UserType.BRANCH.code && url.pathname === '/') {
     throw redirect(303, '/admin')
   }
 
-  if (user_type === UserType.HQ && url.pathname === '/') {
+  if (user_type === UserType.HQ.code && url.pathname === '/') {
     throw redirect(303, '/hq')
   }
 
-  if (user_type !== UserType.BRANCH && url.pathname.startsWith('/admin')) {
+  if (user_type !== UserType.BRANCH.code && url.pathname.startsWith('/admin')) {
     throw redirect(303, '/')
   }
 
-  if (user_type !== UserType.HQ && url.pathname.startsWith('/hq')) {
+  if (user_type !== UserType.HQ.code && url.pathname.startsWith('/hq')) {
     throw redirect(303, '/')
   }
 

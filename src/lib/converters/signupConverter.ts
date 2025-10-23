@@ -1,4 +1,4 @@
-import type { SignupApprovalRequestData, SignupFormData } from '$lib/types'
+import { ApprovalStatus, type SignupApprovalRequestData, type SignupFormData } from '$lib/types'
 import dayjs from 'dayjs'
 import { profileDataConverter } from './profileConverter'
 import { storeDataConverter } from './storeConverter'
@@ -55,7 +55,7 @@ export const approvalRequestDataConverter = () => {
       applicant_id,
       approver_id,
       store_id,
-      status,
+      status: ApprovalStatus[(status as string).toUpperCase()],
       reason,
       requested_at: dayjs(requested_at).isValid() ? dayjs(requested_at).format('YYYY-MM-DD HH:mm:ss') : null,
       approved_at: dayjs(approved_at).isValid() ? dayjs(approved_at).format('YYYY-MM-DD HH:mm:ss') : null,

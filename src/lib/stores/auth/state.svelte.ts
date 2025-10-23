@@ -1,5 +1,5 @@
 import type { AuthState } from '$lib/types'
-import { getUserRole } from '$lib/utils/permissions'
+import { getUserType } from '$lib/utils/permissions'
 import type { User } from '@supabase/supabase-js'
 
 const getInitialState = (): AuthState => ({
@@ -16,13 +16,13 @@ let authState = $state<AuthState>(getInitialState())
 const getAuth = () => authState
 
 const setAuth = (user: User | null, sessionExpiry?: number | null) => {
-  const role = getUserRole(user)
+  const userType = getUserType({ user })
 
   authState = {
     isAuthenticated: !!user,
     isLoading: false,
     user,
-    userType: role,
+    userType: userType || null,
     sessionExpiry: sessionExpiry || null,
     error: null,
   }
