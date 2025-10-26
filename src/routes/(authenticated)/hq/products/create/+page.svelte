@@ -1,5 +1,6 @@
 <script lang="ts">
   import SortableImageList from '$lib/components/SortableImageList.svelte'
+  import TipTap from '$lib/components/TipTap.svelte'
 
   function handleImageListChange(newImages: typeof images, newMainIdx: number) {
     images = newImages
@@ -147,10 +148,11 @@
       <div class="mb-8 flex flex-1 flex-col">
         <label class="text-surface-700 mb-1 block font-medium">
           설명
-          <textarea
+          <!-- <textarea
             class="border-surface-200 focus:border-primary-500 h-40 w-full resize-y border-b px-3 py-2 focus:outline-none"
             bind:value={description}
-          ></textarea>
+          ></textarea> -->
+          <TipTap />
         </label>
       </div>
     </div>
