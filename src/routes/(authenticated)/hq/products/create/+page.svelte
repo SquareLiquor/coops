@@ -1,6 +1,9 @@
 <script lang="ts">
-  import SortableImageList from '$lib/components/SortableImageList.svelte'
-  import TipTap from '$lib/components/TipTap.svelte'
+  import FileUploader from '$lib/components/ui/FileUploader.svelte'
+  import TipTap from '$lib/components/ui/TipTap.svelte'
+  import { Slider } from '@skeletonlabs/skeleton-svelte'
+
+  let content = $state('Hello, world!')
 
   function handleImageListChange(newImages: typeof images, newMainIdx: number) {
     images = newImages
@@ -13,10 +16,6 @@
   let categoryOptions: string[] = ['곡물', '과일', '채소', '육류', '수산물']
   let price: number | '' = ''
   let initialStock: number | '' = ''
-  let supplier = ''
-  let supplierContact = ''
-  let description = ''
-  let imageUrl = ''
 
   // 이미지 업로드 관련 상태
   let images: { id: string; url: string; isFeatured: boolean }[] = []
@@ -56,12 +55,10 @@
     <div class="flex min-w-0 flex-1 flex-col gap-8">
       <div>
         <label for="product-name" class="text-surface-700 mb-1 block font-medium">상품명</label>
-        <input
-          id="product-name"
-          class="border-surface-200 focus:border-primary-500 w-full border-b px-3 py-2 focus:outline-none"
-          bind:value={name}
-          required
-        />
+        <label class="label">
+          <span class="label-text">Input</span>
+          <input class="input" type="text" placeholder="Input" bind:value={name} />
+        </label>
       </div>
       <div>
         <label for="product-category" class="text-surface-700 mb-1 block font-medium">카테고리</label>
@@ -124,23 +121,29 @@
           />
         </div>
         <div class="flex-1">
-          <label for="product-stock" class="text-surface-700 mb-1 block font-medium">초기 재고</label>
-          <input
-            id="product-stock"
-            type="number"
-            min="0"
-            class="border-surface-200 focus:border-primary-500 w-full border-b px-3 py-2 focus:outline-none"
-            bind:value={initialStock}
-            required
-          />
+          <label for="product-stock" class="text-surface-700 mb-1 block font-medium">
+            <Slider defaultValue={[50]}>
+              <Slider.Label>초기 재고</Slider.Label>
+              <Slider.Control>
+                <Slider.Track>
+                  <Slider.Range />
+                </Slider.Track>
+                <Slider.Thumb index={0}>
+                  <Slider.HiddenInput />
+                </Slider.Thumb>
+              </Slider.Control>
+              <Slider.MarkerGroup>
+                <Slider.Marker value={25} />
+                <Slider.Marker value={50} />
+                <Slider.Marker value={75} />
+              </Slider.MarkerGroup>
+            </Slider>
+          </label>
         </div>
       </div>
       <div>
         <label for="product-images" class="text-surface-700 mb-1 block font-medium">상품 이미지</label>
-        <SortableImageList
-          {images}
-          on:change={(e) => handleImageListChange(e.detail.images, e.detail.mainImageIndex)}
-        />
+        <FileUploader />
       </div>
     </div>
     <!-- 우측: 설명 -->

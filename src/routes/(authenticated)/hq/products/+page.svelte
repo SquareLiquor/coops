@@ -217,11 +217,11 @@
   <div class="flex items-center space-x-4">
     <h1 class="text-surface-900 text-2xl font-bold">상품 관리</h1>
   </div>
-  <button
-    class="bg-primary-500 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+  <a
+    href="/hq/products/create"
+    class="btn bg-primary-500 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+    >새 상품 등록</a
   >
-    새 상품 등록
-  </button>
 </div>
 
 <div class="p-6">
