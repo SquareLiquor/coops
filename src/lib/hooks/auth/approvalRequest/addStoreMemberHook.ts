@@ -17,9 +17,7 @@ const addStoreMember = async ({ storeId, userId }: ApproveRequestHookContext) =>
     .eq('user_id', userId)
     .maybeSingle()
 
-  if (data) {
-    throw new ApprovalError('', { code: 'USER_ALREADY_MEMBER', details: { storeId, userId } })
-  }
+  if (data) return
 
   const { error } = await supabase.from('store_members').insert({
     store_id: storeId,

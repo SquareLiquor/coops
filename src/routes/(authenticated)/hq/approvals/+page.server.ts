@@ -1,16 +1,19 @@
 import { approvalRequestDataConverter, storeDataConverter } from '$lib/converters'
 import { ApprovalError, isAppError } from '$lib/errors'
 import { approveRequestHook, rejectRequestHook } from '$lib/hooks'
+
+import { ApprovalSchema, ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
 import { ApprovalStatus } from '$lib/types'
 import { extractFormData } from '$lib/utils'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail, type Actions } from '@sveltejs/kit'
+import { superValidate } from 'sveltekit-superforms'
+import { valibot } from 'sveltekit-superforms/adapters'
 import type { PageServerLoad } from './$types'
 
 const { convertAll: storeConvertAll } = storeDataConverter()
 const { convert, convertAll } = approvalRequestDataConverter()
 
-const searchFormFields = ['status', 'store_id', 'date_from', 'date_to'] // pagination
 const requestSelectQuery = `
   *,
   applicant:applicant_id (*),
@@ -19,41 +22,50 @@ const requestSelectQuery = `
 `
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  const statusOptions = [{ code: undefined, label: '전체' }, ...Object.values(ApprovalStatus)]
+  const filterForm = await superValidate(valibot(FilterSchema))
+  const approvalForm = await superValidate(valibot(ApprovalSchema))
 
   const { data, error } = await supabase
     .from('stores_public')
     .select('*')
-    .order('type', { ascending: true }) // 'hq' 먼저
-    .order('name', { ascending: true }) // 이름순 정렬
+    .order('type', { ascending: true })
+    .order('name', { ascending: true })
 
-  if (error) return { stores: [] }
+  const stores = error ? [] : storeConvertAll(data)
+  const statusOptions = [{ code: undefined, label: '전체' }, ...Object.values(ApprovalStatus)]
 
   return {
+    filterForm,
+    approvalForm,
+    stores,
     statusOptions,
-    stores: storeConvertAll(data),
   }
 }
 
 export const actions: Actions = {
   fetch: async ({ request, locals: { supabase } }) => {
-    const { status, store_id, date_from, date_to } = await extractFormData(await request.formData(), searchFormFields)
+    const form = await superValidate(request, valibot(FilterSchema))
+    const { status, store_id, date_from, date_to } = form.data
+
+    if (!form.valid) fail(400, { form })
 
     const query = supabase
       .from('signup_approval_requests')
       .select(requestSelectQuery, { count: 'exact' })
       .not('store_id', 'is', null)
+      .order('created_at', { ascending: false })
 
-    // TODO: search form
     if (status) query.eq('status', status)
     if (store_id) query.eq('store_id', store_id)
     if (date_from) query.gte('requested_at', date_from)
     if (date_to) query.lte('requested_at', date_to)
 
-    // convert form data
-    const { data } = await query.order('created_at', { ascending: false })
+    const { data } = await query
 
-    return { success: true, requests: data ? convertAll(data) : [] }
+    return {
+      form,
+      requests: data ? convertAll(data) : [],
+    }
   },
 
   approve: async ({ request, locals: { supabase, user } }) => {

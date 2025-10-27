@@ -1,58 +1,49 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { approvalRequestDataConverter } from '$lib/converters'
-  import { getAuth } from '$lib/stores'
-  import { ApprovalStatus, equalsEnum, type ApprovalRequestData, type ApprovalRequestSearchFormData } from '$lib/types'
+  import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
+  import { ApprovalStatus, equalsEnum, type ApprovalRequestData } from '$lib/types'
   import { extractFormData } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { onMount, tick } from 'svelte'
+  import { superForm } from 'sveltekit-superforms'
+  import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
 
-  const { convertAll } = approvalRequestDataConverter()
-
   let { data }: PageProps = $props()
-  let { supabase, statusOptions, stores } = $derived(data)
-
-  const user = getAuth().user
-  let isLoading = $state(false)
-  let isRowLoading: string[] = $state([])
+  let { statusOptions, stores } = $derived(data)
   let requests: ApprovalRequestData[] = $state([])
-  let searchCondition: ApprovalRequestSearchFormData = $state({
-    status: undefined,
-    store_id: undefined,
-    date_from: undefined,
-    date_to: undefined,
-    pagination: {},
-  })
+  let isRowLoading: string[] = $state([])
 
-  let searchFormElement: HTMLFormElement | null = null
+  const {
+    form: filterForm,
+    errors: filterErrors,
+    constraints: filterConstraints,
+    validateForm: validateFilterForm,
+    enhance: filterEnhance,
+    submit: filterSubmit,
+    delayed: filterDelayed,
+  } = superForm(data.filterForm, {
+    validators: valibot(FilterSchema),
+    resetForm: false,
+    onChange: async (event) => {
+      try {
+        console.log('filter form changed')
+        const result = await validateFilterForm({ update: true })
 
-  onMount(async () => {
-    await tick()
-  })
-
-  $effect(() => {
-    const { status, date_from, date_to, store_id } = searchCondition
-    submitSearchForm()
-  })
-
-  function submitSearchForm() {
-    if (!searchFormElement) return
-    ;(searchFormElement as HTMLFormElement).requestSubmit?.()
-  }
-
-  const searchFormEnhance = ({ formData }: { formData: FormData }) => {
-    isLoading = true
-
-    return ({ result }: { result: ActionResult }) => {
-      isLoading = false
-      if (result?.type === 'success') {
-        requests = (result?.data as any)?.requests
-        currentPage = 1
+        if (result.valid) filterSubmit()
+      } catch (e) {
+        console.error('validate form error:', e)
       }
-    }
-  }
+    },
+    onResult: ({ result }: { result: ActionResult }) => {
+      if (result?.type === 'success') {
+        requests = result.data?.requests || []
+      }
+      if (result?.type === 'failure') {
+        requests = []
+      }
+    },
+  })
 
   const requestFormEnhance = async ({ formData }: { formData: FormData }) => {
     const { id } = await extractFormData(formData, ['id'])
@@ -67,19 +58,6 @@
         const idx = requests.findIndex((req) => req.id === updatedRequest.id)
         if (idx !== -1) requests[idx] = updatedRequest
       }
-    }
-  }
-
-  // TODO: 삭제
-  let currentPage = $state(1)
-  const pageSize = 10
-
-  function snapshotFiltered(): any[] {
-    try {
-      const val: any = requests as any
-      return Array.isArray(val) ? val : []
-    } catch (e) {
-      return []
     }
   }
 </script>
@@ -97,64 +75,76 @@
 
 <div class="relative p-6">
   <!-- Filter Area -->
-  <form
-    method="POST"
-    action="?/fetch"
-    use:enhance={searchFormEnhance}
-    bind:this={searchFormElement}
-    class="mb-6 flex items-center justify-between"
-  >
-    <!-- 좌측 필터 영역 -->
-    <div class="flex items-center gap-4">
-      <!-- 날짜 필터 -->
-      <div class="flex items-center gap-2">
-        <input
-          type="date"
-          name="date_from"
-          bind:value={searchCondition.date_from}
-          class="border-0 border-b px-3 py-1.5 text-sm {searchCondition.date_from
-            ? 'border-primary-500 text-surface-700'
-            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
-          placeholder="From"
-        />
-        <span class="text-surface-400">~</span>
-        <input
-          type="date"
-          name="date_to"
-          bind:value={searchCondition.date_to}
-          class="border-0 border-b px-3 py-1.5 text-sm {searchCondition.date_to
-            ? 'border-primary-500 text-surface-700'
-            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
-          placeholder="To"
-        />
+  <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
+    <!-- 좌측 필터 영역 (왼쪽 그룹과 아래 에러 영역을 함께 포함) -->
+    <div class="flex flex-col">
+      <div class="flex items-center gap-4">
+        <!-- 날짜 필터 -->
+        <div class="flex flex-col items-start gap-1">
+          <div class="flex items-center gap-2">
+            <input
+              type="date"
+              name="date_from"
+              bind:value={$filterForm.date_from}
+              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+              class:border-primary-500={$filterForm.date_from}
+              class:text-primary-700={$filterForm.date_from}
+              class:border-surface-100={!$filterForm.date_from}
+              {...$filterConstraints.date_from}
+            />
+            <span class="text-surface-400">~</span>
+            <input
+              type="date"
+              name="date_to"
+              bind:value={$filterForm.date_to}
+              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+              class:border-primary-500={$filterForm.date_to}
+              class:text-primary-700={$filterForm.date_to}
+              class:border-surface-100={!$filterForm.date_to}
+              {...$filterConstraints.date_to}
+            />
+          </div>
+        </div>
+
+        <!-- 매장 선택 필터 -->
+        <select
+          name="store_id"
+          bind:value={$filterForm.store_id}
+          class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+          class:border-primary-500={$filterForm.store_id}
+          class:text-primary-700={$filterForm.store_id}
+          class:border-surface-100={!$filterForm.store_id}
+        >
+          <option value="" selected>전체</option>
+          {#each stores as store}
+            <option value={store.id}>{store.name}</option>
+          {/each}
+        </select>
       </div>
 
-      <!-- 매장 선택 필터 -->
-      <select
-        name="store_id"
-        bind:value={searchCondition.store_id}
-        class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none {searchCondition.store_id
-          ? 'border-primary-500 text-primary-700'
-          : 'border-surface-100'}"
-      >
-        <option value="" selected>전체</option>
-        {#each stores as store}
-          <option value={store.id}>{store.name}</option>
-        {/each}
-      </select>
+      {#if $filterErrors.date_from || $filterErrors.date_to}
+        <div class="mt-1 flex flex-col gap-1">
+          {#if $filterErrors.date_from}
+            <div class="text-error-500 text-sm">{$filterErrors.date_from}</div>
+          {/if}
+          {#if $filterErrors.date_to}
+            <div class="text-error-500 text-sm">{$filterErrors.date_to}</div>
+          {/if}
+        </div>
+      {/if}
     </div>
 
     <!-- 우측 상태 필터 영역 -->
     <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
       <!-- hidden status input synced with searchForm.status -->
-      <input type="hidden" name="status" bind:value={searchCondition.status} />
+      <input type="hidden" name="status" bind:value={$filterForm.status} />
       {#each statusOptions as option}
         <button
           type="button"
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {searchCondition.status === option.code
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {$filterForm.status === option.code
             ? 'bg-primary-500 text-white shadow-sm'
             : 'text-surface-600 hover:bg-surface-100'}"
-          onclick={() => (searchCondition.status = option.code)}
+          onclick={() => ($filterForm.status = option.code)}
         >
           {option.label}
         </button>
@@ -163,7 +153,7 @@
   </form>
 
   <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
-    {#if isLoading}
+    {#if $filterDelayed}
       <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
         <span class="loader-giant"></span>
       </div>
@@ -188,7 +178,7 @@
         {#each requests as request, index}
           <tr class="hover:bg-surface-50 text-center">
             <td class="text-surface-500 py-4 text-sm">
-              {(currentPage - 1) * pageSize + index + 1}
+              {index + 1}
             </td>
             <td>
               <div class="flex items-center justify-center">
@@ -225,20 +215,16 @@
                   class:text-error-500={equalsEnum(ApprovalStatus.REJECTED, request.status)}
                   class:text-warning-500={equalsEnum(ApprovalStatus.PENDING, request.status)}
                 >
-                  {dayjs(request.approved_at).format('YYYY-MM-DD')}
+                  {equalsEnum(ApprovalStatus.APPROVED, request.status)
+                    ? dayjs(request.approved_at).format('YYYY-MM-DD')
+                    : dayjs(request.cancelled_at).format('YYYY-MM-DD')}
                 </div>
                 <div class="text-surface-300 text-xs">
-                  {dayjs(request.approved_at).format('HH:mm:ss')}
+                  {equalsEnum(ApprovalStatus.APPROVED, request.status)
+                    ? dayjs(request.approved_at).format('HH:mm:ss')
+                    : dayjs(request.cancelled_at).format('HH:mm:ss')}
                 </div>
               {/if}
-              <!-- {#if request.status?.code === ApprovalStatus.APPROVED.code}
-                <div class="text-primary-600 text-sm">{dayjs(request.approved_at).format('YYYY-MM-DD')}</div>
-                <div class="text-surface-200 text-xs">{dayjs(request.approved_at).format('HH:mm:ss')}</div>
-              {/if}
-              {#if request.status?.code === ApprovalStatus.REJECTED.code}
-                <div class="text-sm text-red-600">{dayjs(request.cancelled_at).format('YYYY-MM-DD')}</div>
-                <div class="text-surface-200 text-xs">{dayjs(request.cancelled_at).format('HH:mm:ss')}</div>
-              {/if} -->
             </td>
             <!-- <td>
               <div
@@ -252,17 +238,17 @@
               </div>
             </td> -->
             <td>
-              {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
-                <form method="POST" use:enhance={requestFormEnhance}>
-                  <input type="hidden" name="id" value={request.id} />
-                  <input type="hidden" name="user_id" value={request.applicant_id} />
-                  <input type="hidden" name="store_id" value={request.store_id} />
-                  <div class="relative flex items-center justify-center gap-1">
-                    {#if isRowLoading.includes(request.id)}
-                      <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-                        <span class="loader"></span>
-                      </div>
-                    {/if}
+              <form method="POST" use:enhance={requestFormEnhance}>
+                <input type="hidden" name="id" value={request.id} />
+                <input type="hidden" name="user_id" value={request.applicant_id} />
+                <input type="hidden" name="store_id" value={request.store_id} />
+                <div class="relative flex items-center justify-center gap-1">
+                  {#if isRowLoading.includes(request.id)}
+                    <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+                      <span class="loader"></span>
+                    </div>
+                  {/if}
+                  {#if !equalsEnum(ApprovalStatus.APPROVED, request.status)}
                     <button
                       class="bg-success-500 hover:bg-success-200 rounded px-4 py-2 text-xs font-medium text-white"
                       formaction="?/approve"
@@ -270,7 +256,8 @@
                     >
                       승인
                     </button>
-
+                  {/if}
+                  {#if !equalsEnum(ApprovalStatus.REJECTED, request.status)}
                     <button
                       class="bg-error-500 hover:bg-error-200 rounded px-4 py-2 text-xs font-medium text-white"
                       formaction="?/reject"
@@ -278,11 +265,9 @@
                     >
                       거부
                     </button>
-                  </div>
-                </form>
-              {:else}
-                -
-              {/if}
+                  {/if}
+                </div>
+              </form>
             </td>
           </tr>
         {/each}

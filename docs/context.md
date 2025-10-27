@@ -555,7 +555,7 @@ Skeleton 컴포넌트 스타일을 참고해서 버튼, 입력폼, 카드, 테�
 ### 로그인 & 본사 접근 페이지
 
 - /(authenticated)/hq: 본사 메인 페이지/대시보드
-- /(authenticated)/hq/users: 관리자 승인 관리 페이지
+- /(authenticated)/hq/approvals: 관리자 승인 관리 페이지
 - /(authenticated)/hq/stores: 매장 관리 페이지
 - /(authenticated)/hq/products: 상품 관리 페이지
 - /(authenticated)/hq/purchases: 발주 관리 페이지

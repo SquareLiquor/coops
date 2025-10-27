@@ -206,7 +206,7 @@
         <div class="p-6">
           <div class="flex items-center justify-between pb-4">
             <h3 class="text-surface-900 text-lg font-semibold">최근 활동</h3>
-            <a href="/hq/users" class="text-primary-600 hover:text-primary-800 text-sm font-medium"> 모두 보기 </a>
+            <a href="/hq/approvals" class="text-primary-600 hover:text-primary-800 text-sm font-medium"> 모두 보기 </a>
           </div>
           <div class="space-y-3">
             {#each recentActivities as activity}
@@ -284,7 +284,10 @@
       <div class="p-6">
         <h3 class="text-surface-900 pb-4 text-lg font-semibold">빠른 액션</h3>
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <a href="/hq/users" class="flex items-center rounded-lg bg-blue-50 p-4 transition-colors hover:bg-blue-100">
+          <a
+            href="/hq/approvals"
+            class="flex items-center rounded-lg bg-blue-50 p-4 transition-colors hover:bg-blue-100"
+          >
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

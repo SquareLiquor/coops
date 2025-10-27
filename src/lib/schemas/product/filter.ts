@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import * as v from 'valibot'
 
-export const FilterSchema = v.pipe(
+export const ProductsFilterSchema = v.pipe(
   v.object({
     date_from: v.pipe(v.optional(v.string())),
     date_to: v.pipe(v.optional(v.string())),
@@ -29,4 +29,4 @@ export const FilterSchema = v.pipe(
   )
 )
 
-export type FilterForm = v.InferInput<typeof FilterSchema>
+export type ProductsFilterForm = v.InferInput<typeof ProductsFilterSchema>
