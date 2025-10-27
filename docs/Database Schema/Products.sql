@@ -34,8 +34,8 @@ END$$;
 -- 카테고리 관리 테이블
 CREATE TABLE public.product_categories (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   name text NOT NULL UNIQUE,
-  description text,
   active boolean NOT NULL DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -223,6 +223,25 @@ ON public.products
 FOR SELECT
 USING (true);
 
+-- products: 모든 인증된 사용자 INSERT 허용
+CREATE POLICY "products insert for authenticated"
+ON public.products
+FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+
+-- products: 모든 인증된 사용자 UPDATE 허용
+CREATE POLICY "products update for authenticated"
+ON public.products
+FOR UPDATE
+USING (auth.uid() IS NOT NULL)
+WITH CHECK (auth.uid() IS NOT NULL);
+
+-- products: 모든 인증된 사용자 DELETE 허용
+CREATE POLICY "products delete for authenticated"
+ON public.products
+FOR DELETE
+USING (auth.uid() IS NOT NULL);
+
 -- coops: 모든 사용자 SELECT 허용 (예시)
 CREATE POLICY "coops select for all"
 ON public.coops
@@ -234,5 +253,24 @@ CREATE POLICY "stock_transactions select for all"
 ON public.stock_transactions
 FOR SELECT
 USING (true);
+
+-- products: 모든 인증된 사용자 INSERT 허용
+CREATE POLICY "stock_transactions insert for authenticated"
+ON public.stock_transactions
+FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+
+-- products: 모든 인증된 사용자 UPDATE 허용
+CREATE POLICY "stock_transactions update for authenticated"
+ON public.stock_transactions
+FOR UPDATE
+USING (auth.uid() IS NOT NULL)
+WITH CHECK (auth.uid() IS NOT NULL);
+
+-- products: 모든 인증된 사용자 DELETE 허용
+CREATE POLICY "stock_transactions delete for authenticated"
+ON public.stock_transactions
+FOR DELETE
+USING (auth.uid() IS NOT NULL);
 
 -- 실제 서비스에서는 INSERT/UPDATE/DELETE 정책을 별도로 설계 필요

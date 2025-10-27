@@ -39,10 +39,10 @@ export const storeDataConverter = () => {
     }
   }
 
-  const convertAll = (dataArray: any[]): StoreData[] => {
-    if (!dataArray) return []
+  const convertAll = (datas: any[]): StoreData[] => {
+    if (!datas) return []
 
-    return dataArray.map(convert).filter((item): item is StoreData => item !== undefined)
+    return datas.map(convert).filter((item): item is StoreData => item !== undefined)
   }
 
   return { convert, convertAll }

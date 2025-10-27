@@ -1,16 +1,32 @@
-// 상품 테이블(public.products) 기반 타입
-export interface Product {
+export interface CategoryData {
+  id: string
+  store_id: string
+  name: string
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+export interface ProductData {
   id: string
   store_id: string
   origin_id?: string | null
-  category_id?: string | null
+  category_id?: string
   name: string
   description?: string | null
   price: number
   initial_stock: number
-  date?: string | null // ISO date string
-  image_url?: string | null
+  current_stock: number
+  images: ProductImageData[]
   active: boolean
-  created_at: string // ISO timestamp
-  updated_at: string // ISO timestamp
+  created_at: string
+  updated_at: string
+}
+
+export interface ProductImageData {
+  id: string
+  product_id: string
+  url: string
+  is_representative: boolean
+  sort_order: number
+  created_at: string
 }

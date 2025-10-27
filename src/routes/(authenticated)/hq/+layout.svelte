@@ -1,9 +1,24 @@
 <script lang="ts">
   import Sidebar from '$lib/components/Sidebar.svelte'
+  import { setStore } from '$lib/stores/store/state.svelte'
   import { onMount } from 'svelte'
 
-  let { children } = $props()
+  let { data, children } = $props()
+  let { store } = $derived(data)
   let mobileMenuOpen = $state(false)
+
+  onMount(() => {
+    setStore(store)
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        mobileMenuOpen = false
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  })
 
   function closeMobileMenu() {
     mobileMenuOpen = false
@@ -37,17 +52,6 @@
       icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
     },
   ]
-
-  onMount(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        mobileMenuOpen = false
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  })
 </script>
 
 <!-- <div class="flex min-h-screen bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50"></div> -->

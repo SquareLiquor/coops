@@ -30,11 +30,11 @@ export interface StorePublic {
 }
 
 // Store members table interface
-export interface StoreMember {
+export interface StoreMemberData {
   id: string
   store_id: string
   user_id: string
   store?: StoreData
-  user?: ProfileData
+  profile?: ProfileData
   created_at?: string
 }

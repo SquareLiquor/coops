@@ -3,9 +3,11 @@ import * as v from 'valibot'
 
 export const ProductsFilterSchema = v.pipe(
   v.object({
+    store_id: v.string(),
     date_from: v.pipe(v.optional(v.string())),
     date_to: v.pipe(v.optional(v.string())),
-    store_id: v.pipe(v.optional(v.string())),
+    category_id: v.pipe(v.optional(v.string())),
+    product_name: v.pipe(v.optional(v.string())),
     status: v.pipe(v.optional(v.string())),
     // pagination: v.optional(v.object({
     //   page: v.number().min(1).default(1),

@@ -1,164 +1,142 @@
 <script lang="ts">
+  import Editor from '$lib/components/ui/Editor.svelte'
   import FileUploader from '$lib/components/ui/FileUploader.svelte'
-  import TipTap from '$lib/components/ui/TipTap.svelte'
-  import { Slider } from '@skeletonlabs/skeleton-svelte'
+  import { superForm } from 'sveltekit-superforms'
+  import type { PageProps } from './$types'
 
-  let content = $state('Hello, world!')
+  let { data }: PageProps = $props()
+  let { categories } = $derived(data)
 
-  function handleImageListChange(newImages: typeof images, newMainIdx: number) {
-    images = newImages
-  }
+  const { form, message, errors, constraints, enhance, delayed } = superForm(data.form, {
+    resetForm: false,
+  })
 
-  let name = ''
-  let category = ''
-  let newCategory = ''
-  let categoryDropdownOpen = false
-  let categoryOptions: string[] = ['곡물', '과일', '채소', '육류', '수산물']
-  let price: number | '' = ''
-  let initialStock: number | '' = ''
-
-  // 이미지 업로드 관련 상태
-  let images: { id: string; url: string; isFeatured: boolean }[] = []
-
-  function selectCategory(option: string) {
-    category = option
-    categoryDropdownOpen = false
-    newCategory = ''
-  }
-
-  function addNewCategoryInline() {
-    if (newCategory && !categoryOptions.includes(newCategory)) {
-      categoryOptions = [...categoryOptions, newCategory]
-      category = newCategory
-      newCategory = ''
-      categoryDropdownOpen = false
-    }
-  }
+  console.log('errors', $errors, $message)
 </script>
 
 <svelte:head>
   <title>상품 등록 - 본사</title>
 </svelte:head>
 
-<div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
-  <h1 class="text-surface-900 text-2xl font-bold">상품 등록</h1>
-</div>
-
-<form
-  class="w-full p-8"
-  on:submit|preventDefault={() => {
-    /* 실제 등록 로직 필요 */
-  }}
->
-  <div class="flex w-full flex-col gap-8 lg:flex-row">
-    <!-- 좌측: 이미지 + 일반 정보 -->
-    <div class="flex min-w-0 flex-1 flex-col gap-8">
-      <div>
-        <label for="product-name" class="text-surface-700 mb-1 block font-medium">상품명</label>
-        <label class="label">
-          <span class="label-text">Input</span>
-          <input class="input" type="text" placeholder="Input" bind:value={name} />
-        </label>
-      </div>
-      <div>
-        <label for="product-category" class="text-surface-700 mb-1 block font-medium">카테고리</label>
-        <div class="relative" id="product-category">
-          <button
-            type="button"
-            class="border-surface-200 focus:border-primary-500 w-full rounded border-b bg-white px-3 py-2 text-left focus:outline-none"
-            on:click={() => (categoryDropdownOpen = !categoryDropdownOpen)}
-            aria-haspopup="listbox"
-            aria-expanded={categoryDropdownOpen}
-          >
-            {category || '카테고리 선택'}
-            <span class="float-right">▼</span>
-          </button>
-          {#if categoryDropdownOpen}
-            <div class="border-surface-200 absolute right-0 left-0 z-10 mt-1 rounded border bg-white shadow-lg">
-              <ul class="max-h-48 overflow-auto py-1" tabindex="-1">
-                {#each categoryOptions as option}
-                  <li>
-                    <button
-                      type="button"
-                      class="hover:bg-primary-50 w-full px-4 py-2 text-left"
-                      on:click={() => selectCategory(option)}
-                    >
-                      {option}
-                    </button>
-                  </li>
-                {/each}
-                <li class="border-surface-100 flex items-center gap-2 border-t px-4 py-2">
-                  <input
-                    class="border-surface-200 focus:border-primary-500 flex-1 border-b px-2 py-1 focus:outline-none"
-                    placeholder="새 카테고리 입력"
-                    bind:value={newCategory}
-                    on:keydown={(e) => e.key === 'Enter' && (addNewCategoryInline(), e.preventDefault())}
-                  />
-                  <button
-                    type="button"
-                    class="bg-primary-500 hover:bg-primary-700 rounded px-3 py-1 text-sm text-white"
-                    on:click={addNewCategoryInline}
-                    disabled={!newCategory.trim() || categoryOptions.includes(newCategory)}
-                  >
-                    추가
-                  </button>
-                </li>
-              </ul>
-            </div>
-          {/if}
-        </div>
-      </div>
-      <div class="flex gap-4">
-        <div class="flex-1">
-          <label for="product-price" class="text-surface-700 mb-1 block font-medium">가격(원)</label>
-          <input
-            id="product-price"
-            type="number"
-            min="0"
-            class="border-surface-200 focus:border-primary-500 w-full border-b px-3 py-2 focus:outline-none"
-            bind:value={price}
-            required
-          />
-        </div>
-        <div class="flex-1">
-          <label for="product-stock" class="text-surface-700 mb-1 block font-medium">
-            <Slider defaultValue={[50]}>
-              <Slider.Label>초기 재고</Slider.Label>
-              <Slider.Control>
-                <Slider.Track>
-                  <Slider.Range />
-                </Slider.Track>
-                <Slider.Thumb index={0}>
-                  <Slider.HiddenInput />
-                </Slider.Thumb>
-              </Slider.Control>
-              <Slider.MarkerGroup>
-                <Slider.Marker value={25} />
-                <Slider.Marker value={50} />
-                <Slider.Marker value={75} />
-              </Slider.MarkerGroup>
-            </Slider>
-          </label>
-        </div>
-      </div>
-      <div>
-        <label for="product-images" class="text-surface-700 mb-1 block font-medium">상품 이미지</label>
-        <FileUploader />
-      </div>
+<form method="POST" use:enhance>
+  <input type="hidden" name="store_id" value={$form.store_id} />
+  <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
+    <div class="flex items-center space-x-4">
+      <h1 class="text-surface-900 text-2xl font-bold">상품 등록</h1>
     </div>
-    <!-- 우측: 설명 -->
-    <div class="flex min-w-0 flex-1 flex-col">
-      <div class="mb-8 flex flex-1 flex-col">
-        <label class="text-surface-700 mb-1 block font-medium">
-          설명
-          <!-- <textarea
-            class="border-surface-200 focus:border-primary-500 h-40 w-full resize-y border-b px-3 py-2 focus:outline-none"
-            bind:value={description}
-          ></textarea> -->
-          <TipTap />
-        </label>
-      </div>
+    <div class="flex items-center space-x-2">
+      <button
+        type="submit"
+        class="btn bg-surface-50 hover:bg-surface-50 focus:ring-surface-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-black focus:ring-2 focus:ring-offset-2 focus:outline-none"
+      >
+        취소
+      </button>
+      <button
+        class="btn bg-primary-500 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+      >
+        등록
+      </button>
     </div>
   </div>
+
+  <div class="flex w-full min-w-0 flex-1 gap-8 p-8">
+    <!-- 좌측 패널: 기본정보 -->
+    <div class="flex w-1/2 flex-col">
+      <section class="border-surface-100 mb-8 rounded-lg border bg-white p-6">
+        <h2 class="text-lg font-semibold">기본정보</h2>
+        <hr class="hr my-4" />
+        <div class="flex flex-col gap-6">
+          <div class="flex items-end justify-between gap-4">
+            <label class="label w-2/5">
+              <span class="label-text text-sm">상품명</span>
+              <input
+                type="text"
+                name="name"
+                class="input placeholder-surface-200 w-full max-w-md"
+                bind:value={$form.name}
+                placeholder="상품명을 입력해주세요."
+                {...$constraints.name}
+              />
+            </label>
+            <label class="label w-2/5">
+              <span class="label-text text-sm">카테고리</span>
+              <select
+                name="category_id"
+                class="select h-9 w-full max-w-md px-3"
+                bind:value={$form.category_id}
+                {...$constraints.category_id}
+              >
+                <option value="" disabled selected>선택</option>
+                {#each categories as category}
+                  <option value={category.id}>{category.name}</option>
+                {/each}
+              </select>
+            </label>
+          </div>
+          <label class="text-surface-700 mb-1 block font-medium">
+            <span class="label-text text-sm">상세정보</span>
+            <Editor bind:description={$form.description} />
+            <input type="hidden" name="description" bind:value={$form.description} />
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <!-- 우측 패널: 판매 정보, 기타 -->
+    <div class="flex w-1/2 flex-col gap-8">
+      <section class="border-surface-100 mb-8 rounded-lg border bg-white p-6">
+        <h2 class="text-lg font-semibold">판매 정보</h2>
+        <hr class="hr my-4" />
+        <div class="flex flex-col gap-6">
+          <div class="flex items-end justify-between gap-4">
+            <label class="label w-2/5">
+              <span class="label-text text-sm">가격</span>
+              <input
+                name="price"
+                class="input placeholder-surface-200 w-full max-w-md"
+                type="number"
+                bind:value={$form.price}
+                min="0"
+                placeholder="가격을 입력해주세요."
+                {...$constraints.price}
+              />
+            </label>
+            <label class="label w-2/5">
+              <span class="label-text text-sm">단위</span>
+              <select name="unit" class="select h-9 w-full max-w-md px-3">
+                <option value="" disabled selected>선택</option>
+                {#each ['box', 'ea'] as unit}
+                  <option value={unit}>{unit}</option>
+                {/each}
+              </select>
+            </label>
+            <label class="label w-2/5">
+              <span class="label-text text-sm">초기 재고</span>
+              <input
+                name="initial_stock"
+                class="input placeholder-surface-200 w-full max-w-md"
+                type="number"
+                bind:value={$form.initial_stock}
+                min="0"
+                placeholder="초기 재고를 입력해주세요."
+                {...$constraints.initial_stock}
+              />
+            </label>
+          </div>
+        </div>
+      </section>
+      <section class="border-surface-100 rounded-lg border bg-white p-6">
+        <h2 class="text-lg font-semibold">기타</h2>
+        <hr class="hr my-4" />
+        <div class="flex flex-col gap-6">
+          <label for="product-images" class="text-surface-700 mb-1 block font-medium">
+            <span class="label-text text-sm">상품 이미지</span>
+            <FileUploader bind:images={$form.images} />
+          </label>
+        </div>
+      </section>
+    </div>
+  </div>
+
   <!-- form 끝 -->
 </form>

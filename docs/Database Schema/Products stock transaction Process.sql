@@ -9,14 +9,27 @@ CREATE OR REPLACE FUNCTION public.trg_stock_on_product_insert()
 RETURNS trigger AS $$
 BEGIN
   -- 초기 재고가 0이거나 그 이상인 경우 모두 트랜잭션 생성
-  PERFORM public.fn_create_stock_transaction(
-    p_product_id      := NEW.id,
-    p_quantity        := NEW.initial_stock,
-    p_source_store_id := NULL,
-    p_target_store_id := NEW.default_store_id,
-    p_reason          := '상품 등록 초기 재고',
-    p_ref_id          := NEW.id
-  );
+  INSERT INTO public.stock_transactions(
+        product_id,
+        store_id,
+        type,
+        quantity,
+        source_store_id,
+        target_store_id,
+        reason,
+        ref_id,
+        created_at
+    ) VALUES (
+        NEW.id,
+        NEW.store_id,
+        'initial',
+        NEW.initial_stock,
+        NULL,
+        NEW.store_id,
+        '상품 등록 초기 재고',
+        NEW.id,
+        now()
+    );
 
   RETURN NEW;
 END;

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { FileUpload, useFileUpload } from '@skeletonlabs/skeleton-svelte'
 
+  let { images = $bindable() } = $props()
+
   const acceptedFiles: File[] = $state([])
 
   const fileUpload = useFileUpload({
@@ -10,15 +12,10 @@
 
   const handleFileChange = (details: any) => {
     acceptedFiles.push(...(details?.acceptedFiles || []))
-    console.log('File changed:', details?.acceptedFiles, fileUpload().acceptedFiles)
   }
 </script>
 
-<FileUpload
-  onFileChange={handleFileChange}
-  onFileAccept={(e) => console.log('Files accepted:', e)}
-  onFileReject={(e) => console.log('Files rejected:', e)}
->
+<FileUpload onFileChange={handleFileChange} maxFiles={5}>
   <FileUpload.Dropzone>
     <span>Select file or drag here.</span>
     <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
@@ -29,6 +26,7 @@
       {#snippet children(fileUpload)}
         {#each fileUpload().acceptedFiles as file (file.name)}
           <FileUpload.Item {file}>
+            <img src={URL.createObjectURL(file)} alt={file.name} class="mt-2 max-h-48 object-contain" />
             <FileUpload.ItemName>{file.name}</FileUpload.ItemName>
             <FileUpload.ItemSizeText>{file.size} bytes</FileUpload.ItemSizeText>
             <FileUpload.ItemDeleteTrigger />
@@ -40,6 +38,13 @@
 </FileUpload>
 
 {#if acceptedFiles.length > 0}
+  <!-- {#each acceptedFiles as file (file.name)}
+    <div class="mt-4">
+      <strong>{file.name}</strong> - {file.size} bytes
+      <img src={URL.createObjectURL(file)} alt={file.name} class="mt-2 max-h-48 object-contain" />
+    </div>
+  {/each}
+  <br /> -->
   <button class="btn preset-filled hover:preset-filled-error-500 w-fit" onclick={() => fileUpload().clearFiles()}
     >Clear Files</button
   >
