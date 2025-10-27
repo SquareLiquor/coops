@@ -45,8 +45,8 @@
     ]
   },
   "dependencies": {
-    "@skeletonlabs/skeleton": "^3.2.2",
-    "@skeletonlabs/skeleton-svelte": "^1.5.3",
+    "@skeletonlabs/skeleton": "^4.1.5",
+    "@skeletonlabs/skeleton-svelte": "^4.1.5",
     "@supabase/postgrest-js": "^2.76.1",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.76.1",
