@@ -54,9 +54,7 @@
   ]
 </script>
 
-<!-- <div class="flex min-h-screen bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50"></div> -->
 <div class="flex h-screen">
-  <!-- Mobile menu button -->
   <button
     class="border-surface-200 fixed top-4 left-4 z-50 rounded-md border bg-white p-2 shadow-sm lg:hidden"
     onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
@@ -72,10 +70,8 @@
     </svg>
   </button>
 
-  <!-- Unified Sidebar Component -->
   <Sidebar {mobileMenuOpen} menuItems={hqMenuItems} settingsPath="/hq/settings" onCloseMobile={closeMobileMenu} />
 
-  <!-- Overlay for mobile -->
   {#if mobileMenuOpen}
     <button
       type="button"
@@ -85,10 +81,9 @@
     ></button>
   {/if}
 
-  <div class="flex flex-1 flex-col overflow-hidden">
-    <!-- Main content area -->
-    <main class="flex-1 p-6">
-      <div class="border-surface-100 rounded-lg border bg-white shadow-sm md:h-[calc(100vh-3rem)] md:overflow-auto">
+  <div class="flex-1 overflow-hidden">
+    <main>
+      <div class="border-surface-400 border-l bg-white md:h-[calc(100vh)] md:overflow-auto">
         {@render children?.()}
       </div>
     </main>

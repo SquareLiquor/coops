@@ -56,7 +56,7 @@
   <title>상품 관리 - 본사</title>
 </svelte:head>
 
-<div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
+<div class="border-surface-200 flex h-16 items-center justify-between border-b px-6">
   <div class="flex items-center space-x-4">
     <h1 class="text-surface-900 text-2xl font-bold">상품 관리</h1>
   </div>

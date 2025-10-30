@@ -61,7 +61,7 @@
   </nav>
 
   <!-- Settings 메뉴 -->
-  <div class="mt-auto px-4 py-2">
+  <div class="px-2 py-2">
     <a
       href={settingsPath}
       class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
@@ -91,7 +91,7 @@
 
   <!-- 사용자 프로필 -->
   <form method="POST">
-    <div class="mb-6 px-4 py-4">
+    <div class="px-2 py-2">
       <div class="flex items-center gap-3">
         <!-- Avatar Component (Skeleton UI Style) -->
         <!-- <div class="relative">
