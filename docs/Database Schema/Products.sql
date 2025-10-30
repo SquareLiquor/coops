@@ -19,11 +19,15 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'stock_transaction_type') THEN
     CREATE TYPE stock_transaction_type AS ENUM (
-      'initial',      -- 초기 재고
-      'inbound',      -- 입고 (본사→가맹점, 공급사→HQ)
-      'outbound',     -- 출고 (HQ→가맹점, 매장 판매 포함)
-      'adjustment'    -- 재고 조정 (폐기, 분실 등)
+      'INITIAL',      -- 초기 재고
+      'INBOUND',      -- 입고 (본사→가맹점, 공급사→HQ)
+      'OUTBOUND',     -- 출고 (HQ→가맹점, 매장 판매 포함)
+      'ADJUSTMENT'    -- 재고 조정 (폐기, 분실 등)
     );
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'unit_type') THEN
+    CREATE TYPE unit_type AS ENUM ('EA', 'BOX', 'PACK', 'SET', 'BAG');
   END IF;
 END$$;
 
@@ -32,26 +36,28 @@ END$$;
 -- ==============================
 
 -- 카테고리 관리 테이블
-CREATE TABLE public.product_categories (
+CREATE TABLE public.categories (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   name text NOT NULL UNIQUE,
-  active boolean NOT NULL DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
-COMMENT ON TABLE public.product_categories IS '상품 카테고리 관리 테이블';
+COMMENT ON TABLE public.categories IS '상품 카테고리 관리 테이블';
 
 -- products 테이블 (본사/가맹점 공통)
 CREATE TABLE public.products (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   origin_id uuid REFERENCES public.products(id) ON DELETE SET NULL,
-  category_id uuid REFERENCES public.product_categories(id) ON DELETE SET NULL,
+  category_id uuid REFERENCES public.categories(id) ON DELETE SET NULL,
   name text NOT NULL,
   description text,
   price numeric NOT NULL,
   initial_stock integer NOT NULL DEFAULT 0,
+  unit unit_type NOT NULL,
+  quantity_per_unit number NOT NULL,
+  images uuid[] REFERENCES public.product_images(id) ON DELETE CASCADE,
   date date,
   active boolean NOT NULL DEFAULT true,
   created_at timestamptz DEFAULT now(),
@@ -64,7 +70,7 @@ CREATE TABLE public.product_images (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   url text NOT NULL,
-  is_representative boolean NOT NULL DEFAULT false,
+  representative boolean NOT NULL DEFAULT false,
   sort_order integer NOT NULL DEFAULT 0,
   created_at timestamptz DEFAULT now()
 );

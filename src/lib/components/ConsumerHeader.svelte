@@ -1,8 +1,5 @@
 <script lang="ts">
   import { getAuth } from '$lib/stores'
-  import { createBrowserClient } from '$lib/supabase'
-
-  const supabase = createBrowserClient()
 
   const user = $derived(getAuth().user)
   const store = {

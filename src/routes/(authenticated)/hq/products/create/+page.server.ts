@@ -1,66 +1,67 @@
-import { ProductCreationSchema, type ProductCreationData } from '$lib/schemas/product/product'
-import type { CategoryData } from '$lib/types'
+import { productDataConverter } from '$lib/converters/productConverter'
+import { createInitialProductValues, ProductCreationSchema, type ProductInput } from '$lib/schemas/product/product'
+import { getCategories } from '$lib/supabase'
+import { UnitType } from '$lib/types'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from '../$types'
 
-export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => {
+const { convert } = productDataConverter()
+
+export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
-  const initialProductData: ProductCreationData = {
-    store_id: store?.id || '',
-    category_id: '',
-    name: '',
-    description: '',
-    price: 0,
-    initial_stock: 0,
-    images: [],
-  }
-  const form = await superValidate(initialProductData, valibot(ProductCreationSchema), { errors: false })
 
-  const { data } = await supabase.from('categories').select('*').eq('store_id', store?.id).eq('active', true)
+  const initialProductValues = createInitialProductValues(store?.id)
+  const form = await superValidate(initialProductValues, valibot(ProductCreationSchema), { errors: false })
 
-  return { form, categories: data as CategoryData[] }
+  const { categories } = await getCategories(store?.id)
+  const unitTypes = [...Object.values(UnitType)]
+
+  return { form, categories, unitTypes }
 }
 
 export const actions: Actions = {
   default: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(ProductCreationSchema))
-    const { store_id, category_id, name, description, price, initial_stock, images } = form.data
 
-    console.log('form', form)
     if (!form.valid) {
       return fail(400, { form })
     }
 
-    // TODO: create product hook
-    // Step01: Hook Upload image
+    try {
+      const { data } = await createProduct(supabase, form.data)
+      // await createProductHook.runAfter()
 
-    // Step02: Insert Product
-    const { data, error } = await supabase
-      .from('products')
-      .insert({
-        store_id,
-        category_id,
-        name,
-        description,
-        price,
-        initial_stock,
-        active: true,
-      })
-      .select('*')
-      .maybeSingle()
-
-    console.log('insert product', { data, error })
-
-    // Step03: Insert Product Images
-    // const aa = await supabase.from('product_images').insert(
-    //   images.map((image, index) => ({
-    //     product_id: data.id,
-    //     url: URL.createObjectURL(image.file), // uploaded url
-    //     is_representative: image.is_representative,
-    //     sort_order: index,
-    //   }))
-    // )
+      return { form, product: convert(data) }
+    } catch (error) {
+      console.error(error)
+      return fail(500, { message: '상품 등록 중 오류가 발생했습니다.' })
+    }
   },
+}
+
+const createProduct = async (supabase: SupabaseClient, formData: ProductInput) => {
+  const { store_id, category_id, name, description, price, initial_stock, images } = formData
+
+  const { data, error } = await supabase
+    .from('products')
+    .insert({
+      store_id,
+      category_id,
+      name,
+      description,
+      price,
+      initial_stock,
+      active: true,
+    })
+    .select('*')
+    .maybeSingle()
+
+  console.log({ data, error })
+
+  if (error) throw error
+
+  return { data }
 }

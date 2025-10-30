@@ -1,17 +1,30 @@
-import { ProductsFilterSchema as FilterSchema } from '$lib/schemas'
+import { productDataConverter } from '$lib/converters/productConverter'
+import { ProductsFilterSchema as FilterSchema, type ProductsFilterForm } from '$lib/schemas'
+import { getCategories } from '$lib/supabase'
 import type { Actions, ServerLoad } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 
+const { convertAll } = productDataConverter()
+
+const productSelectQuery = `
+  *,
+  category:category_id(*)
+`
+
 export const load: ServerLoad = async ({ parent, locals: { supabase } }) => {
   const { store } = await parent()
-  const initialFilterData = {
+
+  const initialFilterValues: ProductsFilterForm = {
     store_id: store.id,
   }
-  const filterForm = await superValidate(initialFilterData, valibot(FilterSchema))
+  const filterForm = await superValidate(initialFilterValues, valibot(FilterSchema))
+
+  const { categories } = await getCategories(store?.id)
 
   return {
     filterForm,
+    categories,
   }
 }
 
@@ -20,12 +33,11 @@ export const actions: Actions = {
     const form = await superValidate(request, valibot(FilterSchema))
     const { store_id, category_id, product_name, status, date_from, date_to } = form.data
 
-    console.log(form)
     if (!form.valid) return { form }
 
     const query = supabase
-      .from('store_product_view')
-      .select('*', { count: 'exact' })
+      .from('products')
+      .select(productSelectQuery)
       .eq('store_id', store_id)
       .order('created_at', { ascending: false })
 
@@ -37,11 +49,9 @@ export const actions: Actions = {
 
     const { data } = await query
 
-    console.log(data)
-
     return {
       form,
-      products: data ?? [],
+      products: data ? convertAll(data) : [],
     }
   },
   create: async ({ request, locals: { supabase } }) => {},

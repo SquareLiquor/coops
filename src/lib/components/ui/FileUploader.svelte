@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { FileUpload, useFileUpload } from '@skeletonlabs/skeleton-svelte'
+  import { FileUpload } from '@skeletonlabs/skeleton-svelte'
 
-  let { images = $bindable() } = $props()
+  let { images = $bindable(), handleFileChange } = $props()
+
+  // const fileUpload = useFileUpload({
+  //   id: '1',
+  //   defaultAcceptedFiles: [new File(['file'], 'example.png', { type: 'image/png' })],
+  // })
 
   const acceptedFiles: File[] = $state([])
 
-  const fileUpload = useFileUpload({
-    id: '1',
-    defaultAcceptedFiles: [new File(['file'], 'example.png', { type: 'image/png' })],
-  })
-
-  const handleFileChange = (details: any) => {
-    acceptedFiles.push(...(details?.acceptedFiles || []))
-  }
+  // const handleFileChange = (details: any) => {
+  //   acceptedFiles.push(...(details?.acceptedFiles || []))
+  //   handleChange(acceptedFiles)
+  //   console.log('Images in child', acceptedFiles)
+  // }
 </script>
 
 <FileUpload onFileChange={handleFileChange} maxFiles={5}>
@@ -24,6 +26,7 @@
   <FileUpload.ItemGroup>
     <FileUpload.Context>
       {#snippet children(fileUpload)}
+        <!-- <div use:dndzone={{ items: acceptedFiles }}> -->
         {#each fileUpload().acceptedFiles as file (file.name)}
           <FileUpload.Item {file}>
             <img src={URL.createObjectURL(file)} alt={file.name} class="mt-2 max-h-48 object-contain" />
@@ -32,6 +35,7 @@
             <FileUpload.ItemDeleteTrigger />
           </FileUpload.Item>
         {/each}
+        <!-- </div> -->
       {/snippet}
     </FileUpload.Context>
   </FileUpload.ItemGroup>
@@ -45,7 +49,7 @@
     </div>
   {/each}
   <br /> -->
-  <button class="btn preset-filled hover:preset-filled-error-500 w-fit" onclick={() => fileUpload().clearFiles()}
+  <!-- <button class="btn preset-filled hover:preset-filled-error-500 w-fit" onclick={() => fileUpload().clearFiles()}
     >Clear Files</button
-  >
+  > -->
 {/if}

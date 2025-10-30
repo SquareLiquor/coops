@@ -1,5 +1,5 @@
 import type { HookContext } from '$lib/hooks/hooksManager'
-import { supabaseAdmin } from '$lib/supabase/admin'
+import { supabaseAdmin } from '$lib/supabase/clients/admin'
 import type { SignupHookContext } from '$lib/types'
 
 const deleteUser = async ({ userId }: SignupHookContext) => {

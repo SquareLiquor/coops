@@ -17,6 +17,15 @@ export const ApprovalStatus: { [key: string]: ApprovalStatus } = {
   REJECTED: { code: 'rejected', label: '승인 거부', color: 'error' },
 }
 
+export type UnitType = EnumItem
+export const UnitType: { [key: string]: UnitType } = {
+  EA: { code: 'EA', label: '개' },
+  BOX: { code: 'BOX', label: '박스' },
+  PACK: { code: 'PACK', label: '팩' },
+  SET: { code: 'SET', label: '세트' },
+  BAG: { code: 'BAG', label: '봉지' },
+}
+
 export const lookupEnum = <T extends EnumItem>(enumObj: { [key: string]: T }, code: string): T | undefined => {
   return Object.values(enumObj).find((item) => item.code === code)
 }

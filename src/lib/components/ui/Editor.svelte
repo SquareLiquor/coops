@@ -34,5 +34,5 @@
 </script>
 
 <main>
-  <Editor apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {conf} cssClass="min-h-[500px]" />
+  <Editor apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {conf} />
 </main>

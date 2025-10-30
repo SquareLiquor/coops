@@ -2,7 +2,7 @@ import { approvalRequestDataConverter, storeDataConverter } from '$lib/converter
 import { ApprovalError, isAppError } from '$lib/errors'
 import { approveRequestHook, rejectRequestHook } from '$lib/hooks'
 
-import { ApprovalSchema, ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
+import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
 import { ApprovalStatus } from '$lib/types'
 import { extractFormData } from '$lib/utils'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -22,8 +22,7 @@ const requestSelectQuery = `
 `
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  const filterForm = await superValidate(valibot(FilterSchema))
-  const approvalForm = await superValidate(valibot(ApprovalSchema))
+  const filterForm = await superValidate({}, valibot(FilterSchema))
 
   const { data, error } = await supabase
     .from('stores_public')
@@ -36,7 +35,6 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
   return {
     filterForm,
-    approvalForm,
     stores,
     statusOptions,
   }

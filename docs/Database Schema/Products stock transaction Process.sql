@@ -22,7 +22,7 @@ BEGIN
     ) VALUES (
         NEW.id,
         NEW.store_id,
-        'initial',
+        'INITIAL',
         NEW.initial_stock,
         NULL,
         NEW.store_id,

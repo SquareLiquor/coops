@@ -1,17 +1,16 @@
 <script lang="ts">
+  import Combobox from '$lib/components/ui/Combobox.svelte'
   import Editor from '$lib/components/ui/Editor.svelte'
   import FileUploader from '$lib/components/ui/FileUploader.svelte'
   import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { categories } = $derived(data)
+  let { categories, unitTypes } = $derived(data)
 
   const { form, message, errors, constraints, enhance, delayed } = superForm(data.form, {
     resetForm: false,
   })
-
-  console.log('errors', $errors, $message)
 </script>
 
 <svelte:head>
@@ -46,8 +45,8 @@
         <h2 class="text-lg font-semibold">기본정보</h2>
         <hr class="hr my-4" />
         <div class="flex flex-col gap-6">
-          <div class="flex items-end justify-between gap-4">
-            <label class="label w-2/5">
+          <div class="flex gap-10">
+            <label class="label w-3/7">
               <span class="label-text text-sm">상품명</span>
               <input
                 type="text"
@@ -58,22 +57,20 @@
                 {...$constraints.name}
               />
             </label>
-            <label class="label w-2/5">
+            <label class="label w-4/7">
               <span class="label-text text-sm">카테고리</span>
-              <select
-                name="category_id"
-                class="select h-9 w-full max-w-md px-3"
-                bind:value={$form.category_id}
-                {...$constraints.category_id}
-              >
-                <option value="" disabled selected>선택</option>
-                {#each categories as category}
-                  <option value={category.id}>{category.name}</option>
-                {/each}
-              </select>
+              <Combobox
+                data={categories}
+                options={{ allowNewItem: true, handleAddNewItem: () => {}, placeholder: '선택' }}
+                handleSelect={(details: any) => {
+                  $form.category_id = details?.value
+                  console.log($form.category_id)
+                }}
+              />
+              <input type="hidden" name="category_id" bind:value={$form.category_id} />
             </label>
           </div>
-          <label class="text-surface-700 mb-1 block font-medium">
+          <label class="label">
             <span class="label-text text-sm">상세정보</span>
             <Editor bind:description={$form.description} />
             <input type="hidden" name="description" bind:value={$form.description} />
@@ -88,8 +85,8 @@
         <h2 class="text-lg font-semibold">판매 정보</h2>
         <hr class="hr my-4" />
         <div class="flex flex-col gap-6">
-          <div class="flex items-end justify-between gap-4">
-            <label class="label w-2/5">
+          <div class="flex gap-10">
+            <label class="label w-2/6">
               <span class="label-text text-sm">가격</span>
               <input
                 name="price"
@@ -101,17 +98,8 @@
                 {...$constraints.price}
               />
             </label>
-            <label class="label w-2/5">
-              <span class="label-text text-sm">단위</span>
-              <select name="unit" class="select h-9 w-full max-w-md px-3">
-                <option value="" disabled selected>선택</option>
-                {#each ['box', 'ea'] as unit}
-                  <option value={unit}>{unit}</option>
-                {/each}
-              </select>
-            </label>
-            <label class="label w-2/5">
-              <span class="label-text text-sm">초기 재고</span>
+            <label class="label w-2/6">
+              <span class="label-text text-sm">재고</span>
               <input
                 name="initial_stock"
                 class="input placeholder-surface-200 w-full max-w-md"
@@ -123,15 +111,58 @@
               />
             </label>
           </div>
+          <div class="flex gap-10">
+            <label class="label w-2/6">
+              <span class="label-text text-sm">단위</span>
+              <select
+                name="unit"
+                class="select h-9 w-full max-w-md px-3"
+                bind:value={$form.unit}
+                onchange={() => ($form.quantity_per_unit = 1)}
+              >
+                <option value="" disabled selected>선택</option>
+                {#each unitTypes as unit}
+                  <option value={unit.code}>{unit.label}</option>
+                {/each}
+              </select>
+            </label>
+
+            <label class="label w-2/6">
+              <span class="label-text text-sm">개 당 가격</span>
+              <input
+                name="initial_stock"
+                class="input placeholder-surface-200 w-full max-w-md"
+                type="number"
+                value={$form.price / $form.quantity_per_unit}
+                min="0"
+                placeholder=""
+                disabled
+              />
+            </label>
+
+            <label class="label w-2/6">
+              <span class="label-text text-sm">단위 별 수량</span>
+              <input
+                name="initial_stock"
+                class="input placeholder-surface-200 w-full max-w-md"
+                type="number"
+                bind:value={$form.quantity_per_unit}
+                disabled={$form.unit === 'EA'}
+                min="0"
+                placeholder="단위 당 수량을 입력해주세요."
+                {...$constraints.quantity_per_unit}
+              />
+            </label>
+          </div>
         </div>
       </section>
       <section class="border-surface-100 rounded-lg border bg-white p-6">
-        <h2 class="text-lg font-semibold">기타</h2>
+        <h2 class="text-lg font-semibold">상품 이미지</h2>
         <hr class="hr my-4" />
         <div class="flex flex-col gap-6">
           <label for="product-images" class="text-surface-700 mb-1 block font-medium">
-            <span class="label-text text-sm">상품 이미지</span>
-            <FileUploader bind:images={$form.images} />
+            <FileUploader handleFileChange={(details: any) => ($form.images = details?.acceptedFiles)} />
+            <input type="hidden" name="images" bind:value={$form.images} />
           </label>
         </div>
       </section>

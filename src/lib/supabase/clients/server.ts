@@ -1,5 +1,4 @@
 import { getRequestEvent } from '$app/server'
-// import { SUPABASE_SECRET_KEY } from '$env/static/private'
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import {
   createServerClient as _createServerClient,

@@ -1,3 +1,3 @@
 // Re-export all supabase related code
-export * from './browser'
-export * from './server'
+export * from './clients'
+export * from './products'

@@ -25,7 +25,7 @@ export const ProductsFilterSchema = v.pipe(
 
         return dateFrom && dateTo && dateFrom.isBefore(dateTo)
       },
-      'Message'
+      '검색 시작일은 검색 종료일 이전이어야 합니다.'
     ),
     ['date_from']
   )
