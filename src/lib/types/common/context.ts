@@ -1,3 +1,4 @@
+import type { ProductCreateInput } from '$lib/schemas/product/product'
 import type { SigninFormData, SignupFormData } from './form'
 
 export interface SignupHookContext {
@@ -14,4 +15,9 @@ export interface ApproveRequestHookContext {
   storeId: string
   userId: string
   originStatus?: 'pending' | 'approved' | 'rejected'
+}
+
+export interface CreateProductHookContext {
+  product: ProductCreateInput
+  productId: string
 }

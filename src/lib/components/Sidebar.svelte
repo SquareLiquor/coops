@@ -37,10 +37,13 @@
         <li>
           <a
             href={item.href}
-            class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-              {currentPath === item.href
-              ? 'bg-primary-500 text-primary-50 border-primary-200 border'
-              : 'text-surface-700 hover:bg-surface-100'}"
+            class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+            class:bg-primary-500={currentPath.startsWith(item.href)}
+            class:text-primary-50={currentPath.startsWith(item.href)}
+            class:border-primary-200={currentPath.startsWith(item.href)}
+            class:border={currentPath.startsWith(item.href)}
+            class:text-surface-700={!currentPath.startsWith(item.href)}
+            class:hover:bg-surface-100={!currentPath.startsWith(item.href)}
             onclick={handleMenuClick}
           >
             <svg

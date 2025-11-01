@@ -5,8 +5,8 @@
   let { description = $bindable() } = $props()
 
   let conf = {
-    height: 500,
     menubar: false,
+    height: 600,
     plugins: [
       'advlist',
       'autolink',

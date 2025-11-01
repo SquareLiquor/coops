@@ -26,7 +26,6 @@
     resetForm: false,
     onChange: async (event) => {
       try {
-        console.log('filter form changed')
         const result = await validateFilterForm({ update: true })
 
         if (result.valid) filterSubmit()
@@ -47,8 +46,6 @@
   onMount(async () => {
     await tick()
     filterSubmit()
-
-    console.log('filterForm', $filterForm)
   })
 </script>
 

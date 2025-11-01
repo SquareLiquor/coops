@@ -1,5 +1,7 @@
 import { categoryDataConvert } from '$lib/converters/productConverter'
+import { isBrowser } from '@supabase/ssr'
 import * as v from 'valibot'
+import { createBrowserClient } from '../clients/browser'
 import { createServerClient } from '../clients/server'
 
 export const categorySchema = v.object({
@@ -15,16 +17,19 @@ const { convert, convertAll } = categoryDataConvert()
 export const getCategories = async (store_id: string | undefined) => {
   if (!store_id) return { categories: [] }
 
-  const supabase = createServerClient()
-
-  const { data, error } = await supabase.from('categories').select('*').eq('store_id', store_id)
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('store_id', store_id)
+    .order('name', { ascending: true })
 
   if (error) return { categories: [] }
   return { categories: convertAll(data) }
 }
 
 export const createCategory = async ({ name, store_id }: Pick<CategoryInput, 'name' | 'store_id'>) => {
-  const supabase = createServerClient()
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { data, error } = await supabase
     .from('categories')
@@ -41,7 +46,7 @@ export const createCategory = async ({ name, store_id }: Pick<CategoryInput, 'na
 }
 
 export const deleteCategory = async ({ id }: Pick<CategoryInput, 'id'>) => {
-  const supabase = createServerClient()
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const response = await supabase.from('categories').delete().eq('id', id)
 }

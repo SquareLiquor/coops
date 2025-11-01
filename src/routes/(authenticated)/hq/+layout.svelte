@@ -27,11 +27,6 @@
   // HQ 메뉴 아이템
   const hqMenuItems = [
     {
-      href: '/hq',
-      label: '대시보드',
-      icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z',
-    },
-    {
       href: '/hq/products',
       label: '상품 관리',
       icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6m6-6v6',

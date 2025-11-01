@@ -1,5 +1,7 @@
 import { productDataConverter } from '$lib/converters/productConverter'
-import { createInitialProductValues, ProductCreationSchema, type ProductInput } from '$lib/schemas/product/product'
+import { isAppError } from '$lib/errors'
+import { createProductHook } from '$lib/hooks/products/creation'
+import { createInitialProductValues, ProductCreateSchema, type ProductCreateInput } from '$lib/schemas/product/product'
 import { getCategories } from '$lib/supabase'
 import { UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -14,7 +16,7 @@ export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
   const initialProductValues = createInitialProductValues(store?.id)
-  const form = await superValidate(initialProductValues, valibot(ProductCreationSchema), { errors: false })
+  const form = await superValidate(initialProductValues, valibot(ProductCreateSchema), { errors: false })
 
   const { categories } = await getCategories(store?.id)
   const unitTypes = [...Object.values(UnitType)]
@@ -24,7 +26,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 
 export const actions: Actions = {
   default: async ({ request, locals: { supabase } }) => {
-    const form = await superValidate(request, valibot(ProductCreationSchema))
+    const form = await superValidate(request, valibot(ProductCreateSchema))
 
     if (!form.valid) {
       return fail(400, { form })
@@ -32,17 +34,21 @@ export const actions: Actions = {
 
     try {
       const { data } = await createProduct(supabase, form.data)
-      // await createProductHook.runAfter()
+      await createProductHook.runAfter({ product: form.data, productId: data.id })
 
-      return { form, product: convert(data) }
+      return { form }
     } catch (error) {
       console.error(error)
+      if (isAppError(error)) {
+        error.errorHandler()
+        // await createProductHook.runCleanup({ productId: undefined })
+      }
       return fail(500, { message: '상품 등록 중 오류가 발생했습니다.' })
     }
   },
 }
 
-const createProduct = async (supabase: SupabaseClient, formData: ProductInput) => {
+const createProduct = async (supabase: SupabaseClient, formData: ProductCreateInput) => {
   const { store_id, category_id, name, description, price, initial_stock, images } = formData
 
   const { data, error } = await supabase
@@ -58,8 +64,6 @@ const createProduct = async (supabase: SupabaseClient, formData: ProductInput) =
     })
     .select('*')
     .maybeSingle()
-
-  console.log({ data, error })
 
   if (error) throw error
 

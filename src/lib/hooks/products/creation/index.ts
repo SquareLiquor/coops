@@ -1,8 +1,9 @@
 import { createHook } from '$lib/hooks/hooksManager'
-import type { ApproveRequestHookContext } from '$lib/types'
+import type { CreateProductHookContext } from '$lib/types'
 import { createProductImagesHook } from './createProductImagesHook'
-import { uploadImagesHook } from './uploadImagesHook'
+import { deleteProductHook } from './deleteProductHook'
 
-export const createProductHook = createHook<ApproveRequestHookContext>()
-createProductHook.after(uploadImagesHook)
+export const createProductHook = createHook<CreateProductHookContext>()
+
+createProductHook.cleanup(deleteProductHook)
 createProductHook.after(createProductImagesHook)
