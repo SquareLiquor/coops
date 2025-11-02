@@ -1,9 +1,9 @@
 import { productDataConverter } from '$lib/converters/productConverter'
 import { isAppError } from '$lib/errors'
-import { createProductHook } from '$lib/hooks/products/creation'
-import { createInitialProductValues, ProductCreateSchema, type ProductCreateInput } from '$lib/schemas/product/product'
+import { createCoopHook } from '$lib/hooks/hooks/creation'
+import { CoopCreateSchema, createInitialCoopValues, type CoopCreateInput } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
-import { UnitType } from '$lib/types'
+import { SalesStatus, UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
@@ -15,54 +15,55 @@ const { convert } = productDataConverter()
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
-  const initialProductValues = createInitialProductValues(store?.id)
-  const form = await superValidate(initialProductValues, valibot(ProductCreateSchema), { errors: false })
+  const initialCoopValues = createInitialCoopValues(store?.id)
+  const form = await superValidate(initialCoopValues, valibot(CoopCreateSchema), { errors: false })
 
   const { categories } = await getCategories(store?.id)
   const unitTypes = [...Object.values(UnitType)]
+  const salesStatuses = [...Object.values(SalesStatus)]
 
-  return { form, categories, unitTypes }
+  return { form, categories, unitTypes, salesStatuses }
 }
 
 export const actions: Actions = {
   default: async ({ request, locals: { supabase } }) => {
-    const form = await superValidate(request, valibot(ProductCreateSchema))
+    const form = await superValidate(request, valibot(CoopCreateSchema))
 
     if (!form.valid) {
       return fail(400, { form })
     }
 
     try {
-      const { data } = await createProduct(supabase, form.data)
-      await createProductHook.runAfter({ product: form.data, productId: data.id })
+      const { shared } = await createCoopHook.runBefore({ coop: form.data, product: form.data.mappedProduct })
+
+      const { data } = await createCoop(supabase, form.data, shared.get('productId'))
 
       return { form }
     } catch (error) {
       console.error(error)
       if (isAppError(error)) {
         error.errorHandler()
-        // await createProductHook.runCleanup({ productId: undefined })
+        await createCoopHook.runCleanup({})
       }
       return fail(500, { form, message: '상품 등록 중 오류가 발생했습니다.' })
     }
   },
 }
 
-const createProduct = async (supabase: SupabaseClient, formData: ProductCreateInput) => {
-  const { store_id, category_id, name, description, price, initial_stock, unit, quantity_per_unit } = formData
+const createCoop = async (supabase: SupabaseClient, formData: CoopCreateInput, productId: string) => {
+  const { store_id, name, status, max_quantity, sales_price, sales_date, description } = formData
 
   const { data, error } = await supabase
-    .from('products')
+    .from('coops')
     .insert({
       store_id,
-      category_id,
+      product_id: productId,
+      status,
+      max_quantity,
+      sales_price,
+      sales_date,
       name,
       description,
-      price,
-      initial_stock,
-      unit,
-      quantity_per_unit,
-      active: true,
     })
     .select('*')
     .maybeSingle()

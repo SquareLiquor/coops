@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ProductDetailModel from '$lib/components/modals/ProductDetailModel.svelte'
   import { ProductsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { ProductData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
@@ -12,6 +13,7 @@
   let { data }: PageProps = $props()
   let { categories } = data
   let products: ProductData[] = $state([])
+  let selectedProductId: string | null = $state(null)
 
   const {
     form: filterForm,
@@ -182,7 +184,13 @@
               <div class="text-surface-900 text-sm">{product.category?.name}</div>
             </td>
             <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{product.name}</div>
+              <button
+                type="button"
+                class="text-primary-500 m-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium hover:underline"
+                onclick={() => (selectedProductId = product.id)}
+              >
+                {product.name}
+              </button>
             </td>
             <td class="px-4 py-4">
               <div class="text-surface-900 text-sm font-medium">{formatCurrency(product.price)}</div>
@@ -227,3 +235,7 @@
     {/if}
   </div>
 </div>
+
+{#if selectedProductId}
+  <ProductDetailModel productId={selectedProductId} onClose={() => (selectedProductId = null)} />
+{/if}

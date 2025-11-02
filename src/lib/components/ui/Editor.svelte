@@ -6,7 +6,7 @@
 
   let conf = {
     menubar: false,
-    height: 600,
+    height: 500,
     plugins: [
       'advlist',
       'autolink',

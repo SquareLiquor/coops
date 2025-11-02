@@ -2,22 +2,18 @@
   import { page } from '$app/state'
   import { getAuth } from '$lib/stores'
 
-  let { mobileMenuOpen, menuItems, settingsPath, onCloseMobile } = $props()
+  let { menuItems, settingsPath } = $props()
 
   const currentPath = $derived(page.url.pathname)
   const user = $derived(getAuth().user)
-
-  function handleMenuClick() {
-    onCloseMobile()
-  }
 </script>
 
 <!-- Unified Sidebar -->
 <aside
   class={`
-    ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-    fixed inset-y-0 left-0 z-40 flex
-    w-64 flex-col shadow-lg transition-transform
+    fixed
+    inset-y-0 left-0 z-40 flex w-64
+    -translate-x-full flex-col shadow-lg transition-transform
     duration-200 ease-in-out lg:static lg:translate-x-0 lg:shadow-none
   `}
 >
@@ -44,7 +40,6 @@
             class:border={currentPath.startsWith(item.href)}
             class:text-surface-700={!currentPath.startsWith(item.href)}
             class:hover:bg-surface-100={!currentPath.startsWith(item.href)}
-            onclick={handleMenuClick}
           >
             <svg
               class="h-4 w-4 {currentPath === item.href
@@ -71,7 +66,6 @@
         {currentPath === settingsPath
         ? 'bg-primary-500 text-primary-50 border-primary-200 border'
         : 'text-surface-700 hover:bg-surface-100'}"
-      onclick={handleMenuClick}
     >
       <svg
         class="h-4 w-4 {currentPath === settingsPath

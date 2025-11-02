@@ -12,10 +12,10 @@ export interface ProductData {
   id: string
   store_id: string
   origin_id?: string | null
-  category_id?: string
+  category_id: string
   category?: CategoryData
   name: string
-  description?: string | null
+  description: string
   price: number
   initial_stock: number
   unit: string

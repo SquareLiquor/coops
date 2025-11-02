@@ -26,6 +26,16 @@ export const UnitType: { [key: string]: UnitType } = {
   BAG: { code: 'BAG', label: '봉지' },
 }
 
+export type SalesStatus = EnumItem & { color?: string }
+export const SalesStatus: { [key: string]: SalesStatus } = {
+  PREPARING: { code: 'PREPARING', label: '판매 준비', color: 'gray' },
+  ONGOING: { code: 'ONGOING', label: '판매 진행', color: 'greern' },
+  ENDED: { code: 'ENDED', label: '판매 종료', color: 'blue' },
+  COMPLETED: { code: 'COMPLETED', label: '판매 완료', color: 'yellow' },
+  STOPPED: { code: 'STOPPED', label: '판매 중지', color: 'red' },
+  PAUSED: { code: 'PAUSED', label: '판매 일시 정지', color: 'orange' },
+}
+
 export const lookupEnum = <T extends EnumItem>(enumObj: { [key: string]: T }, code: string): T | undefined => {
   return Object.values(enumObj).find((item) => item.code === code)
 }

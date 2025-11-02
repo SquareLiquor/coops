@@ -5,24 +5,10 @@
 
   let { data, children } = $props()
   let { store } = $derived(data)
-  let mobileMenuOpen = $state(false)
 
   onMount(() => {
     setStore(store)
-
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        mobileMenuOpen = false
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
   })
-
-  function closeMobileMenu() {
-    mobileMenuOpen = false
-  }
 
   // HQ 메뉴 아이템
   const hqMenuItems = [
@@ -50,31 +36,7 @@
 </script>
 
 <div class="flex h-screen">
-  <button
-    class="border-surface-200 fixed top-4 left-4 z-50 rounded-md border bg-white p-2 shadow-sm lg:hidden"
-    onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
-    aria-label="메뉴 토글"
-  >
-    <svg class="text-surface-600 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d={mobileMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
-      />
-    </svg>
-  </button>
-
-  <Sidebar {mobileMenuOpen} menuItems={hqMenuItems} settingsPath="/hq/settings" onCloseMobile={closeMobileMenu} />
-
-  {#if mobileMenuOpen}
-    <button
-      type="button"
-      class="bg-opacity-75 bg-surface-600 fixed inset-0 z-30 lg:hidden"
-      onclick={() => (mobileMenuOpen = false)}
-      aria-label="모바일 메뉴 닫기"
-    ></button>
-  {/if}
+  <Sidebar menuItems={hqMenuItems} settingsPath="/hq/settings" />
 
   <div class="flex-1 overflow-hidden">
     <main>

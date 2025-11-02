@@ -56,9 +56,7 @@ CREATE TABLE public.products (
   price numeric NOT NULL,
   initial_stock integer NOT NULL DEFAULT 0,
   unit unit_type NOT NULL,
-  quantity_per_unit number NOT NULL,
-  images uuid[] REFERENCES public.product_images(id) ON DELETE CASCADE,
-  date date,
+  quantity_per_unit numeric NOT NULL,
   active boolean NOT NULL DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
