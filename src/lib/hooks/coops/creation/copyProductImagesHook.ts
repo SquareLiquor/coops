@@ -30,18 +30,6 @@ const copyProductImages = async ({ product }: CreateCoopHookContext, shared: any
   }
 }
 
-const deleteProductImages = async (context: CreateCoopHookContext, shared: any) => {
-  const supabase = createServerClient()
-
-  const productId = shared.get('productId')
-  if (!productId) return
-
-  const { data, error } = await supabase.from('product_images').delete().eq('product_id', productId)
-
-  if (error) throw new SupabaseError('Failed to delete product images during cleanup')
-}
-
 export const copyProductImagesHook: HookContext<CreateCoopHookContext> = {
   hook: copyProductImages,
-  cleanup: deleteProductImages,
 }

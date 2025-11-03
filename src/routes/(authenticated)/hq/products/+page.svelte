@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProductDetailModel from '$lib/components/modals/ProductDetailModel.svelte'
+  import ProductDetailModal from '$lib/components/modals/ProductDetailModal.svelte'
   import { ProductsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { ProductData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
@@ -237,5 +237,5 @@
 </div>
 
 {#if selectedProductId}
-  <ProductDetailModel productId={selectedProductId} onClose={() => (selectedProductId = null)} />
+  <ProductDetailModal productId={selectedProductId} onClose={() => (selectedProductId = null)} />
 {/if}

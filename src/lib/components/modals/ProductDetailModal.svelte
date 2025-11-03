@@ -31,13 +31,15 @@
 >
   <div
     class="relative max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-lg bg-white shadow-xl"
+    role="dialog"
+    aria-modal="true"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => e.stopPropagation()}
   >
     <!-- 헤더 -->
     <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
       <div class="flex items-center space-x-4">
-        <h1 class="text-surface-900 text-2xl font-bold">상품 상세정보</h1>
+        <h1 class="text-surface-900 text-2xl font-bold">상품 상세정보 (TODO: Modal 디자인 변경)</h1>
       </div>
       <div class="flex items-center space-x-2">
         <button
@@ -67,27 +69,21 @@
           <h2 class="text-lg font-semibold">기본정보</h2>
           <hr class="hr my-4" />
           <div class="flex flex-col gap-4">
-            <div class="grid grid-cols-4 gap-2">
-              <div class="col-span-2">
-                <label class="label">
-                  <span class="label-text text-sm font-medium">상품명</span>
-                  <div class="input bg-surface-50 border-surface-200 cursor-default">{product.name}</div>
-                </label>
-              </div>
-              <div class="col-span-2">
-                <label class="label">
-                  <span class="label-text text-sm font-medium">카테고리</span>
-                  <div class="input bg-surface-50 border-surface-200 cursor-default">{product.category}</div>
-                </label>
-              </div>
+            <div class="label">
+              <span class="label-text text-sm font-medium">상품명</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">{product.name}</div>
             </div>
-            <div class="flex-1">
-              <label class="label flex flex-col">
-                <span class="label-text text-sm font-medium">상세정보</span>
-                <div class="border-surface-200 bg-surface-50 min-h-[200px] rounded-lg border p-4 text-sm">
-                  {product.description}
-                </div>
-              </label>
+            <div class="input bg-surface-50 border-surface-200 cursor-default">{product.name}</div>
+            <div class="label">
+              <span class="label-text text-sm font-medium">카테고리</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">{product.category}</div>
+            </div>
+            <div class="input bg-surface-50 border-surface-200 cursor-default">{product.category}</div>
+            <div class="label flex flex-col">
+              <span class="label-text text-sm font-medium">상세정보</span>
+              <div class="border-surface-200 bg-surface-50 min-h-[200px] rounded-lg border p-4 text-sm">
+                {product.description}
+              </div>
             </div>
           </div>
         </section>
@@ -98,34 +94,32 @@
         <section class="border-surface-100 rounded-lg border bg-white p-6">
           <h2 class="text-lg font-semibold">판매 정보</h2>
           <hr class="hr my-4" />
+
           <div class="flex flex-col gap-4">
-            <div class="grid grid-cols-2 gap-2">
-              <label class="label">
-                <span class="label-text text-sm font-medium">가격</span>
-                <div class="input bg-surface-50 border-surface-200 cursor-default">
-                  {product.price?.toLocaleString()}원
-                </div>
-              </label>
-              <label class="label">
-                <span class="label-text text-sm font-medium">재고</span>
-                <div class="input bg-surface-50 border-surface-200 cursor-default">{product.initial_stock}개</div>
-              </label>
+            <div class="label">
+              <span class="label-text text-sm font-medium">가격</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">
+                {product.price?.toLocaleString()}원
+              </div>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-              <label class="label">
-                <span class="label-text text-sm font-medium">단위</span>
-                <div class="input bg-surface-50 border-surface-200 cursor-default">{product.unit}</div>
-              </label>
-              <label class="label">
-                <span class="label-text text-sm font-medium">단위별 수량</span>
-                <div class="input bg-surface-50 border-surface-200 cursor-default">{product.quantity_per_unit}</div>
-              </label>
-              <label class="label">
-                <span class="label-text text-sm font-medium">개당 가격</span>
-                <div class="input bg-surface-50 border-surface-200 cursor-default">
-                  {Math.round(product.price / product.quantity_per_unit).toLocaleString()}원
-                </div>
-              </label>
+            <div class="label">
+              <span class="label-text text-sm font-medium">재고</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">{product.initial_stock}개</div>
+            </div>
+            <div class="input bg-surface-50 border-surface-200 cursor-default">{product.initial_stock}개</div>
+            <div class="label">
+              <span class="label-text text-sm font-medium">단위</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">{product.unit}</div>
+            </div>
+            <div class="label">
+              <span class="label-text text-sm font-medium">단위별 수량</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">{product.quantity_per_unit}</div>
+            </div>
+            <div class="label">
+              <span class="label-text text-sm font-medium">개당 가격</span>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">
+                {Math.round(product.price / product.quantity_per_unit).toLocaleString()}원
+              </div>
             </div>
           </div>
         </section>

@@ -1,148 +1,65 @@
 <script lang="ts">
-  let coops = [
-    {
-      id: 'COOP-001',
-      title: '유기농 쌀 공동구매',
-      category: '곡물',
-      status: 'pre',
-      target: '50',
-      current: '32',
-      price: '45000',
-      storePrice: '45000',
-      endDate: '2024-12-25',
-    },
-    {
-      id: 'COOP-002',
-      title: '제주 감귤 5kg',
-      category: '과일',
-      status: 'completed',
-      target: '100',
-      current: '100',
-      price: '25000',
-      storePrice: '27000',
-      endDate: '2024-12-20',
-    },
-    {
-      id: 'COOP-003',
-      title: '친환경 배추 10포기',
-      category: '채소',
-      status: 'paused',
-      target: '80',
-      current: '15',
-      price: '18000',
-      storePrice: '18000',
-      endDate: '2024-12-30',
-    },
-    {
-      id: 'COOP-004',
-      title: '청양고추 1kg',
-      category: '채소',
-      status: 'selling',
-      target: '30',
-      current: '28',
-      price: '12000',
-      storePrice: '13500',
-      endDate: '2024-12-28',
-    },
-    {
-      id: 'COOP-005',
-      title: '사과 3kg (부사)',
-      category: '과일',
-      status: 'closed',
-      target: '60',
-      current: '45',
-      price: '22000',
-      storePrice: '22000',
-      endDate: '2024-12-27',
-    },
-    {
-      id: 'COOP-006',
-      title: '국산 콩 500g',
-      category: '곡물',
-      status: 'pre',
-      target: '40',
-      current: '8',
-      price: '15000',
-      storePrice: '16000',
-      endDate: '2025-01-05',
-    },
-  ]
+  import CoopDetailModal from '$lib/components/modals/CoopDetailModal.svelte'
+  import { CoopsFilterSchema as FilterSchema } from '$lib/schemas'
+  import { equalsEnum, SalesStatus } from '$lib/types'
+  import type { CoopData } from '$lib/types/entities/coop'
+  import { formatCurrency } from '$lib/utils'
+  import type { ActionResult } from '@sveltejs/kit'
+  import dayjs from 'dayjs'
+  import { onMount, tick } from 'svelte'
+  import { superForm } from 'sveltekit-superforms'
+  import { valibot } from 'sveltekit-superforms/adapters'
+  import type { PageProps } from './$types'
 
-  // 필터 상태
-  let selectedStatus = 'all'
-  let selectedCategory = 'all'
-  let dateFrom = ''
-  let dateTo = ''
+  let { data }: PageProps = $props()
+  let { categories, salesStatuses } = data
+  let coops: CoopData[] = $state([])
+  let selectedCoopId: string | null = $state(null)
 
-  const statusOptions = [
-    { value: 'all', label: '전체', count: coops.length },
-    { value: 'pre', label: '판매 전', count: coops.filter((c) => c.status === 'pre').length },
-    { value: 'selling', label: '판매 중', count: coops.filter((c) => c.status === 'selling').length },
-    { value: 'paused', label: '일시 중지', count: coops.filter((c) => c.status === 'paused').length },
-    { value: 'stopped', label: '판매 중지', count: coops.filter((c) => c.status === 'stopped').length },
-    { value: 'closed', label: '판매 종료', count: coops.filter((c) => c.status === 'closed').length },
-    { value: 'completed', label: '판매 완료', count: coops.filter((c) => c.status === 'completed').length },
-  ]
+  const {
+    form: filterForm,
+    errors: filterErrors,
+    constraints: filterConstraints,
+    validateForm: validateFilterForm,
+    enhance: filterEnhance,
+    submit: filterSubmit,
+    delayed: filterDelayed,
+  } = superForm(data.filterForm, {
+    validators: valibot(FilterSchema),
+    resetForm: false,
+    onChange: async (event) => {
+      try {
+        const result = await validateFilterForm({ update: true })
 
-  // 필터링된 공구 목록
-  $: filteredCoops = coops.filter((coop) => {
-    const statusMatch = selectedStatus === 'all' || coop.status === selectedStatus
-    const categoryMatch = selectedCategory === 'all' || coop.category === selectedCategory
-
-    let dateMatch = true
-    if (dateFrom) {
-      dateMatch = dateMatch && new Date(coop.endDate) >= new Date(dateFrom)
-    }
-    if (dateTo) {
-      dateMatch = dateMatch && new Date(coop.endDate) <= new Date(dateTo)
-    }
-
-    return statusMatch && categoryMatch && dateMatch
+        if (result.valid) filterSubmit()
+      } catch (e) {
+        console.error('validate form error:', e)
+      }
+    },
+    onResult: ({ result }: { result: ActionResult }) => {
+      if (result?.type === 'success') {
+        coops = result.data?.coops || []
+      }
+      if (result?.type === 'failure') {
+        coops = []
+      }
+    },
   })
 
-  const categoryOptions = [
-    { value: 'all', label: '전체' },
-    { value: '곡물', label: '곡물' },
-    { value: '과일', label: '과일' },
-    { value: '채소', label: '채소' },
-  ]
+  onMount(async () => {
+    await tick()
+    filterSubmit()
+  })
 
-  function getStatusBadge(status: string) {
-    switch (status) {
-      case 'pre':
-        return 'bg-surface-100 text-surface-700'
-      case 'selling':
-        return 'bg-green-300 text-green-700'
-      case 'paused':
-        return 'bg-yellow-100 text-yellow-700'
-      case 'stopped':
-        return 'bg-orange-100 text-orange-700'
-      case 'closed':
-        return 'bg-red-100 text-red-700'
-      case 'completed':
-        return 'bg-emerald-500 text-white'
-      default:
-        return 'bg-surface-100 text-surface-800'
-    }
-  }
-
-  function getStatusText(status: string) {
-    switch (status) {
-      case 'pre':
-        return '판매 전'
-      case 'selling':
-        return '판매 중'
-      case 'paused':
-        return '일시 중지'
-      case 'stopped':
-        return '판매 중지'
-      case 'closed':
-        return '판매 종료'
-      case 'completed':
-        return '판매 완료'
-      default:
-        return status
-    }
+  // 진행률 색상 클래스 반환 함수
+  function getProgressColor(coop: { current_quantity: number; max_quantity: number }) {
+    const percent = Math.round((coop.current_quantity / coop.max_quantity) * 100)
+    if (percent >= 90) return 'bg-primary-500'
+    if (percent >= 70) return 'bg-primary-400'
+    if (percent >= 50) return 'bg-primary-300'
+    if (percent >= 30) return 'bg-primary-200'
+    if (percent >= 10) return 'bg-primary-100'
+    return 'bg-primary-50'
   }
 </script>
 
@@ -161,136 +78,156 @@
     >새 상품 등록</a
   >
 </div>
+<div class="relative p-6">
+  <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
+    <input type="hidden" name="store_id" bind:value={$filterForm.store_id} />
 
-<div class="p-6">
-  <!-- 필터 영역 -->
-  <div class="mb-6 flex items-center justify-between">
-    <!-- 좌측 필터 영역 -->
-    <div class="flex items-center gap-4">
-      <!-- 날짜 필터 -->
-      <div class="flex items-center gap-2">
+    <div class="flex flex-col">
+      <div class="flex items-center gap-4">
+        <!-- 날짜 필터 -->
+        <div class="flex flex-col items-start gap-1">
+          <div class="flex items-center gap-2">
+            <input
+              type="date"
+              name="date_from"
+              bind:value={$filterForm.date_from}
+              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+              class:border-primary-500={$filterForm.date_from}
+              class:text-primary-700={$filterForm.date_from}
+              class:border-surface-100={!$filterForm.date_from}
+              {...$filterConstraints.date_from}
+            />
+            <span class="text-surface-400">~</span>
+            <input
+              type="date"
+              name="date_to"
+              bind:value={$filterForm.date_to}
+              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+              class:border-primary-500={$filterForm.date_to}
+              class:text-primary-700={$filterForm.date_to}
+              class:border-surface-100={!$filterForm.date_to}
+              {...$filterConstraints.date_to}
+            />
+          </div>
+        </div>
+        <!-- 상품명 검색 -->
+
         <input
-          type="date"
-          bind:value={dateFrom}
-          class="border-0 border-b px-3 py-1.5 text-sm {dateFrom
-            ? 'border-primary-500 text-primary-700'
-            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
-          placeholder="From"
-        />
-        <span class="text-surface-400">~</span>
-        <input
-          type="date"
-          bind:value={dateTo}
-          class="border-0 border-b px-3 py-1.5 text-sm {dateTo
-            ? 'border-primary-500 text-primary-700'
-            : 'border-surface-100'} focus:border-primary-500 bg-transparent focus:outline-none"
-          placeholder="To"
+          type="text"
+          name="product_name"
+          bind:value={$filterForm.name}
+          placeholder="상품명 검색"
+          class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+          class:border-primary-500={$filterForm.name}
+          class:text-primary-700={$filterForm.name}
+          class:border-surface-100={!$filterForm.name}
         />
       </div>
 
-      <!-- 카테고리 필터 -->
-      <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
-        {#each categoryOptions as option}
-          <button
-            class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedCategory === option.value
-              ? 'bg-primary-500 text-primary-50 shadow-sm'
-              : 'text-surface-600 hover:text-surface-800'}"
-            on:click={() => (selectedCategory = option.value)}
-          >
-            {option.label}
-          </button>
-        {/each}
-      </div>
+      {#if $filterErrors.date_from || $filterErrors.date_to}
+        <div class="mt-1 flex flex-col gap-1">
+          {#if $filterErrors.date_from}
+            <div class="text-error-500 text-sm">{$filterErrors.date_from}</div>
+          {/if}
+          {#if $filterErrors.date_to}
+            <div class="text-error-500 text-sm">{$filterErrors.date_to}</div>
+          {/if}
+        </div>
+      {/if}
     </div>
-
     <!-- 우측 상태 필터 영역 -->
     <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
-      {#each statusOptions as option}
+      <input type="hidden" name="status" bind:value={$filterForm.status} />
+      {#each salesStatuses as option}
         <button
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
-            ? 'bg-primary-500 text-primary-50 shadow-sm'
-            : 'text-surface-600 hover:text-surface-800'}"
-          on:click={() => (selectedStatus = option.value)}
+          type="button"
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {$filterForm.status === option.code
+            ? 'bg-primary-500 text-white shadow-sm'
+            : 'text-surface-600 hover:bg-surface-100'}"
+          onclick={() => ($filterForm.status = option.code)}
         >
           {option.label}
         </button>
       {/each}
     </div>
-  </div>
+  </form>
 
-  <div class="border-surface-100 overflow-hidden rounded-lg border bg-white">
-    <table class="w-full table-auto">
+  <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
+    {#if $filterDelayed}
+      <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+        <span class="loader-giant"></span>
+      </div>
+    {/if}
+
+    <table class="min-w-full">
       <thead class="bg-surface-50/50 border-surface-100 border-b">
         <tr>
           <th class="w-8 px-4 py-3 text-center">
             <span class="text-surface-500 text-xs font-medium">#</span>
           </th>
-          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 판매 상태 </th>
-          <th class="text-surface-500 w-[25%] px-4 py-3 text-sm font-bold"> 상품명 </th>
-          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 가격 </th>
-          <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 판매일 </th>
-          <th class="text-surface-500 w-[25%] px-4 py-3 text-sm font-bold"> 진행률 </th>
-          <th class="px-4 py-3"></th>
+          <th class="text-surface-500 w-[10%] px-4 text-center font-bold">판매 상태</th>
+          <th class="text-surface-500 w-[25%] px-4 text-center font-bold">상품명</th>
+          <th class="text-surface-500 w-[15%] px-4 text-center font-bold">가격</th>
+          <th class="text-surface-500 w-[15%] px-4 text-center font-bold">판매일</th>
+          <th class="text-surface-500 w-[25%] px-4 text-center font-bold">진행률</th>
+          <th class="text-surface-500 w-32 px-6 text-center font-bold"></th>
         </tr>
       </thead>
-      <tbody class="bg-white">
-        {#each filteredCoops as coop, index}
-          <tr class="hover:bg-surface-50 border-surface-50 border-b">
-            <td class="text-surface-500 px-4 py-4 text-center text-sm">
+      <tbody class="divide-surface-100 divide-y bg-white">
+        {#each coops as coop, index}
+          <tr class="hover:bg-surface-50 text-center">
+            <td class="text-surface-500 py-4 text-sm">
               {index + 1}
             </td>
-            <td class="px-4 py-4 text-center">
-              <span class="{getStatusBadge(coop.status)} inline-block rounded-full px-3 py-1 text-xs font-medium">
-                {getStatusText(coop.status)}
+            <td class="text-surface-500 px-6 py-4 text-sm">
+              <span
+                class="inline-flex rounded-full px-2 py-1 text-xs font-medium text-white"
+                class:bg-gray-500={equalsEnum(SalesStatus.PREPARING, coop.status)}
+                class:bg-green-500={equalsEnum(SalesStatus.ONGOING, coop.status)}
+                class:bg-blue-500={equalsEnum(SalesStatus.ENDED, coop.status)}
+                class:bg-yellow-500={equalsEnum(SalesStatus.COMPLETED, coop.status)}
+                class:bg-red-500={equalsEnum(SalesStatus.STOPPED, coop.status)}
+                class:bg-orange-500={equalsEnum(SalesStatus.PAUSED, coop.status)}
+              >
+                {coop.status?.label}
               </span>
             </td>
-            <td class="px-4 py-4 text-left">
-              <div class="flex flex-col">
-                <span class="text-surface-900 text-sm font-medium">{coop.title}</span>
-                <span class="text-surface-400 mt-1 text-xs">{coop.category}</span>
+            <td>
+              <div class="flex items-center justify-start">
+                {#if coop.product?.category?.name}
+                  <div class="text-surface-400 px-2 text-xs">[{coop.product?.category?.name}]</div>
+                {/if}
+                <button
+                  type="button"
+                  class="text-primary-500 m-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium hover:underline"
+                  onclick={() => (selectedCoopId = coop.id)}
+                >
+                  {coop.name}
+                </button>
               </div>
             </td>
             <td class="px-4 py-4 text-center whitespace-nowrap">
-              {#if coop.status === 'pre'}
-                <span class="text-surface-900 text-sm font-bold">{parseInt(coop.price).toLocaleString()} 원</span>
-              {:else if coop.storePrice && coop.storePrice !== coop.price}
-                <div class="flex flex-col items-center">
-                  <span class="text-surface-900 text-sm font-bold">{parseInt(coop.storePrice).toLocaleString()} 원</span
-                  >
-                  <span class="text-surface-400 mt-1 text-xs line-through"
-                    >{parseInt(coop.price).toLocaleString()}원</span
-                  >
-                </div>
-              {:else}
-                <span class="text-surface-900 text-sm font-bold">{parseInt(coop.price).toLocaleString()} 원</span>
-              {/if}
+              <span class="text-surface-900 text-sm font-bold">{formatCurrency(coop.sales_price)}</span>
             </td>
-            <td class="text-surface-700 px-4 py-4 text-center text-sm whitespace-nowrap">
-              {coop.status === 'pre' ? '-' : coop.endDate}
+            <td>
+              <div class="text-surface-700 text-xs">{dayjs(coop.sales_date).format('YYYY-MM-DD')}</div>
+              <div class="text-surface-300 text-xs">{dayjs(coop.sales_date).format('HH:mm:ss')}</div>
             </td>
 
             <td class="px-4 py-4 text-center">
               <div class="flex flex-col items-center gap-1">
                 <div class="mb-1 flex w-full items-center justify-between text-xs">
-                  <span class="text-surface-700 font-medium">{coop.current}</span>
+                  <span class="text-surface-700 font-medium">{coop.current_quantity}</span>
                   <span class="text-surface-600 mx-auto text-base font-medium"
-                    >{Math.round((parseInt(coop.current) / parseInt(coop.target)) * 100)}%</span
+                    >{Math.round((coop.current_quantity / coop.max_quantity) * 100)}%</span
                   >
-                  <span class="text-surface-400 font-medium">{coop.target}</span>
+                  <span class="text-surface-400 font-medium">{coop.max_quantity}</span>
                 </div>
                 <div class="relative w-full">
                   <div class="bg-surface-50/50 h-2 justify-between overflow-hidden rounded-full">
                     <div
-                      class="{(() => {
-                        const progress = Math.round((parseInt(coop.current) / parseInt(coop.target)) * 100)
-                        if (progress >= 90) return 'bg-primary-500'
-                        if (progress >= 70) return 'bg-primary-400'
-                        if (progress >= 50) return 'bg-primary-300'
-                        if (progress >= 30) return 'bg-primary-200'
-                        if (progress >= 10) return 'bg-primary-100'
-                        return 'bg-primary-50'
-                      })()} h-full rounded-full transition-all duration-300"
-                      style="width: {Math.round((parseInt(coop.current) / parseInt(coop.target)) * 100)}%"
+                      class="h-full rounded-full transition-all duration-300 {getProgressColor(coop)}"
+                      style="width: {Math.round((coop.current_quantity / coop.max_quantity) * 100)}%"
                     ></div>
                   </div>
                 </div>
@@ -301,5 +238,15 @@
         {/each}
       </tbody>
     </table>
+
+    {#if coops.length === 0}
+      <div class="py-12 text-center">
+        <h3 class="text-surface-900 mt-2 text-sm font-medium">판매 상품 정보가 없습니다</h3>
+      </div>
+    {/if}
   </div>
 </div>
+
+{#if selectedCoopId}
+  <CoopDetailModal coop={coops.find((c) => c.id === selectedCoopId) || null} onClose={() => (selectedCoopId = null)} />
+{/if}
