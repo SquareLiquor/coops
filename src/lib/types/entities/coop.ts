@@ -1,5 +1,5 @@
 import type { SalesStatus } from '../common'
-import type { ProductData } from './product'
+import type { CategoryData, ProductData } from './product'
 import type { StoreData } from './store'
 
 export interface CoopData {
@@ -8,6 +8,8 @@ export interface CoopData {
   store?: StoreData
   product_id: string
   product?: ProductData
+  category_id: string
+  category?: CategoryData
   status?: SalesStatus
   sales_price: number
   sales_date: string

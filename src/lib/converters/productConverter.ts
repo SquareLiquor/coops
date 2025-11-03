@@ -28,7 +28,7 @@ export const productDataConverter = () => {
       store_id,
       origin_id,
       category_id,
-      category: categoryDataConvert().convert(category),
+      category: categoryDataConverter().convert(category),
       name,
       description,
       price,
@@ -77,7 +77,7 @@ export const productImageDataConverter = () => {
   return { convert, convertAll }
 }
 
-export const categoryDataConvert = () => {
+export const categoryDataConverter = () => {
   const convert = (data: any | null): CategoryData | undefined => {
     if (!data) return undefined
 

@@ -29,6 +29,7 @@ export const CoopSchema = v.pipe(
   v.object({
     store_id: v.string(),
     product_id: v.optional(v.string()),
+    category_id: v.optional(v.string()),
     status: v.string(),
     max_quantity: v.pipe(v.number(), v.minValue(1, '판매 가능 수량은 0보다 커야 합니다.')),
     sales_price: v.pipe(v.number(), v.minValue(1, '판매 가격은 0보다 커야 합니다.')),

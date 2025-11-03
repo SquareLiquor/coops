@@ -2,7 +2,7 @@
   import { PUBLIC_TINYMCE_API_KEY } from '$env/static/public'
   import Editor from '@tinymce/tinymce-svelte'
 
-  let { description = $bindable() } = $props()
+  let { description = $bindable(), disabled = false } = $props()
 
   let conf = {
     menubar: false,
@@ -34,5 +34,5 @@
 </script>
 
 <main>
-  <Editor apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {conf} />
+  <Editor apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {disabled} {conf} />
 </main>

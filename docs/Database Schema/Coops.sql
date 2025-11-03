@@ -23,6 +23,7 @@ CREATE TABLE public.coops (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  category_id uuid NOT NULL REFERENCES public.categories(id) ON DELETE SET NULL,
   status sales_status NOT NULL,
   max_quantity integer NOT NULL,
   sales_price numeric NOT NULL,

@@ -1,7 +1,7 @@
 import { lookupEnum, SalesStatus } from '$lib/types'
 import type { CoopData } from '$lib/types/entities/coop'
 import dayjs from 'dayjs'
-import { productDataConverter } from './productConverter'
+import { categoryDataConverter, productDataConverter } from './productConverter'
 import { storeDataConverter } from './storeConverter'
 
 export const coopDataConverter = () => {
@@ -14,6 +14,8 @@ export const coopDataConverter = () => {
       store,
       product_id,
       product,
+      category_id,
+      category,
       name,
       description,
       sales_price,
@@ -31,6 +33,8 @@ export const coopDataConverter = () => {
       store: storeDataConverter().convert(store),
       product_id,
       product: productDataConverter().convert(product),
+      category_id,
+      category: categoryDataConverter().convert(category),
       status: lookupEnum(SalesStatus, status),
       sales_price,
       sales_date: dayjs(sales_date).format('YYYY-MM-DD HH:mm:ss'),

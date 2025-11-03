@@ -110,8 +110,20 @@
             />
           </div>
         </div>
-        <!-- 상품명 검색 -->
 
+        <!-- 카테고리 필터 -->
+        <select
+          class="border-surface-100 focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+          name="category_id"
+          bind:value={$filterForm.category_id}
+        >
+          <option value={undefined} selected>전체</option>
+          {#each categories as category}
+            <option value={category.id}>{category.name}</option>
+          {/each}
+        </select>
+
+        <!-- 상품명 검색 -->
         <input
           type="text"
           name="product_name"

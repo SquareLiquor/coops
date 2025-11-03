@@ -11,7 +11,8 @@ const { convert, convertAll } = coopDataConverter()
 const coopSelectQuery = `
   *,
   store:store_id(*),
-  product:product_id(*, category:category_id(*), product_images(*))
+  product:product_id(*, product_images(*))
+  category:category_id(*)
 `
 
 export const load: ServerLoad = async ({ parent }) => {
@@ -54,7 +55,6 @@ export const actions: Actions = {
 
     const { data, error } = await query
 
-    console.log('coop selectd data', data)
     return {
       form,
       coops: data ? convertAll(data) : [],

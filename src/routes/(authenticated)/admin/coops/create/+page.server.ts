@@ -51,13 +51,15 @@ export const actions: Actions = {
 }
 
 const createCoop = async (supabase: SupabaseClient, formData: CoopCreateInput, productId: string) => {
-  const { store_id, name, status, max_quantity, sales_price, sales_date, description } = formData
+  const { store_id, name, status, max_quantity, sales_price, sales_date, description, mappedProduct } = formData
+  const { category_id } = mappedProduct
 
   const { data, error } = await supabase
     .from('coops')
     .insert({
       store_id,
       product_id: productId,
+      category_id,
       status,
       max_quantity,
       sales_price,

@@ -6,13 +6,15 @@
 
   let {
     images = $bindable(),
+    disabled = false,
     options,
   }: {
     images: ProductImagesInput[]
-    options: { maxFiles: number }
+    disabled: boolean
+    options: { maxFiles: number; removeable?: boolean }
   } = $props()
 
-  let { maxFiles = 1 } = $derived(options ?? {})
+  let { maxFiles = 1, removeable = true } = $derived(options ?? {})
   let availableImages = $derived(images.filter((images) => !images.toDelete))
 
   /**
@@ -80,7 +82,12 @@
   }
 </script>
 
-<FileUpload accept="image/*" disabled={availableImages.length >= maxFiles} onFileChange={handleFileChange} {maxFiles}>
+<FileUpload
+  accept="image/*"
+  disabled={availableImages.length >= maxFiles || disabled}
+  onFileChange={handleFileChange}
+  {maxFiles}
+>
   <FileUpload.Dropzone>
     <span>Select file or drag here.</span>
     <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
@@ -125,21 +132,24 @@
             </div>
           </label>
 
-          <div class="group/del absolute top-2 right-2">
-            <button
-              type="button"
-              onclick={() => handleFileDelete(index)}
-              class="flex h-5 w-5 items-center justify-center rounded-full border border-white/50 bg-white/20 text-xs text-white backdrop-blur-sm transition-colors hover:bg-red-500/80"
-            >
-              ×
-            </button>
-            <!-- 툴팁 -->
-            <div
-              class="absolute top-0 right-6 z-10 hidden rounded bg-black/80 px-2 py-1 text-xs whitespace-nowrap text-white group-hover/del:block"
-            >
-              삭제
+          {#if removeable}
+            <div class="group/del absolute top-2 right-2">
+              <button
+                type="button"
+                onclick={() => handleFileDelete(index)}
+                class="flex h-5 w-5 items-center justify-center rounded-full border border-white/50 bg-white/20 text-xs text-white backdrop-blur-sm transition-colors hover:bg-red-500/80"
+              >
+                ×
+              </button>
+              <!-- 툴팁 -->
+
+              <div
+                class="absolute top-0 right-6 z-10 hidden rounded bg-black/80 px-2 py-1 text-xs whitespace-nowrap text-white group-hover/del:block"
+              >
+                삭제
+              </div>
             </div>
-          </div>
+          {/if}
         </div>
       {/if}
     {/each}

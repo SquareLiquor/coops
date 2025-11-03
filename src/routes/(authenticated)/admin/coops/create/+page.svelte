@@ -118,6 +118,7 @@
                 class="input placeholder-surface-200 w-full"
                 bind:value={$form.name}
                 placeholder="상품명"
+                disabled={!$form.mappedProduct.origin_id}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.name}
@@ -131,6 +132,7 @@
                 bind:category_id={$form.mappedProduct.category_id}
                 data={categories}
                 options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleNewCategory }}
+                disabled={!$form.mappedProduct.origin_id}
               />
               <input type="hidden" name="category_id" bind:value={$form.mappedProduct.category_id} />
               <div class="mt-1 min-h-[20px]">
@@ -143,9 +145,14 @@
           <label class="label flex min-h-0 flex-1 flex-col">
             <span class="label-text text-sm">상세정보</span>
             <div class="h-full min-h-0 flex-1">
-              <Editor bind:description={$form.description} />
+              <Editor bind:description={$form.description} disabled={!$form.mappedProduct.origin_id} />
             </div>
-            <input type="hidden" name="description" bind:value={$form.description} />
+            <input
+              type="hidden"
+              name="description"
+              bind:value={$form.description}
+              disabled={!$form.mappedProduct.origin_id}
+            />
             <div class="mt-1 min-h-[20px]">
               {#if $errors.description}
                 <span class="text-xs text-red-500">{$errors.description}</span>
@@ -172,6 +179,7 @@
                 bind:value={$form.sales_price}
                 min="0"
                 placeholder="가격"
+                disabled={!$form.mappedProduct.origin_id}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.sales_price}
@@ -200,6 +208,7 @@
                 bind:value={$form.max_quantity}
                 min="0"
                 placeholder="판매 가능 수량"
+                disabled={!$form.mappedProduct.origin_id}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.max_quantity}
@@ -211,7 +220,12 @@
           <div class="grid grid-cols-4 gap-2">
             <label class="label">
               <span class="label-text text-sm">판매상태</span>
-              <select name="unit" class="select h-9 w-full px-3 align-middle" bind:value={$form.status}>
+              <select
+                name="unit"
+                class="select h-9 w-full px-3 align-middle"
+                bind:value={$form.status}
+                disabled={!$form.mappedProduct.origin_id}
+              >
                 {#each salesStatuses as status}
                   <option value={status.code}>{status.label}</option>
                 {/each}
@@ -227,6 +241,7 @@
                 bind:value={$form.sales_date}
                 placeholder="판매일자"
                 {...$constraints.sales_date}
+                disabled={!$form.mappedProduct.origin_id}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.sales_date}
@@ -255,8 +270,17 @@
         <h2 class="text-lg font-semibold">상품 이미지</h2>
         <hr class="hr my-4" />
         <label for="product-images" class="text-surface-700 block font-medium">
-          <FileUploader bind:images={$form.mappedProduct.images} options={{ maxFiles: 5 }} />
-          <input type="hidden" name="images" bind:value={$form.mappedProduct.images} />
+          <FileUploader
+            bind:images={$form.mappedProduct.images}
+            options={{ maxFiles: 5, removeable: false }}
+            disabled={!$form.mappedProduct.origin_id}
+          />
+          <input
+            type="hidden"
+            name="images"
+            bind:value={$form.mappedProduct.images}
+            disabled={!$form.mappedProduct.origin_id}
+          />
         </label>
       </section>
     </div>

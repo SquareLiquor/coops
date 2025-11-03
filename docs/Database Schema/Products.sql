@@ -39,9 +39,10 @@ END$$;
 CREATE TABLE public.categories (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
-  name text NOT NULL UNIQUE,
+  name text NOT NULL,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  CONSTRAINT categories_store_name_key UNIQUE (store_id, name)
 );
 COMMENT ON TABLE public.categories IS '상품 카테고리 관리 테이블';
 

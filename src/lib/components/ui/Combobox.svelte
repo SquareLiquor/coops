@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Combobox, Portal, useListCollection, type ComboboxRootProps } from '@skeletonlabs/skeleton-svelte'
 
-  let { category_id = $bindable(), data = $bindable(), options } = $props()
+  let { category_id = $bindable(), data = $bindable(), disabled = false, options } = $props()
 
   let items = $state(data)
   let { allowNewItem, placeholder, handleAddNewItem } = options
@@ -50,6 +50,7 @@
     <Combobox
       class="flex-1"
       {placeholder}
+      {disabled}
       {collection}
       {onOpenChange}
       {onInputValueChange}
@@ -82,12 +83,13 @@
         type="text"
         placeholder="카테고리 추가"
         bind:value={newItem}
+        {disabled}
         onkeydown={(e) => e.key === 'Enter' && _handleAddNewItem(e)}
       />
       <button
         class="ig-btn preset-filled"
         onclick={_handleAddNewItem}
-        disabled={!addableNewItem}
+        disabled={!addableNewItem || disabled}
         type="button"
         aria-label="Add new category"
       >

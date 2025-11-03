@@ -1,4 +1,4 @@
-import { categoryDataConvert } from '$lib/converters/productConverter'
+import { categoryDataConverter } from '$lib/converters/productConverter'
 import { isBrowser } from '@supabase/ssr'
 import * as v from 'valibot'
 import { createBrowserClient } from '../clients/browser'
@@ -12,7 +12,7 @@ export const categorySchema = v.object({
 
 export type CategoryInput = v.InferInput<typeof categorySchema>
 
-const { convert, convertAll } = categoryDataConvert()
+const { convert, convertAll } = categoryDataConverter()
 
 export const getCategories = async (store_id: string | undefined) => {
   if (!store_id) return { categories: [] }
