@@ -1,5 +1,5 @@
-import { productDataConverter } from '$lib/converters/productConverter'
-import { ProductsFilterSchema as FilterSchema, getInitialFilterValues } from '$lib/schemas'
+import { productDataConverter } from '$lib/converters'
+import { ProductsFilterSchema as FilterSchema, getInitialProductsFilterValues } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
@@ -15,7 +15,7 @@ const productSelectQuery = `
 export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => {
   const { store } = await parent()
 
-  const initialFilterValues = getInitialFilterValues(store?.id)
+  const initialFilterValues = getInitialProductsFilterValues(store?.id)
   const filterForm = await superValidate(initialFilterValues, valibot(FilterSchema))
 
   const { categories } = await getCategories(store?.id)

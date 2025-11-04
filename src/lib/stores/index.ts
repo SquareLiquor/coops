@@ -6,6 +6,6 @@
 
 // Authentication stores
 export * from './auth'
-
+export * from './store'
 // UI stores
 export * from './ui'

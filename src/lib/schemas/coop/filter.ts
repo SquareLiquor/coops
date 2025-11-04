@@ -33,7 +33,7 @@ export const CoopsFilterSchema = v.pipe(
 
 export type CoopsFilterForm = v.InferInput<typeof CoopsFilterSchema>
 
-export const getInitialFilterValues = (store_id: string | undefined) => {
+export const getInitialCoopsFilterValues = (store_id: string | undefined) => {
   if (!store_id) return {}
 
   return { store_id }

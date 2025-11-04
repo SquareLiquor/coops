@@ -1,6 +1,6 @@
 <script lang="ts">
   import Sidebar from '$lib/components/Sidebar.svelte'
-  import { setStore } from '$lib/stores/store/state.svelte'
+  import { setStore } from '$lib/stores'
   import { onMount } from 'svelte'
 
   let { data, children } = $props()

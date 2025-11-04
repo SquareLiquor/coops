@@ -1,6 +1,6 @@
-import { productDataConverter } from '$lib/converters/productConverter'
+import { productDataConverter } from '$lib/converters'
 import { isAppError } from '$lib/errors'
-import { createCoopHook } from '$lib/hooks/coops/creation'
+import { createCoopHook } from '$lib/hooks/'
 import { CoopCreateSchema, getInitialCoopValues, type CoopCreateInput } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
 import { SalesStatus, UnitType } from '$lib/types'

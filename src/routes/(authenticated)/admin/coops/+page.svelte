@@ -1,8 +1,8 @@
 <script lang="ts">
   import CoopDetailModal from '$lib/components/modals/CoopDetailModal.svelte'
   import { CoopsFilterSchema as FilterSchema } from '$lib/schemas'
+  import type { CoopData } from '$lib/types'
   import { equalsEnum, SalesStatus } from '$lib/types'
-  import type { CoopData } from '$lib/types/entities/coop'
   import { formatCurrency } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
