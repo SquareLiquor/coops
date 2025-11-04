@@ -69,7 +69,7 @@ export const CoopCopyProductSchema = v.pipe(v.object({}))
 export type CoopCreateInput = v.InferInput<typeof CoopCreateSchema>
 export type CoopUpdateInput = v.InferInput<typeof CoopUpdateSchema>
 
-export const createInitialCoopValues = (store_id: string | undefined) => {
+export const getInitialCoopValues = (store_id: string | undefined) => {
   if (!store_id) return {}
 
   return {

@@ -1,10 +1,10 @@
 import { coopDataConverter } from '$lib/converters/coopsConverter'
-import { CoopsFilterSchema } from '$lib/schemas'
+import { CoopsFilterSchema, getInitialFilterValues } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
 import { SalesStatus } from '$lib/types'
-import type { Actions, ServerLoad } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
+import type { Actions, PageServerLoad } from './$types'
 
 const { convert, convertAll } = coopDataConverter()
 
@@ -15,12 +15,10 @@ const coopSelectQuery = `
   category:category_id(*)
 `
 
-export const load: ServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
-  const initialFilterValues = {
-    store_id: store.id,
-  }
+  const initialFilterValues = getInitialFilterValues(store?.id)
   const filterForm = await superValidate(initialFilterValues, valibot(CoopsFilterSchema))
 
   const { categories } = await getCategories(store?.id)

@@ -10,7 +10,7 @@
     options,
   }: {
     images: ProductImagesInput[]
-    disabled: boolean
+    disabled?: boolean
     options: { maxFiles: number; removeable?: boolean }
   } = $props()
 

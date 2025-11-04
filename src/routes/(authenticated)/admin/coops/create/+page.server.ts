@@ -1,21 +1,21 @@
 import { productDataConverter } from '$lib/converters/productConverter'
 import { isAppError } from '$lib/errors'
 import { createCoopHook } from '$lib/hooks/coops/creation'
-import { CoopCreateSchema, createInitialCoopValues, type CoopCreateInput } from '$lib/schemas'
+import { CoopCreateSchema, getInitialCoopValues, type CoopCreateInput } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
 import { SalesStatus, UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { fail } from '@sveltejs/kit'
+import { fail, type Actions } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
-import type { Actions, PageServerLoad } from '../$types'
+import type { PageServerLoad } from './$types'
 
 const { convert } = productDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
-  const initialCoopValues = createInitialCoopValues(store?.id)
+  const initialCoopValues = getInitialCoopValues(store?.id)
   const form = await superValidate(initialCoopValues, valibot(CoopCreateSchema), { errors: false })
 
   const { categories } = await getCategories(store?.id)

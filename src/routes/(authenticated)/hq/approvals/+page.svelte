@@ -5,14 +5,20 @@
   import { extractFormData } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
+  import { onMount, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
   import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { statusOptions, stores } = $derived(data)
+  let { statuses, stores } = $derived(data)
   let requests: ApprovalRequestData[] = $state([])
   let isRowLoading: string[] = $state([])
+
+  onMount(async () => {
+    await tick()
+    filterSubmit()
+  })
 
   const {
     form: filterForm,
@@ -114,7 +120,7 @@
           class:text-primary-700={$filterForm.store_id}
           class:border-surface-100={!$filterForm.store_id}
         >
-          <option value="" selected>전체</option>
+          <option value={undefined} selected>전체</option>
           {#each stores as store}
             <option value={store.id}>{store.name}</option>
           {/each}
@@ -137,12 +143,14 @@
     <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
       <!-- hidden status input synced with searchForm.status -->
       <input type="hidden" name="status" bind:value={$filterForm.status} />
-      {#each statusOptions as option}
+      {#each statuses as option}
         <button
-          type="button"
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {$filterForm.status === option.code
-            ? 'bg-primary-500 text-white shadow-sm'
-            : 'text-surface-600 hover:bg-surface-100'}"
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors"
+          class:bg-primary-500={$filterForm.status === option.code}
+          class:text-primary-50={$filterForm.status === option.code}
+          class:shadow-sm={$filterForm.status === option.code}
+          class:text-surface-600={$filterForm.status !== option.code}
+          class:hover:text-surface-800={$filterForm.status !== option.code}
           onclick={() => ($filterForm.status = option.code)}
         >
           {option.label}

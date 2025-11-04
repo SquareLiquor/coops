@@ -1,15 +1,14 @@
 import { approvalRequestDataConverter, storeDataConverter } from '$lib/converters'
 import { ApprovalError, isAppError } from '$lib/errors'
 import { approveRequestHook, rejectRequestHook } from '$lib/hooks'
-
 import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
 import { ApprovalStatus } from '$lib/types'
 import { extractFormData } from '$lib/utils'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { fail, type Actions } from '@sveltejs/kit'
+import { fail } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
-import type { PageServerLoad } from './$types'
+import type { Actions, PageServerLoad } from './$types'
 
 const { convertAll: storeConvertAll } = storeDataConverter()
 const { convert, convertAll } = approvalRequestDataConverter()
@@ -31,12 +30,12 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     .order('name', { ascending: true })
 
   const stores = error ? [] : storeConvertAll(data)
-  const statusOptions = [{ code: undefined, label: '전체' }, ...Object.values(ApprovalStatus)]
+  const statuses = [{ code: undefined, label: '전체' }, ...Object.values(ApprovalStatus)]
 
   return {
     filterForm,
     stores,
-    statusOptions,
+    statuses,
   }
 }
 

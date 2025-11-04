@@ -11,9 +11,14 @@
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { categories } = data
+  let { categories, statuses } = data
   let products: ProductData[] = $state([])
   let selectedProductId: string | null = $state(null)
+
+  onMount(async () => {
+    await tick()
+    filterSubmit()
+  })
 
   const {
     form: filterForm,
@@ -43,11 +48,6 @@
         products = []
       }
     },
-  })
-
-  onMount(async () => {
-    await tick()
-    filterSubmit()
   })
 </script>
 
@@ -83,6 +83,7 @@
               class:border-primary-500={$filterForm.date_from}
               class:text-primary-700={$filterForm.date_from}
               class:border-surface-100={!$filterForm.date_from}
+              {...$filterConstraints.date_from}
             />
             <span class="text-surface-400">~</span>
             <input
@@ -93,6 +94,7 @@
               class:border-primary-500={$filterForm.date_to}
               class:text-primary-700={$filterForm.date_to}
               class:border-surface-100={!$filterForm.date_to}
+              {...$filterConstraints.date_to}
             />
           </div>
         </div>
@@ -137,17 +139,17 @@
     <!-- 우측 상태 필터 영역 -->
     <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
       <input type="hidden" name="status" bind:value={$filterForm.status} />
-      {#each [{ value: undefined, label: '전체' }] as option}
+      {#each statuses as status}
         <button
-          class="transition-colors} rounded px-3 py-1.5 text-sm font-medium"
-          class:bg-primary-500={$filterForm.status === option?.value}
-          class:text-primary-50={$filterForm.status === option?.value}
-          class:shadow-sm={$filterForm.status === option?.value}
-          class:text-surface-600={$filterForm.status !== option?.value}
-          class:hover:text-surface-800={$filterForm.status !== option?.value}
-          onclick={() => ($filterForm.status = option?.value)}
+          class="rounded px-3 py-1.5 text-sm font-medium transition-colors"
+          class:bg-primary-500={$filterForm.status === status.code}
+          class:text-primary-50={$filterForm.status === status.code}
+          class:shadow-sm={$filterForm.status === status.code}
+          class:text-surface-600={$filterForm.status !== status.code}
+          class:hover:text-surface-800={$filterForm.status !== status.code}
+          onclick={() => ($filterForm.status = status.code)}
         >
-          {option.label}
+          {status.label}
         </button>
       {/each}
     </div>

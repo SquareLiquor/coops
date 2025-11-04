@@ -1,9 +1,9 @@
 import { productDataConverter } from '$lib/converters/productConverter'
-import { ProductsFilterSchema as FilterSchema, type ProductsFilterForm } from '$lib/schemas'
+import { ProductsFilterSchema as FilterSchema, getInitialFilterValues } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
-import type { Actions, ServerLoad } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
+import type { Actions, PageServerLoad } from './$types'
 
 const { convertAll } = productDataConverter()
 
@@ -12,19 +12,19 @@ const productSelectQuery = `
   category:category_id(*)
 `
 
-export const load: ServerLoad = async ({ parent, locals: { supabase } }) => {
+export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => {
   const { store } = await parent()
 
-  const initialFilterValues: ProductsFilterForm = {
-    store_id: store.id,
-  }
+  const initialFilterValues = getInitialFilterValues(store?.id)
   const filterForm = await superValidate(initialFilterValues, valibot(FilterSchema))
 
   const { categories } = await getCategories(store?.id)
+  const statuses = [{ code: undefined, label: '전체' }]
 
   return {
     filterForm,
     categories,
+    statuses,
   }
 }
 

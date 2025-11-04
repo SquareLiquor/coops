@@ -8,7 +8,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
-import type { Actions, PageServerLoad } from '../$types'
+import type { Actions, PageServerLoad } from './$types'
 
 const { convert } = productDataConverter()
 

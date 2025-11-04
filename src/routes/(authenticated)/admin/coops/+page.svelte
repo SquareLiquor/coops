@@ -16,6 +16,11 @@
   let coops: CoopData[] = $state([])
   let selectedCoopId: string | null = $state(null)
 
+  onMount(async () => {
+    await tick()
+    filterSubmit()
+  })
+
   const {
     form: filterForm,
     errors: filterErrors,
@@ -44,11 +49,6 @@
         coops = []
       }
     },
-  })
-
-  onMount(async () => {
-    await tick()
-    filterSubmit()
   })
 
   // 진행률 색상 클래스 반환 함수

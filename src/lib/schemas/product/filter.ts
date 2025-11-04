@@ -32,3 +32,9 @@ export const ProductsFilterSchema = v.pipe(
 )
 
 export type ProductsFilterForm = v.InferInput<typeof ProductsFilterSchema>
+
+export const getInitialFilterValues = (store_id: string | undefined) => {
+  if (!store_id) return {}
+
+  return { store_id }
+}
