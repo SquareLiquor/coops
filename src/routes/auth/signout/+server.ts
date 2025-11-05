@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 
-export const POST = async ({ url, locals: { supabase } }) => {
+export const POST = async ({ url, cookies, locals: { supabase } }) => {
   const { error } = await supabase.auth.signOut()
 
   if (error) {
@@ -10,6 +10,8 @@ export const POST = async ({ url, locals: { supabase } }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   }
+
+  cookies.delete('store_id', { path: '/' })
 
   const redirectTo = url.searchParams.get('redirectTo') || '/'
   throw redirect(303, redirectTo)

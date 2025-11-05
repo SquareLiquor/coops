@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import { getAuth } from '$lib/stores'
 
   const user = $derived(getAuth().user)
@@ -19,7 +20,14 @@
     <div class="relative flex items-center">
       <!-- 로고 (왼쪽) -->
       <div class="flex items-center">
-        <div class="ml-2 text-xl">{store.logo}</div>
+        <button
+          type="button"
+          class="ml-2 cursor-pointer border-none bg-transparent text-xl"
+          aria-label="매장 홈으로 이동"
+          onclick={() => goto('/coops')}
+        >
+          {store.logo}
+        </button>
       </div>
 
       <!-- 상점명 (가운데) -->

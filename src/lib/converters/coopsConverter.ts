@@ -21,7 +21,7 @@ export const coopDataConverter = () => {
       sales_price,
       sales_date,
       max_quantity,
-      current_quantity,
+      current_quantity = 0,
       status,
       created_at,
       updated_at,
@@ -29,6 +29,8 @@ export const coopDataConverter = () => {
 
     return {
       id,
+      name,
+      description,
       store_id,
       store: storeDataConverter().convert(store),
       product_id,
@@ -38,10 +40,12 @@ export const coopDataConverter = () => {
       status: lookupEnum(SalesStatus, status),
       sales_price,
       sales_date: dayjs(sales_date).format('YYYY-MM-DD HH:mm:ss'),
+      is_today: dayjs().isSame(dayjs(sales_date), 'day'),
+      remaining_time: dayjs(sales_date).diff(dayjs(), 'second').toString(),
       max_quantity,
       current_quantity: current_quantity ?? 0,
-      name,
-      description,
+      remaining_quantity: Math.max(max_quantity - current_quantity, 0),
+      progress: Math.min(Math.round((current_quantity / max_quantity) * 100), 100),
       created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
       updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }

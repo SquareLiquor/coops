@@ -1,11 +1,11 @@
 import type { StoreData } from '$lib/types'
 
-let stoteState = $state<StoreData>()
+let storeState = $state<StoreData>()
 
-const getStore = () => stoteState
+const getStore = () => storeState
 
 const setStore = (store: StoreData | undefined) => {
-  if (store) stoteState = store
+  if (store) storeState = store
 }
 
 export { getStore, setStore }
