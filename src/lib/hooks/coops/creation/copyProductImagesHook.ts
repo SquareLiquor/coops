@@ -1,6 +1,6 @@
 import { SupabaseError } from '$lib/errors'
 import type { HookContext } from '$lib/hooks/hooksManager'
-import type { OriginProductImageInput } from '$lib/schemas'
+import type { ProductImageInputForCoop } from '$lib/schemas'
 import { createServerClient } from '$lib/supabase'
 import type { CreateCoopHookContext } from '$lib/types'
 
@@ -16,7 +16,7 @@ const copyProductImages = async ({ product }: CreateCoopHookContext, shared: any
   const { data, error } = await supabase
     .from('product_images')
     .insert(
-      images.map((image: OriginProductImageInput) => ({
+      images.map((image: ProductImageInputForCoop) => ({
         product_id: productId,
         url: image.url,
         representative: image.representative,

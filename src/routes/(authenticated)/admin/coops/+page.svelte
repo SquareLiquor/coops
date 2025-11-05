@@ -3,10 +3,10 @@
   import { CoopsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { CoopData } from '$lib/types'
   import { equalsEnum, SalesStatus } from '$lib/types'
-  import { formatCurrency } from '$lib/utils'
+  import { debounce, formatCurrency } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { onMount, tick } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
   import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
@@ -15,11 +15,20 @@
   let { categories, salesStatuses } = data
   let coops: CoopData[] = $state([])
   let selectedCoopId: string | null = $state(null)
+  let debouncedFilterSubmit: ReturnType<typeof debounce>
 
   onMount(async () => {
     await tick()
+
+    debouncedFilterSubmit = debounce(async () => {
+      const result = await validateFilterForm({ update: true })
+      if (result.valid) filterSubmit()
+    }, 300)
+
     filterSubmit()
   })
+
+  onDestroy(() => debouncedFilterSubmit?.cancel?.())
 
   const {
     form: filterForm,
@@ -28,15 +37,18 @@
     validateForm: validateFilterForm,
     enhance: filterEnhance,
     submit: filterSubmit,
-    delayed: filterDelayed,
+    submitting: filterSubmitting,
   } = superForm(data.filterForm, {
     validators: valibot(FilterSchema),
     resetForm: false,
-    onChange: async (event) => {
+    onChange: async ({ target }) => {
       try {
-        const result = await validateFilterForm({ update: true })
-
-        if (result.valid) filterSubmit()
+        if ((target as HTMLInputElement)?.type === 'text') {
+          debouncedFilterSubmit()
+        } else {
+          const result = await validateFilterForm({ update: true })
+          if (result.valid) filterSubmit()
+        }
       } catch (e) {
         console.error('validate form error:', e)
       }
@@ -126,7 +138,7 @@
         <!-- 상품명 검색 -->
         <input
           type="text"
-          name="product_name"
+          name="name"
           bind:value={$filterForm.name}
           placeholder="상품명 검색"
           class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
@@ -165,7 +177,7 @@
   </form>
 
   <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
-    {#if $filterDelayed}
+    {#if $filterSubmitting}
       <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
         <span class="loader-giant"></span>
       </div>
@@ -178,11 +190,11 @@
             <span class="text-surface-500 text-xs font-medium">#</span>
           </th>
           <th class="text-surface-500 w-[10%] px-4 text-center font-bold">판매 상태</th>
+          <th class="text-surface-500 w-[10%] px-4 text-center font-bold">카테고리</th>
           <th class="text-surface-500 w-[25%] px-4 text-center font-bold">상품명</th>
           <th class="text-surface-500 w-[15%] px-4 text-center font-bold">가격</th>
           <th class="text-surface-500 w-[15%] px-4 text-center font-bold">판매일</th>
-          <th class="text-surface-500 w-[25%] px-4 text-center font-bold">진행률</th>
-          <th class="text-surface-500 w-32 px-6 text-center font-bold"></th>
+          <th class="text-surface-500 w-[15%] px-4 text-center font-bold">진행률</th>
         </tr>
       </thead>
       <tbody class="divide-surface-100 divide-y bg-white">
@@ -204,11 +216,9 @@
                 {coop.status?.label}
               </span>
             </td>
+            <td>{coop.category?.name}</td>
             <td>
               <div class="flex items-center justify-start">
-                {#if coop.product?.category?.name}
-                  <div class="text-surface-400 px-2 text-xs">[{coop.product?.category?.name}]</div>
-                {/if}
                 <button
                   type="button"
                   class="text-primary-500 m-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium hover:underline"
@@ -245,7 +255,6 @@
                 </div>
               </div>
             </td>
-            <td class="px-4 py-4"></td>
           </tr>
         {/each}
       </tbody>

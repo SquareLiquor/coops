@@ -2,10 +2,10 @@
   import ProductDetailModal from '$lib/components/modals/ProductDetailModal.svelte'
   import { ProductsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { ProductData } from '$lib/types'
-  import { formatCurrency } from '$lib/utils'
+  import { debounce, formatCurrency } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { onMount, tick } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
   import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
@@ -14,11 +14,20 @@
   let { categories, statuses } = data
   let products: ProductData[] = $state([])
   let selectedProductId: string | null = $state(null)
+  let debouncedFilterSubmit: ReturnType<typeof debounce>
 
   onMount(async () => {
     await tick()
+
+    debouncedFilterSubmit = debounce(async () => {
+      const result = await validateFilterForm({ update: true })
+      if (result.valid) filterSubmit()
+    }, 300)
+
     filterSubmit()
   })
+
+  onDestroy(() => debouncedFilterSubmit?.cancel?.())
 
   const {
     form: filterForm,
@@ -27,15 +36,18 @@
     validateForm: validateFilterForm,
     enhance: filterEnhance,
     submit: filterSubmit,
-    delayed: filterDelayed,
+    submitting: filterSubmitting,
   } = superForm(data.filterForm, {
     validators: valibot(FilterSchema),
     resetForm: false,
-    onChange: async (event) => {
+    onChange: async ({ target }) => {
       try {
-        const result = await validateFilterForm({ update: true })
-
-        if (result.valid) filterSubmit()
+        if ((target as HTMLInputElement)?.type === 'text') {
+          debouncedFilterSubmit()
+        } else {
+          const result = await validateFilterForm({ update: true })
+          if (result.valid) filterSubmit()
+        }
       } catch (e) {
         console.error('validate form error:', e)
       }
@@ -156,7 +168,7 @@
   </form>
 
   <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
-    {#if $filterDelayed}
+    {#if $filterSubmitting}
       <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
         <span class="loader-giant"></span>
       </div>

@@ -1,4 +1,4 @@
-import type { CoopCreateInput, OriginProductInput } from '$lib/schemas'
+import type { CoopCreateInput, ProductInputForCoop } from '$lib/schemas'
 import type { ProductCreateInput } from '$lib/schemas/product/product'
 import type { SigninFormData, SignupFormData } from './form'
 
@@ -19,12 +19,12 @@ export interface ApproveRequestHookContext {
 }
 
 export interface CreateProductHookContext {
-  product: ProductCreateInput
-  productId: string
+  product?: ProductCreateInput
+  productId?: string
 }
 
 export interface CreateCoopHookContext {
   coop?: CoopCreateInput
-  product?: OriginProductInput
+  product?: ProductInputForCoop
   productId?: string
 }

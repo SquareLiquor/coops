@@ -11,7 +11,7 @@ const { convert, convertAll } = coopDataConverter()
 const coopSelectQuery = `
   *,
   store:store_id(*),
-  product:product_id(*, product_images(*))
+  product:product_id(*, product_images(*)),
   category:category_id(*)
 `
 

@@ -6,7 +6,7 @@ import { getCategories } from '$lib/supabase'
 import { UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
-import { superValidate } from 'sveltekit-superforms'
+import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
 
@@ -28,9 +28,7 @@ export const actions: Actions = {
   default: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(ProductCreateSchema))
 
-    if (!form.valid) {
-      return fail(400, { form })
-    }
+    if (!form.valid) return fail(400, { form })
 
     try {
       const { data } = await createProduct(supabase, form.data)
@@ -38,12 +36,11 @@ export const actions: Actions = {
 
       return { form }
     } catch (error) {
-      console.error(error)
       if (isAppError(error)) {
         error.errorHandler()
-        // await createProductHook.runCleanup({ productId: undefined })
+        await createProductHook.runCleanup({})
       }
-      return fail(500, { form, message: '상품 등록 중 오류가 발생했습니다.' })
+      return setError(form, '상품 등록 중 오류가 발생했습니다.')
     }
   },
 }

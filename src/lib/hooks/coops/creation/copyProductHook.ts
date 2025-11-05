@@ -11,8 +11,8 @@ const copyProduct = async (context: CreateCoopHookContext, shared: any) => {
   const supabase = createServerClient()
 
   const { coop, product } = context
-  const { store_id, name, sales_price, description } = coop || {}
-  const { origin_id, category_id, images = [] } = product || {}
+  const { store_id, name, category_id, sales_price, description } = coop || {}
+  const { origin_id } = product || {}
 
   const { data: copiedData, error: copiedError } = await supabase
     .from('products')

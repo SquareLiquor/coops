@@ -11,7 +11,7 @@
   let { data }: PageProps = $props()
   let { store, categories, unitTypes } = $derived(data)
 
-  const { form, message, errors, constraints, enhance, delayed } = superForm(data.form, {
+  const { form, message, errors, constraints, enhance, submitting } = superForm(data.form, {
     dataType: 'json',
     onResult: async ({ result }: { result: ActionResult }) => {
       if (result.type === 'success') {
@@ -39,6 +39,11 @@
   <title>상품 등록 - 본사</title>
 </svelte:head>
 
+{#if $submitting}
+  <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+    <span class="loader-giant"></span>
+  </div>
+{/if}
 <form method="POST" use:enhance class="flex h-full flex-1 flex-col">
   <input type="hidden" name="store_id" value={$form.store_id} />
   <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">

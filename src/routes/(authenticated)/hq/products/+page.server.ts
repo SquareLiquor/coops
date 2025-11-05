@@ -54,7 +54,4 @@ export const actions: Actions = {
       products: data ? convertAll(data) : [],
     }
   },
-  create: async ({ request, locals: { supabase } }) => {},
-  update: async ({ request, locals: { supabase } }) => {},
-  delete: async ({ request, locals: { supabase } }) => {},
 }

@@ -4,10 +4,13 @@
   import Combobox from '$lib/components/ui/Combobox.svelte'
   import Editor from '$lib/components/ui/Editor.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
+  import { convertProductToCoop } from '$lib/converters'
+  import { CoopCreateSchema } from '$lib/schemas'
   import { createCategory } from '$lib/supabase'
   import type { ProductData, ProductImageData } from '$lib/types'
   import { type ActionResult } from '@sveltejs/kit'
   import { superForm } from 'sveltekit-superforms'
+  import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
@@ -16,9 +19,10 @@
   // 상품 매핑 모달
   let productMappingModalOpen = $state(false)
 
-  const { form, message, errors, constraints, enhance, delayed } = superForm(data.form, {
+  const { form, message, errors, constraints, enhance, submitting } = superForm(data.form, {
+    validators: valibot(CoopCreateSchema),
     dataType: 'json',
-    onResult: async ({ result }: { result: ActionResult }) => {
+    onResult: async ({ result, ...results }: { result: ActionResult }) => {
       if (result.type === 'success') {
         await goto('/admin/coops')
       } else if (result.type === 'error') {
@@ -28,38 +32,24 @@
     invalidateAll: false,
   })
 
-  const handleNewCategory = async (categoryName: string) => {
+  const handleAddNewCategory = async (categoryName: string) => {
     if (!store) return
 
     const { category } = await createCategory({ name: categoryName, store_id: store.id })
 
     if (!!category) {
       categories = [...categories, category].sort((a, b) => a.name.localeCompare(b.name))
-      $form.mappedProduct.category_id = category.id
+      $form.category_id = category.id
     }
   }
 
-  const handleMappingProduct = ({ product, images }: { product: ProductData; images: ProductImageData[] }) => {
+  const handleSelectProduct = ({ product, images }: { product: ProductData; images: ProductImageData[] }) => {
     $form = {
       ...$form,
       name: product.name,
-      product_id: product.id,
-      sales_price: product.price,
       description: product.description,
-      mappedProduct: {
-        origin_id: product.id,
-        category_id: product.category_id,
-        name: product.name,
-        price: product.price,
-        unit: 'EA',
-        images: images.map((img) => ({
-          url: img.url,
-          representative: img.representative,
-          sort_order: img.sort_order,
-          toDelete: false,
-          isOrigin: true,
-        })),
-      },
+      sales_price: product.price,
+      product: convertProductToCoop({ product, images }),
     }
   }
 </script>
@@ -68,6 +58,11 @@
   <title>상품 등록 - 본사</title>
 </svelte:head>
 
+{#if $submitting}
+  <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+    <span class="loader-giant"></span>
+  </div>
+{/if}
 <form method="POST" use:enhance class="flex h-full flex-1 flex-col">
   <input type="hidden" name="store_id" value={$form.store_id} />
   <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
@@ -118,7 +113,8 @@
                 class="input placeholder-surface-200 w-full"
                 bind:value={$form.name}
                 placeholder="상품명"
-                disabled={!$form.mappedProduct.origin_id}
+                disabled={!$form.product.origin_id}
+                {...$constraints.name}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.name}
@@ -129,15 +125,15 @@
             <label class="label col-span-2 flex flex-col">
               <span class="label-text text-sm">카테고리</span>
               <Combobox
-                bind:category_id={$form.mappedProduct.category_id}
+                bind:category_id={$form.category_id}
                 data={categories}
-                options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleNewCategory }}
-                disabled={!$form.mappedProduct.origin_id}
+                options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleAddNewCategory }}
+                disabled={!$form.product.origin_id}
               />
-              <input type="hidden" name="category_id" bind:value={$form.mappedProduct.category_id} />
+              <input type="hidden" name="category_id" bind:value={$form.category_id} />
               <div class="mt-1 min-h-[20px]">
-                {#if $errors.mappedProduct?.category_id}
-                  <span class="text-xs text-red-500">{$errors.mappedProduct?.category_id}</span>
+                {#if $errors?.category_id}
+                  <span class="text-xs text-red-500">{$errors?.category_id}</span>
                 {/if}
               </div>
             </label>
@@ -145,13 +141,13 @@
           <label class="label flex min-h-0 flex-1 flex-col">
             <span class="label-text text-sm">상세정보</span>
             <div class="h-full min-h-0 flex-1">
-              <Editor bind:description={$form.description} disabled={!$form.mappedProduct.origin_id} />
+              <Editor bind:description={$form.description} disabled={!$form.product.origin_id} />
             </div>
             <input
               type="hidden"
               name="description"
               bind:value={$form.description}
-              disabled={!$form.mappedProduct.origin_id}
+              disabled={!$form.product.origin_id}
             />
             <div class="mt-1 min-h-[20px]">
               {#if $errors.description}
@@ -170,7 +166,41 @@
         <hr class="hr my-4" />
         <div class="flex flex-col gap-4">
           <div class="grid grid-cols-4 gap-2">
+            <label class="label">
+              <span class="label-text text-sm">판매상태</span>
+              <select
+                name="unit"
+                class="select h-9 w-full px-3 align-middle"
+                bind:value={$form.status}
+                disabled={!$form.product.origin_id}
+                {...$constraints.status}
+              >
+                {#each salesStatuses as status}
+                  <option value={status.code}>{status.label}</option>
+                {/each}
+              </select>
+              <input type="hidden" name="category_id" bind:value={$form.status} />
+            </label>
             <label class="label flex flex-col">
+              <span class="label-text text-sm">판매일자</span>
+              <input
+                type="date"
+                name="sale_date"
+                placeholder="판매일자"
+                class="input placeholder-surface-200 w-full"
+                bind:value={$form.sales_date}
+                disabled={!$form.product.origin_id}
+                {...$constraints.sales_date}
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.sales_date}
+                  <span class="text-xs text-red-500">{$errors.sales_date}</span>
+                {/if}
+              </div>
+            </label>
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <label class="label">
               <span class="label-text text-sm">판매 가격</span>
               <input
                 name="price"
@@ -179,7 +209,8 @@
                 bind:value={$form.sales_price}
                 min="0"
                 placeholder="가격"
-                disabled={!$form.mappedProduct.origin_id}
+                disabled={!$form.product.origin_id}
+                {...$constraints.sales_price}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.sales_price}
@@ -193,13 +224,13 @@
                 name="price"
                 class="input placeholder-surface-200 w-full text-right"
                 type="text"
-                bind:value={$form.mappedProduct.price}
+                bind:value={$form.product.price}
                 min="0"
                 placeholder="가격"
                 disabled
               />
             </label>
-            <label class="label flex flex-col">
+            <label class="label">
               <span class="label-text text-sm">판매 가능 수량</span>
               <input
                 name="initial_stock"
@@ -208,7 +239,8 @@
                 bind:value={$form.max_quantity}
                 min="0"
                 placeholder="판매 가능 수량"
-                disabled={!$form.mappedProduct.origin_id}
+                disabled={!$form.product.origin_id}
+                {...$constraints.max_quantity}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.max_quantity}
@@ -219,50 +251,34 @@
           </div>
           <div class="grid grid-cols-4 gap-2">
             <label class="label">
-              <span class="label-text text-sm">판매상태</span>
-              <select
-                name="unit"
-                class="select h-9 w-full px-3 align-middle"
-                bind:value={$form.status}
-                disabled={!$form.mappedProduct.origin_id}
-              >
-                {#each salesStatuses as status}
-                  <option value={status.code}>{status.label}</option>
-                {/each}
-              </select>
-              <input type="hidden" name="category_id" bind:value={$form.status} />
-            </label>
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">판매일자</span>
-              <input
-                type="date"
-                name="sale_date"
-                class="input placeholder-surface-200 w-full"
-                bind:value={$form.sales_date}
-                placeholder="판매일자"
-                {...$constraints.sales_date}
-                disabled={!$form.mappedProduct.origin_id}
-              />
-              <div class="mt-1 min-h-[20px]">
-                {#if $errors.sales_date}
-                  <span class="text-xs text-red-500">{$errors.sales_date}</span>
-                {/if}
-              </div>
-            </label>
-            <!-- <label class="label">
               <span class="label-text text-sm">단위</span>
               <select
                 name="unit"
                 class="select h-9 w-full px-3 align-middle"
-                bind:value={$form.mappedProduct.unit}
-                onchange={() => ($form.mappedProduct.quantity_per_unit = 1)}
+                bind:value={$form.product.unit}
+                disabled={!$form.product.origin_id}
+                onchange={() => ($form.product.quantity_per_unit = 1)}
+                {...$constraints.product?.unit}
               >
                 <option value="" disabled selected>선택</option>
                 {#each unitTypes as unit}
                   <option value={unit.code}>{unit.label}</option>
                 {/each}
               </select>
-            </label> -->
+            </label>
+            <label class="label">
+              <span class="label-text text-sm">단위 별 수량</span>
+              <input
+                name="initial_stock"
+                class="input placeholder-surface-200 w-full"
+                type="number"
+                bind:value={$form.product.quantity_per_unit}
+                disabled={!$form.product.origin_id || $form.product.unit === 'EA'}
+                min="0"
+                placeholder="단위 당 수량"
+                {...$constraints.product?.quantity_per_unit}
+              />
+            </label>
           </div>
         </div>
       </section>
@@ -271,16 +287,11 @@
         <hr class="hr my-4" />
         <label for="product-images" class="text-surface-700 block font-medium">
           <FileUploader
-            bind:images={$form.mappedProduct.images}
+            bind:images={$form.product.images}
             options={{ maxFiles: 5, removeable: false }}
-            disabled={!$form.mappedProduct.origin_id}
+            disabled={!$form.product.origin_id}
           />
-          <input
-            type="hidden"
-            name="images"
-            bind:value={$form.mappedProduct.images}
-            disabled={!$form.mappedProduct.origin_id}
-          />
+          <input type="hidden" name="images" bind:value={$form.product.images} disabled={!$form.product.origin_id} />
         </label>
       </section>
     </div>
@@ -289,7 +300,7 @@
   {#if productMappingModalOpen}
     <ProductSearchModal
       {hqStore}
-      onSelect={handleMappingProduct}
+      onSelect={handleSelectProduct}
       onClose={() => {
         productMappingModalOpen = false
       }}

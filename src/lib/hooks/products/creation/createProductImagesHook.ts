@@ -5,11 +5,10 @@ import { createServerClient } from '$lib/supabase/clients/server'
 import type { CreateProductHookContext } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
 
-const createProductImages = async ({ product, productId }: CreateProductHookContext) => {
-  const { images } = product
-
+const createProductImages = async ({ product, productId }: CreateProductHookContext, shared: any) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
+  const { images = [] } = product || {}
   const { data, error } = await supabase.from('product_images').insert([
     ...images.map((img, index) => ({
       product_id: productId,
@@ -20,6 +19,8 @@ const createProductImages = async ({ product, productId }: CreateProductHookCont
   ])
 
   if (error) throw new SupabaseError('PRODUCT_IMAGE_CREATION_FAILED', { details: { error: error.message } })
+
+  shared.set('productId', productId)
 }
 
 export const createProductImagesHook: HookContext<CreateProductHookContext> = {

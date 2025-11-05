@@ -1,4 +1,4 @@
-import { lookupEnum, SalesStatus } from '$lib/types'
+import { lookupEnum, SalesStatus, type ProductData, type ProductImageData } from '$lib/types'
 import type { CoopData } from '$lib/types/entities/coop'
 import dayjs from 'dayjs'
 import { categoryDataConverter, productDataConverter } from './productConverter'
@@ -54,4 +54,22 @@ export const coopDataConverter = () => {
   }
 
   return { convert, convertAll }
+}
+
+export const convertProductToCoop = ({ product, images }: { product: ProductData; images: ProductImageData[] }) => {
+  const { id, price, unit, quantity_per_unit } = product
+
+  return {
+    origin_id: id,
+    price: price,
+    unit,
+    quantity_per_unit,
+    images: images.map((img) => ({
+      url: img.url,
+      representative: img.representative,
+      sort_order: img.sort_order,
+      toDelete: false,
+      isOrigin: true,
+    })),
+  }
 }

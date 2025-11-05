@@ -27,7 +27,7 @@
     validateForm: validateFilterForm,
     enhance: filterEnhance,
     submit: filterSubmit,
-    delayed: filterDelayed,
+    submitting: filterSubmitting,
   } = superForm(data.filterForm, {
     validators: valibot(FilterSchema),
     resetForm: false,
@@ -160,7 +160,7 @@
   </form>
 
   <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
-    {#if $filterDelayed}
+    {#if $filterSubmitting}
       <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
         <span class="loader-giant"></span>
       </div>
