@@ -68,6 +68,7 @@
                     class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                     type="submit"
                     formaction="/auth/signout?redirectTo=/auth"
+                    onclick={() => localStorage.removeItem('store')}
                   >
                     로그아웃
                   </button>
