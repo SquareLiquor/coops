@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProductDetailModal from '$lib/components/modals/ProductDetailModal.svelte'
+  import ProductDetailModal from '$lib/components/modals/hq/ProductDetailModal.svelte'
   import { ProductsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { ProductData } from '$lib/types'
   import { debounce, formatCurrency } from '$lib/utils'

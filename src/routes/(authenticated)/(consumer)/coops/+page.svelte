@@ -1,6 +1,8 @@
 <script lang="ts">
-  import Cart from '$lib/components/Cart.svelte'
   import CoopFooter from '$lib/components/CoopFooter.svelte'
+  import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
+  import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
+  import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { addToCart, getCartItem, hasCartItem, updateCartItem } from '$lib/stores'
   import type { CoopData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
@@ -11,6 +13,7 @@
   let { categories, coops } = data
 
   let isCartOpen = $state(false)
+  let selectedCoopId = $state<string | null>(null)
   let selectedDate = $state(dayjs().format('YYYY-MM-DD'))
   let selectedCategory: string | undefined = $state(undefined)
 
@@ -39,17 +42,11 @@
   }
 </script>
 
-<div
-  class="border-surface-200 from-primary-500/5 dark:border-surface-700 dark:from-primary-500/5 dark:to-surface-800 border-b bg-gradient-to-b to-white px-4 pt-2 pb-4"
->
+<div class="border-surface-200 from-primary-500/5 border-b bg-gradient-to-b to-white px-4 pt-2 pb-4">
   <div class="container mx-auto">
     <div class="flex items-center space-x-4">
-      <div class="flex-shrink-0">
-        <input
-          type="date"
-          bind:value={selectedDate}
-          class="border-surface-300 hover:border-primary-500 dark:border-surface-600 text-surface-700 rounded-lg border bg-white px-2.5 py-1.5 text-xs font-medium transition-colors dark:bg-white"
-        />
+      <div class="w-35 flex-shrink-0">
+        <DatePicker bind:selectedDate />
       </div>
 
       <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
@@ -77,11 +74,13 @@
   <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
     {#each filteredCoops as coop}
       <div
-        class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
+        class="border-surface-200 overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
+        role="button"
+        tabindex="0"
+        onclick={() => (selectedCoopId = coop.id)}
+        onkeydown={() => (selectedCoopId = coop.id)}
       >
-        <div
-          class="from-surface-100 to-surface-200 dark:from-surface-700 dark:to-surface-800 relative aspect-[5/3] bg-gradient-to-br"
-        >
+        <div class="from-surface-100 to-surface-200 relative aspect-[5/3] bg-gradient-to-br">
           <img
             src={coop.product.images.find((image) => image.representative)?.url}
             alt={coop.name}
@@ -133,7 +132,7 @@
         <div class="p-2.5">
           <div class="flex items-center justify-between">
             <div class="flex-1">
-              <h3 class="text-surface-900 dark:text-surface-100 line-clamp-1 text-sm font-bold">
+              <h3 class="text-surface-900 line-clamp-1 text-sm font-bold">
                 {coop.name}
               </h3>
               <div class="mt-0.5 flex items-center space-x-1">
@@ -142,7 +141,7 @@
             </div>
             <div class="ml-2 flex items-center space-x-1.5">
               <button
-                class="bg-surface-100 hover:bg-surface-200 dark:bg-surface-700 dark:hover:bg-surface-600 flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50"
+                class="bg-surface-100 hover:bg-surface-200 flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50"
                 disabled={getCartItem(coop.product.id)?.quantity === 0}
                 onclick={() => handleChangeQuantity(coop, -1)}
                 aria-label="수량 감소"
@@ -151,7 +150,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                 </svg>
               </button>
-              <span class="text-surface-900 dark:text-surface-100 w-8 text-center text-sm font-medium">
+              <span class="text-surface-900 w-8 text-center text-sm font-medium">
                 {getCartItem(coop.product.id)?.quantity ?? 0}
               </span>
               <button
@@ -172,4 +171,7 @@
 </main>
 
 <CoopFooter bind:isCartOpen />
-<Cart bind:isCartOpen />
+<CartModal bind:isCartOpen />
+{#if selectedCoopId}
+  <CoopDetailModal bind:selectedCoopId coops={filteredCoops} />
+{/if}

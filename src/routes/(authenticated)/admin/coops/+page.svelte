@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CoopDetailModal from '$lib/components/modals/CoopDetailModal.svelte'
+  import CoopDetailModal from '$lib/components/modals/admin/CoopDetailModal.svelte'
   import { CoopsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { CoopData } from '$lib/types'
   import { equalsEnum, SalesStatus } from '$lib/types'

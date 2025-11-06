@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import ProductSearchModal from '$lib/components/modals/ProductSearchModal.svelte'
+  import ProductSearchModal from '$lib/components/modals/hq/ProductSearchModal.svelte'
   import Combobox from '$lib/components/ui/Combobox.svelte'
   import Editor from '$lib/components/ui/Editor.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'

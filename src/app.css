@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton-svelte';
 @import '@skeletonlabs/skeleton/themes/legacy';
@@ -7,6 +8,9 @@
 @import '@skeletonlabs/skeleton/themes/mint';
 @import '@skeletonlabs/skeleton/themes/crimson';
 @import '@skeletonlabs/skeleton/themes/nosh';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
 
 .loader {
   border: 3px solid #f3f3f3;
@@ -37,16 +41,16 @@
   }
 }
 
-/* Chrome, Safari, Edge, Opera */
-input[type='number']::-webkit-outer-spin-button,
-input[type='number']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
+/* number 필드 화살표 없애기 */
 input[type='number'] {
+  /* 1. WebKit 기반 브라우저 (Chrome, Safari, 구 Edge, Opera) */
+  -webkit-appearance: none;
+  /* 2. Firefox 브라우저 (화살표 대신 일반 텍스트 필드로 처리) */
   -moz-appearance: textfield;
+  /* 3. 표준 속성 (최신 브라우저 및 린트 경고 해결) */
+  appearance: none;
+  /* 4. 기타: 일부 브라우저에서 input에 기본 적용되는 margin 제거 */
+  margin: 0;
 }
 
 /* Hide horizontal scrollbar for category filter */

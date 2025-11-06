@@ -39,8 +39,6 @@ const addToCart = (item: CartItemData) => {
   }
 
   calculate()
-
-  console.log('Cart after adding item:', cartState)
 }
 
 const updateCartItem = (id: string, quantity: number) => {
