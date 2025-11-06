@@ -1,3 +1,4 @@
+import { clearAuth, clearStore } from '$lib/stores/index.js'
 import { redirect } from '@sveltejs/kit'
 
 export const POST = async ({ url, cookies, locals: { supabase } }) => {
@@ -11,7 +12,8 @@ export const POST = async ({ url, cookies, locals: { supabase } }) => {
     })
   }
 
-  cookies.delete('store_id', { path: '/' })
+  clearAuth()
+  clearStore()
 
   const redirectTo = url.searchParams.get('redirectTo') || '/'
   throw redirect(303, redirectTo)

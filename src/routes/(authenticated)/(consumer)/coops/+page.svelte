@@ -3,26 +3,44 @@
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
-  import { addToCart, getCartItem, hasCartItem, updateCartItem } from '$lib/stores'
-  import type { CoopData } from '$lib/types'
+  import { coopDataConverter } from '$lib/converters'
+  import { addToCart, getCartItem, getStore, hasCartItem, updateCartItem } from '$lib/stores'
+  import { getCategories } from '$lib/supabase'
+  import type { CategoryData, CoopData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
+  import { onMount, tick } from 'svelte'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { categories, coops } = data
+  let { supabase, coopsSelectQuery } = data
 
-  let isCartOpen = $state(false)
-  let selectedCoopId = $state<string | null>(null)
-  let selectedDate = $state(dayjs().format('YYYY-MM-DD'))
-  let selectedCategory: string | undefined = $state(undefined)
-
+  let coops = $state<CoopData[]>([])
+  let categories = $state<CategoryData[]>([])
   let filteredCoops = $derived.by(() => {
     return coops.filter((coop) => {
       const matchesDate = dayjs(coop.sales_date).isSame(dayjs(selectedDate), 'day')
       const matchesCategory = selectedCategory ? coop.category.id === selectedCategory : true
       return matchesDate && matchesCategory
     })
+  })
+
+  let isCartOpen = $state(false)
+  let selectedCoopId = $state<string | null>(null)
+  let selectedDate = $state(dayjs().format('YYYY-MM-DD'))
+  let selectedCategory: string | undefined = $state(undefined)
+
+  onMount(async () => {
+    await tick()
+    const store = getStore()
+
+    const [coopsRes, categoriesRes] = await Promise.all([
+      supabase.from('coops').select(coopsSelectQuery).eq('store_id', store.id).eq('status', 'ONGOING'),
+      getCategories(store.id),
+    ])
+
+    coops = coopDataConverter().convertAll(coopsRes.data ?? [])
+    categories = categoriesRes.categories
   })
 
   const handleChangeQuantity = (coop: CoopData, quantity: number) => {

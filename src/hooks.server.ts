@@ -72,10 +72,6 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.session = session
   event.locals.user = user
 
-  const { url, cookies } = event
-  let storeId = url.searchParams.get('s')
-  if (storeId) cookies.set('store_id', storeId, { path: '/' })
-
   return resolve(event)
 }
 

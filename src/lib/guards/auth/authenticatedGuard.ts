@@ -16,7 +16,7 @@ export const authenticatedGuard: Handle = async ({ event, resolve }) => {
   const { app_metadata: { user_type } = {} } = user || {}
   const auth_protected_path = '(authenticated)'
 
-  if (!session && (route.id?.includes(auth_protected_path) || url.pathname === '/')) {
+  if (!session && route.id?.includes(auth_protected_path)) {
     if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/hq')) {
       throw redirect(303, '/auth/admin')
     }
