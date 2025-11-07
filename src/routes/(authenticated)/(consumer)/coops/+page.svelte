@@ -157,7 +157,13 @@
                 <span class="text-primary-600 text-sm font-bold">{formatCurrency(coop.sales_price)}</span>
               </div>
             </div>
-            <div class="ml-2 flex items-center space-x-1.5">
+            <div
+              class="ml-2 flex items-center space-x-1.5"
+              role="dialog"
+              tabindex="0"
+              onclick={(e) => e.stopPropagation()}
+              onkeydown={(e) => e.stopPropagation()}
+            >
               <button
                 class="bg-surface-100 hover:bg-surface-200 flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50"
                 disabled={getCartItem(coop.product.id)?.quantity === 0}
