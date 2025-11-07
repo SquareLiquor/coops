@@ -1,49 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { page } from '$app/state'
-  import { getStore, setStore } from '$lib/stores'
+  import { setStore } from '$lib/stores'
   import type { StoreData } from '$lib/types'
-  import { onMount } from 'svelte'
 
   let { data } = $props()
-  let { supabase } = data
-  let stores: StoreData[] = $state([])
+  let stores: StoreData[] = $derived(data.stores)
   let selectedStoreId: string = $state('')
-
-  onMount(async () => {
-    if (await checkStoreIdParam()) {
-      await goto('/coops')
-      return
-    }
-
-    if (await checkExistingStore()) {
-      await goto('/coops')
-      return
-    }
-
-    await fetchStoreList()
-  })
-
-  async function checkStoreIdParam() {
-    const storeId = page.url.searchParams.get('s')
-    if (!storeId) return false
-
-    const { data } = await supabase.from('stores').select('*').eq('id', storeId).maybeSingle()
-    if (data) setStore(data)
-
-    return !!data
-  }
-
-  async function checkExistingStore() {
-    const store = getStore()
-
-    return !!store
-  }
-
-  async function fetchStoreList() {
-    const { data } = await supabase.from('stores').select('*').neq('type', 'hq')
-    stores = data || []
-  }
 
   const handleSelectStore = async () => {
     const store = stores.find((s) => s.id === selectedStoreId)

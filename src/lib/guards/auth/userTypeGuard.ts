@@ -15,10 +15,6 @@ export const userTypeGuard: Handle = async ({ event, resolve }) => {
   const { app_metadata } = user || {}
   const { user_type } = app_metadata || {}
 
-  if (UserType.CONSUMER.code === user_type && url.pathname === '/') {
-    throw redirect(303, '/coops')
-  }
-
   if (UserType.BRANCH.code === user_type && url.pathname === '/') {
     throw redirect(303, '/admin')
   }
