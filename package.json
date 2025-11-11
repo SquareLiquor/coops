@@ -21,7 +21,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.16",
+    "@tailwindcss/vite": "^4.1.17",
     "@types/node": "^22.19.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -30,13 +30,13 @@
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "svelte": "^5.43.3",
+    "svelte": "^5.43.5",
     "svelte-check": "^4.3.3",
     "sveltekit-superforms": "^2.28.1",
-    "tailwindcss": "^4.1.16",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.3",
-    "vite": "^7.2.1"
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -45,11 +45,11 @@
     ]
   },
   "dependencies": {
-    "@skeletonlabs/skeleton": "^4.2.4",
-    "@skeletonlabs/skeleton-svelte": "^4.2.4",
-    "@supabase/postgrest-js": "^2.79.0",
+    "@skeletonlabs/skeleton": "^4.3.2",
+    "@skeletonlabs/skeleton-svelte": "^4.3.2",
+    "@supabase/postgrest-js": "^2.81.0",
     "@supabase/ssr": "^0.7.0",
-    "@supabase/supabase-js": "^2.79.0",
+    "@supabase/supabase-js": "^2.81.0",
     "@tinymce/tinymce-svelte": "^3.2.0",
     "dayjs": "^1.11.19",
     "immer": "^10.2.0",
