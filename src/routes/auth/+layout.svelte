@@ -1,14 +1,9 @@
 <script lang="ts">
-  import Notifications from '$lib/components/Notifications.svelte'
-
   let { children } = $props()
 </script>
 
 <!-- Auth Layout -->
 <div class="min-h-screen">
-  <!-- Notifications -->
-  <Notifications />
-
   {@render children?.()}
 </div>
 

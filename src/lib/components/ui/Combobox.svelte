@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Combobox, Portal, useListCollection, type ComboboxRootProps } from '@skeletonlabs/skeleton-svelte'
 
-  let { category_id = $bindable(), data = $bindable(), disabled = false, options } = $props()
+  let { selected = $bindable(), data = $bindable(), disabled = false, options } = $props()
 
   let items = $state(data)
   let { allowNewItem, placeholder, handleAddNewItem } = options
@@ -32,7 +32,7 @@
   }
 
   const handleSelect = (details: any) => {
-    category_id = details.itemValue
+    selected = details.itemValue
   }
 
   const _handleAddNewItem = async (event: Event) => {
@@ -55,6 +55,7 @@
       {onOpenChange}
       {onInputValueChange}
       onSelect={handleSelect}
+      value={[selected]}
       inputBehavior="autohighlight"
     >
       <Combobox.Control>

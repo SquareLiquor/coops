@@ -1,6 +1,5 @@
 <script lang="ts">
   import favicon from '$lib/assets/favicon.svg'
-  import Notifications from '$lib/components/Notifications.svelte'
   import { setupAuthStateListener, syncUserToAuthState } from '$lib/stores'
   import { onMount } from 'svelte'
   import '../app.css'
@@ -28,5 +27,4 @@
 
 <div class="from-surface-50/50 to-surface-50/10 min-h-screen bg-gradient-to-br">
   {@render children?.()}
-  <Notifications />
 </div>

@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 }
 
 export const actions: Actions = {
-  default: async ({ request, locals: { supabase } }) => {
+  create: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(ProductCreateSchema))
 
     if (!form.valid) return fail(400, { form })
