@@ -8,6 +8,9 @@ import type { PageLoad } from './$types'
 
 const { convertAll } = storeDataConverter()
 
+/**
+ * 메인 페이지 접근 시 상점 Store가 있는 지 체크, 없다면 페이지에서 선택
+ */
 export const load: PageLoad = async ({ url, parent }) => {
   const { supabase } = await parent()
 

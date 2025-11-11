@@ -6,7 +6,16 @@
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { coopDataConverter } from '$lib/converters'
   import { convertCartDataToOrderInput } from '$lib/schemas'
-  import { addToCart, getAuth, getCart, getCartItem, getStore, hasCartItem, updateCartItem } from '$lib/stores'
+  import {
+    addToCart,
+    clearCart,
+    getAuth,
+    getCart,
+    getCartItem,
+    getStore,
+    hasCartItem,
+    updateCartItem,
+  } from '$lib/stores'
   import { getCategories } from '$lib/supabase'
   import type { CategoryData, CoopData } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
@@ -61,12 +70,17 @@
       isCartOpen = false
     },
     onResult: async ({ result, ...results }: { result: ActionResult }) => {
-      console.log(result, results)
       if (result.type === 'success') {
         toaster.success({
           description: '주문이 성공적으로 생성되었습니다.',
           duration: 5000,
-          action: { label: '확인', onClick: () => goto('/orders') },
+          action: {
+            label: '확인',
+            onClick: () => {
+              clearCart()
+              goto('/orders')
+            },
+          },
         })
       }
 

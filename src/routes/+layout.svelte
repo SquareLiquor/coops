@@ -7,12 +7,13 @@
   let { data, children } = $props()
   let { session, user } = data
 
-  // 서버 세션 정보 변경 시에만 store 동기화 (SSR 지원 + 효율적)
+  // 서버 세션 정보 변경 시에만 Store 동기화 (SSR)
   $effect(() => {
     syncUserToAuthState(user, session)
   })
 
   onMount(() => {
+    // 인증 상태 변경 리스너 설정 (csr)
     const cleanup = setupAuthStateListener()
 
     return () => {
