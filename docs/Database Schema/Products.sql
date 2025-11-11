@@ -137,9 +137,7 @@ SELECT
     COALESCE(sp.name, hp.name) AS name,
     COALESCE(sp.description, hp.description) AS description,
     COALESCE(sp.price, hp.price) AS price,
-    COALESCE(sp.image_url, hp.image_url) AS image_url,
     COALESCE(sp.active, hp.active) AS active,
-    COALESCE(sp.date, hp.date) AS date,
     
     -- ① 실제 재고 합계 (stock_transactions 기반)
     (
@@ -155,16 +153,15 @@ SELECT
     c.max_quantity,
     c.price AS coop_price,
     c.start_at,
-    c.end_at
+    c.end_at,
     
     -- ⑤ 공동구매 참여 가능 수량
-    -- c.max_quantity -
-    -- COALESCE((
-    --     SELECT SUM(o.quantity)
-    --     FROM public.orders o
-    --     WHERE o.coop_id = c.id
-    --       AND o.status IN ('pending', 'completed')
-    -- ), 0) AS coop_available_quantity
+    COALESCE((
+        SELECT SUM(o.quantity)
+        FROM public.order_items o
+        WHERE o.coop_id = c.id
+          AND o.status IN ('ORDERED', 'COMPLETED')
+    ), 0) AS ordered_quantity
 
 FROM public.stores s
 -- 본사 상품

@@ -47,9 +47,10 @@
                   >
                   <div class="flex flex-shrink-0 flex-row items-center space-x-2">
                     <button
+                      type="button"
                       class="bg-surface-100 hover:bg-surface-200 text-surface-700 flex h-5 w-5 items-center justify-center rounded-full"
                       disabled={item.quantity === 1}
-                      onclick={() => updateCartItem(item.id, -1)}
+                      onclick={() => updateCartItem(item.coopId, -1)}
                       aria-label="수량 감소"
                     >
                       <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,8 +58,9 @@
                       </svg>
                     </button>
                     <button
+                      type="button"
                       class="bg-primary-500 hover:bg-primary-600 flex h-5 w-5 items-center justify-center rounded-full text-white"
-                      onclick={() => updateCartItem(item.id, 1)}
+                      onclick={() => updateCartItem(item.coopId, 1)}
                       aria-label="수량 증가"
                     >
                       <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,8 +68,9 @@
                       </svg>
                     </button>
                     <button
+                      type="button"
                       class="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
-                      onclick={() => removeFromCart(item.id)}
+                      onclick={() => removeFromCart(item.coopId)}
                       aria-label="삭제"
                     >
                       <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,6 +95,7 @@
               <span class="text-surface-600 text-xs">총 {itemsCount}개</span>
             </div>
             <button
+              type="submit"
               class="bg-primary-500 hover:bg-primary-600 ml-6 rounded px-6 py-2 text-sm font-semibold text-white transition-colors"
             >
               주문하기

@@ -3,6 +3,7 @@ import { getUserType } from '$lib/utils/permissions'
 import type { User } from '@supabase/supabase-js'
 
 const getInitialState = (): AuthState => ({
+  id: '',
   isAuthenticated: false,
   isLoading: false,
   user: null,
@@ -19,6 +20,7 @@ const setAuth = (user: User | null, sessionExpiry?: number | null) => {
   const userType = getUserType({ user })
 
   authState = {
+    id: user?.id || '',
     isAuthenticated: !!user,
     isLoading: false,
     user,

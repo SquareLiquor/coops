@@ -1,15 +1,19 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import CoopFooter from '$lib/components/CoopFooter.svelte'
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { coopDataConverter } from '$lib/converters'
-  import { addToCart, getCartItem, getStore, hasCartItem, updateCartItem } from '$lib/stores'
+  import { convertCartDataToOrderInput } from '$lib/schemas'
+  import { addToCart, getAuth, getCart, getCartItem, getStore, hasCartItem, updateCartItem } from '$lib/stores'
   import { getCategories } from '$lib/supabase'
   import type { CategoryData, CoopData } from '$lib/types'
-  import { formatCurrency } from '$lib/utils'
+  import { formatCurrency, toaster } from '$lib/utils'
+  import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onMount, tick } from 'svelte'
+  import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
@@ -41,11 +45,45 @@
 
     coops = coopDataConverter().convertAll(coopsRes.data ?? [])
     categories = categoriesRes.categories
+
+    $cartForm.store_id = store.id
+    $cartForm.user_id = getAuth().user!.id
+  })
+
+  const {
+    form: cartForm,
+    enhance,
+    submitting,
+  } = superForm(data.form, {
+    dataType: 'json',
+    onSubmit: async () => {
+      $cartForm = convertCartDataToOrderInput(getAuth(), getStore(), getCart())
+      isCartOpen = false
+    },
+    onResult: async ({ result, ...results }: { result: ActionResult }) => {
+      console.log(result, results)
+      if (result.type === 'success') {
+        toaster.success({
+          description: '주문이 성공적으로 생성되었습니다.',
+          duration: 5000,
+          action: { label: '확인', onClick: () => goto('/orders') },
+        })
+      }
+
+      if (result.type === 'failure') {
+        toaster.error({
+          title: '주문 생성 실패',
+          description: '주문 생성에 실패했습니다. 다시 시도해 주세요.',
+          duration: 5000,
+        })
+      }
+    },
+    invalidateAll: false,
   })
 
   const handleChangeQuantity = (coop: CoopData, quantity: number) => {
-    if (hasCartItem(coop.product.id)) {
-      updateCartItem(coop.product.id, quantity)
+    if (hasCartItem(coop.id)) {
+      updateCartItem(coop.id, quantity)
       return
     }
 
@@ -53,12 +91,26 @@
       name,
       sales_price: price,
       sales_date,
-      product: { id, images },
+      product: { images },
     } = coop
 
-    addToCart({ id, name, quantity, price, sales_date, image: images.find((image) => image.representative)?.url || '' })
+    addToCart({
+      coopId: coop.id,
+      productId: coop.product.id,
+      name,
+      quantity,
+      price,
+      sales_date,
+      image: images.find((image) => image.representative)?.url || '',
+    })
   }
 </script>
+
+{#if $submitting}
+  <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+    <span class="loader-giant"></span>
+  </div>
+{/if}
 
 <div class="border-surface-200 from-primary-500/5 border-b bg-gradient-to-b to-white px-4 pt-2 pb-4">
   <div class="container mx-auto">
@@ -166,7 +218,7 @@
             >
               <button
                 class="bg-surface-100 hover:bg-surface-200 flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50"
-                disabled={getCartItem(coop.product.id)?.quantity === 0}
+                disabled={getCartItem(coop.id)?.quantity === 0}
                 onclick={() => handleChangeQuantity(coop, -1)}
                 aria-label="수량 감소"
               >
@@ -175,7 +227,7 @@
                 </svg>
               </button>
               <span class="text-surface-900 w-8 text-center text-sm font-medium">
-                {getCartItem(coop.product.id)?.quantity ?? 0}
+                {getCartItem(coop.id)?.quantity ?? 0}
               </span>
               <button
                 class="bg-primary-500 hover:bg-primary-600 flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors"
@@ -195,7 +247,11 @@
 </main>
 
 <CoopFooter bind:isCartOpen />
-<CartModal bind:isCartOpen />
+
+<form method="POST" action="?/createOrder" use:enhance>
+  <CartModal bind:isCartOpen />
+</form>
+
 {#if selectedCoopId}
   <CoopDetailModal bind:selectedCoopId coops={filteredCoops} />
 {/if}

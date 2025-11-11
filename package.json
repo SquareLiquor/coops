@@ -45,6 +45,7 @@
     ]
   },
   "dependencies": {
+    "@lucide/svelte": "^0.553.0",
     "@skeletonlabs/skeleton": "^4.3.2",
     "@skeletonlabs/skeleton-svelte": "^4.3.2",
     "@supabase/postgrest-js": "^2.81.0",

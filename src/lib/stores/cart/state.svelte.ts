@@ -1,6 +1,8 @@
 import type { CartData, CartItemData } from '$lib/types/common/cart'
 
 const initialState: CartData = {
+  userId: '',
+  storeId: '',
   totalPrice: 0,
   totalQuantity: 0,
   itemsCount: 0,
@@ -11,12 +13,12 @@ let cartState = $state<CartData>(initialState)
 
 const getCart = () => cartState
 
-const getCartItem = (id: string) => {
-  return cartState.items.find((item) => item.id === id)
+const getCartItem = (coopId: string) => {
+  return cartState.items.find((item) => item.coopId === coopId)
 }
 
-const hasCartItem = (id: string): boolean => {
-  return cartState.items.some((item) => item.id === id)
+const hasCartItem = (coopId: string): boolean => {
+  return cartState.items.some((item) => item.coopId === coopId)
 }
 
 const calculate = () => {
@@ -44,7 +46,7 @@ const addToCart = (item: CartItemData) => {
 const updateCartItem = (id: string, quantity: number) => {
   cartState = {
     ...cartState,
-    items: cartState.items.map((i) => (i.id === id ? { ...i, quantity: (i.quantity ?? 0) + quantity } : i)),
+    items: cartState.items.map((i) => (i.coopId === id ? { ...i, quantity: (i.quantity ?? 0) + quantity } : i)),
   }
 
   calculate()
@@ -53,7 +55,7 @@ const updateCartItem = (id: string, quantity: number) => {
 const removeFromCart = (id: string) => {
   cartState = {
     ...cartState,
-    items: cartState.items.filter((item) => item.id !== id),
+    items: cartState.items.filter((item) => item.coopId !== id),
   }
 
   calculate()

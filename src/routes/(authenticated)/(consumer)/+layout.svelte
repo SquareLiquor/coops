@@ -1,14 +1,8 @@
 <script lang="ts">
   import ConsumerHeader from '$lib/components/ConsumerHeader.svelte'
-  import { setStore } from '$lib/stores/index.js'
-  import { onMount } from 'svelte'
+  import Toast from '$lib/components/ui/Toast.svelte'
 
-  let { data, children } = $props()
-  let { store } = data
-
-  onMount(() => {
-    !!store && setStore(store)
-  })
+  let { children } = $props()
 </script>
 
 <!-- 모바일 컨테이너 -->
@@ -17,5 +11,6 @@
 
   <main>
     {@render children?.()}
+    <Toast />
   </main>
 </div>

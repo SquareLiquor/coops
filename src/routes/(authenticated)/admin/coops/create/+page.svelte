@@ -125,7 +125,7 @@
             <label class="label col-span-2 flex flex-col">
               <span class="label-text text-sm">카테고리</span>
               <Combobox
-                bind:category_id={$form.category_id}
+                bind:selected={$form.category_id}
                 data={categories}
                 options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleAddNewCategory }}
                 disabled={!$form.product.origin_id}

@@ -36,6 +36,13 @@ export const SalesStatus: { [key: string]: SalesStatus } = {
   PAUSED: { code: 'PAUSED', label: '판매 일시 정지', color: 'orange' },
 }
 
+export type OrderStatus = EnumItem & { color?: string }
+export const OrderStatus: { [key: string]: OrderStatus } = {
+  ORDERED: { code: 'ORDERED', label: '주문 생성', color: 'green' },
+  COMPLETED: { code: 'COMPLETED', label: '주문 완료', color: 'blue' },
+  CANCELLED: { code: 'CANCELLED', label: '주문 취소', color: 'red' },
+}
+
 export const lookupEnum = <T extends EnumItem>(enumObj: { [key: string]: T }, code: string): T | undefined => {
   return Object.values(enumObj).find((item) => item.code === code)
 }

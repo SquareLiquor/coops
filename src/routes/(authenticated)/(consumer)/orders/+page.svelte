@@ -1,4 +1,11 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+  import type { PageProps } from './$types'
+
+  let { data }: PageProps = $props()
+  let { supabase } = data
+
+  onMount(async () => {})
   // Types
   type OrderItem = {
     id: number

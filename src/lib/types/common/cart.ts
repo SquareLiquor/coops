@@ -1,4 +1,6 @@
 export interface CartData {
+  userId: string
+  storeId: string
   totalPrice: number
   totalQuantity: number
   itemsCount: number
@@ -6,7 +8,8 @@ export interface CartData {
 }
 
 export interface CartItemData {
-  id: string
+  coopId: string
+  productId: string
   name: string
   quantity: number
   price: number

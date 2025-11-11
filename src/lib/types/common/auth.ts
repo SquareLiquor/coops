@@ -2,6 +2,8 @@ import type { User } from '@supabase/supabase-js'
 import type { UserType } from './enum'
 
 export interface AuthState {
+  id: string
+
   // 기본 인증 상태
   isAuthenticated: boolean
   isLoading: boolean
