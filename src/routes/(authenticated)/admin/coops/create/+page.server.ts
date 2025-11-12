@@ -41,7 +41,6 @@ export const actions: Actions = {
 
       return { form }
     } catch (error) {
-      console.log('error', error)
       if (isAppError(error)) {
         error.errorHandler()
         await createCoopHook.runCleanup({})

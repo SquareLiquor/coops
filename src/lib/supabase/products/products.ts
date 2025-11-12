@@ -14,7 +14,7 @@ export const getProductById = async (productId: string) => {
       `
       *,
       category:categories(id, name),
-      images:product_images(id, url, representative, sort_order)
+      images:product_images(id, url, path, representative, sort_order)
     `
     )
     .eq('id', productId)

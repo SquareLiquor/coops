@@ -1,9 +1,9 @@
 import { isAppError } from '$lib/errors'
-import { productDataToUpdateInput, ProductUpdateSchema, type ProductUpdateInput } from '$lib/schemas'
+import { productDataToUpdateInput, ProductUpdateSchema, type ImageInput, type ProductUpdateInput } from '$lib/schemas'
 import { getCategories, getProductById } from '$lib/supabase'
 import { UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { error, fail, redirect } from '@sveltejs/kit'
+import { error, fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
@@ -32,11 +32,13 @@ export const actions: Actions = {
   // 상품 수정
   update: async ({ request, params, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(ProductUpdateSchema))
+    const { id, images } = form.data
 
     if (!form.valid) return fail(400, { form })
 
     try {
       await updateProduct(supabase, form.data)
+      await updateProductImages(supabase, id, images)
 
       return { form }
     } catch (err) {
@@ -44,20 +46,6 @@ export const actions: Actions = {
         err.errorHandler()
       }
       return setError(form, '상품 수정 중 오류가 발생했습니다.')
-    }
-  },
-
-  // 상품 삭제
-  delete: async ({ params, locals: { supabase } }) => {
-    try {
-      await deleteProduct(supabase, params.id)
-
-      throw redirect(302, '/hq/products')
-    } catch (err) {
-      if (isAppError(err)) {
-        err.errorHandler()
-      }
-      throw error(500, '상품 삭제 중 오류가 발생했습니다.')
     }
   },
 }
@@ -80,20 +68,24 @@ const updateProduct = async (supabase: SupabaseClient, formData: ProductUpdateIn
     .eq('id', id)
 
   if (updateError) throw updateError
-
-  // 이미지 업데이트 로직이 필요하다면 여기에 추가
-  // 기존 이미지 삭제 및 새 이미지 추가 로직
 }
 
-const deleteProduct = async (supabase: SupabaseClient, productId: string) => {
-  // Soft delete - active를 false로 설정
-  const { error: deleteError } = await supabase
-    .from('products')
-    .update({
-      active: false,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', productId)
+const updateProductImages = async (supabase: SupabaseClient, productId: string, images: ImageInput[]) => {
+  // 기존 이미지 삭제
+  const { error: deleteError } = await supabase.from('product_images').delete().eq('product_id', productId)
 
   if (deleteError) throw deleteError
+
+  // 새 이미지 추가
+  const { error: insertError } = await supabase.from('product_images').insert(
+    images.map((image, index) => ({
+      product_id: productId,
+      url: image.url,
+      path: image.path,
+      representative: image.representative,
+      sort_order: index,
+    }))
+  )
+
+  if (insertError) throw insertError
 }

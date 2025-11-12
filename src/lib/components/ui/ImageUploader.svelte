@@ -49,7 +49,6 @@
       })
     }
 
-    // use가 true인 이미지들에게 sortOrder를 순차적으로 부여, 나머지는 -1
     let order = 0
     images = images.map((img) => {
       if (img.use) {
@@ -86,7 +85,6 @@
           `/${dayjs().format('YYYY-MM-DD')}/${crypto.randomUUID()}`
         )
 
-        console.log(path, publicUrl)
         newImages.push({
           url: publicUrl,
           path,
@@ -124,7 +122,6 @@
 
   const handleFileUsageToggle = (index: number, event: Event) => {
     const target = event.target as HTMLInputElement
-    console.log(target, target.checked)
     const image = images[index]
     updateImage({ ...image, use: target.checked, representative: target.checked ? image.representative : false })
   }

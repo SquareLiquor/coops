@@ -32,7 +32,7 @@ export const actions: Actions = {
 
     try {
       const { data } = await createProduct(supabase, form.data)
-      await createProductHook.runAfter({ product: form.data, productId: data.id })
+      await createProductHook.runAfter({ product: form.data, productId: data.id, images: form.data.images })
 
       return { form }
     } catch (error) {

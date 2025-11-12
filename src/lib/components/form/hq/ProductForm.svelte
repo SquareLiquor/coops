@@ -40,7 +40,7 @@
   })
 
   const handleNewCategory = async (categoryName: string) => {
-    const { category } = await createCategory({ name: categoryName, store_id: $formData.id })
+    const { category } = await createCategory({ name: categoryName, store_id: $formData.storeId })
 
     if (!!category) {
       categories = [...categories, category].sort((a, b) => a.name.localeCompare(b.name))
@@ -64,7 +64,7 @@
   {#if isEditMode}
     <input type="hidden" name="id" value={$formData.id} />
   {/if}
-  <input type="hidden" name="store_id" value={$formData.store_id} />
+  <input type="hidden" name="storeId" value={$formData.storeId} />
   <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
     <div class="flex items-center space-x-4">
       <h1 class="text-surface-900 text-2xl font-bold">{titleText}</h1>
@@ -108,11 +108,11 @@
             <label class="label col-span-2">
               <span class="label-text text-sm">카테고리</span>
               <Combobox
-                bind:selected={$formData.category_id}
+                bind:selected={$formData.categoryId}
                 data={categories}
                 options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleNewCategory }}
               />
-              <input type="hidden" name="category_id" bind:value={$formData.category_id} />
+              <input type="hidden" name="categoryId" bind:value={$formData.categoryId} />
             </label>
           </div>
           <label class="label flex min-h-0 flex-1 flex-col">
@@ -148,10 +148,10 @@
             <label class="label">
               <span class="label-text text-sm">개 당 가격</span>
               <input
-                name="price_per_piece"
+                name="pricePerPiece"
                 class="input placeholder-surface-200 w-full"
                 type="number"
-                value={$formData.price / $formData.quantity_per_unit}
+                value={$formData.price / $formData.quantityPerUnit}
                 min="0"
                 placeholder=""
                 disabled
@@ -161,13 +161,13 @@
               <label class="label">
                 <span class="label-text text-sm">재고</span>
                 <input
-                  name="initial_stock"
+                  name="initialStock"
                   class="input placeholder-surface-200 w-full"
                   type="number"
-                  bind:value={$formData.initial_stock}
+                  bind:value={$formData.initialStock}
                   min="0"
                   placeholder="초기 재고"
-                  {...$constraints.initial_stock}
+                  {...$constraints.initialStock}
                 />
               </label>
             {/if}
@@ -179,7 +179,7 @@
                 name="unit"
                 class="select h-9 w-full px-3 align-middle"
                 bind:value={$formData.unit}
-                onchange={() => ($formData.quantity_per_unit = 1)}
+                onchange={() => ($formData.quantityPerUnit = 1)}
               >
                 <option value="" disabled selected>선택</option>
                 {#each unitTypes as unit}
@@ -190,14 +190,14 @@
             <label class="label">
               <span class="label-text text-sm">단위 별 수량</span>
               <input
-                name="quantity_per_unit"
+                name="quantityPerUnit"
                 class="input placeholder-surface-200 w-full"
                 type="number"
-                bind:value={$formData.quantity_per_unit}
+                bind:value={$formData.quantityPerUnit}
                 disabled={$formData.unit === 'EA'}
                 min="0"
                 placeholder="단위 당 수량"
-                {...$constraints.quantity_per_unit}
+                {...$constraints.quantityPerUnit}
               />
             </label>
           </div>

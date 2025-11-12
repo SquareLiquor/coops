@@ -21,6 +21,7 @@ export interface ApproveRequestHookContext {
 export interface CreateProductHookContext {
   product?: ProductCreateInput
   productId?: string
+  images?: ImageInput[]
 }
 
 export interface CreateCoopHookContext {

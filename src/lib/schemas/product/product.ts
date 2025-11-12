@@ -12,7 +12,7 @@ export const ProductSchema = v.pipe(
     price: v.pipe(v.number()),
     unit: v.string(),
     quantityPerUnit: v.pipe(v.number()),
-    images: v.array(ImageSchema),
+    images: v.pipe(v.array(ImageSchema), v.minLength(1, '상품 이미지를 최소 1개 이상 등록해주세요.')),
     active: v.optional(v.boolean()),
   })
 )

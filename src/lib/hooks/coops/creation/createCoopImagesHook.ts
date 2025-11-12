@@ -5,6 +5,9 @@ import { copyFile, createBrowserClient, createServerClient, deleteFile } from '$
 import type { CreateCoopHookContext } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
 
+const PRODUCTS_BUCKET = 'products'
+const COOPS_BUCKET = 'coops'
+
 const createCoopImages = async ({ images }: CreateCoopHookContext, shared: any) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
@@ -13,13 +16,20 @@ const createCoopImages = async ({ images }: CreateCoopHookContext, shared: any) 
   const coopId = shared.get('coopId')
   if (!coopId) return
 
+  const imagesToDelete = images!.filter((image: ImageInput) => !image.use)
   const imagesToCopy = images!.filter((image: ImageInput) => !image.new && image.use)
   const imagesToNew = images!.filter((image: ImageInput) => image.new && image.use)
+
+  await Promise.all(
+    imagesToDelete.map(async (image: ImageInput) => {
+      await deleteFile(COOPS_BUCKET, [image.path])
+    })
+  )
 
   const imagesCopied: ImageInput[] = []
   await Promise.all(
     imagesToCopy.map(async (image: ImageInput) => {
-      const { path, publicUrl } = await copyFile('products', 'coops', image.path, image.path)
+      const { path, publicUrl } = await copyFile(PRODUCTS_BUCKET, COOPS_BUCKET, image.path, image.path)
       imagesCopied.push({
         ...image,
         url: publicUrl,

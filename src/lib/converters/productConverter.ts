@@ -35,7 +35,7 @@ export const productDataConverter = () => {
       initialStock: initial_stock,
       unit,
       quantityPerUnit: quantity_per_unit,
-      images,
+      images: productImageDataConverter().convertAll(images),
       active,
       createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),

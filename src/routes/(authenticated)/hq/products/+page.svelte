@@ -81,7 +81,7 @@
 <div class="relative p-6">
   <!-- 좌측 필터 영역 -->
   <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
-    <input type="hidden" name="store_id" bind:value={$filterForm.storeId} />
+    <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
     <div class="flex flex-col">
       <div class="flex items-center gap-5">
         <!-- 날짜 필터 -->
@@ -89,7 +89,7 @@
           <div class="flex items-center gap-2">
             <input
               type="date"
-              name="date_from"
+              name="dateFrom"
               bind:value={$filterForm.dateFrom}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
               class:border-primary-500={$filterForm.dateFrom}
@@ -100,7 +100,7 @@
             <span class="text-surface-400">~</span>
             <input
               type="date"
-              name="date_to"
+              name="dateTo"
               bind:value={$filterForm.dateTo}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
               class:border-primary-500={$filterForm.dateTo}
@@ -114,7 +114,7 @@
         <!-- 카테고리 필터 -->
         <select
           class="border-surface-100 focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          name="category_id"
+          name="categoryId"
           bind:value={$filterForm.categoryId}
         >
           <option value={undefined} selected>전체</option>
@@ -127,7 +127,7 @@
 
         <input
           type="text"
-          name="product_name"
+          name="productName"
           bind:value={$filterForm.productName}
           placeholder="상품명 검색"
           class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"

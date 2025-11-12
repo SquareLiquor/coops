@@ -61,7 +61,7 @@
   </div>
 {/if}
 <form method="POST" use:enhance class="flex h-full flex-1 flex-col">
-  <input type="hidden" name="store_id" value={$form.storeId} />
+  <input type="hidden" name="storeId" value={$form.storeId} />
   <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
     <div class="flex items-center space-x-4">
       <h1 class="text-surface-900 text-2xl font-bold">상품 등록</h1>
@@ -127,7 +127,7 @@
                 options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleAddNewCategory }}
                 disabled={!$form.product.originId}
               />
-              <input type="hidden" name="category_id" bind:value={$form.categoryId} />
+              <input type="hidden" name="categoryId" bind:value={$form.categoryId} />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors?.categoryId}
                   <span class="text-xs text-red-500">{$errors?.categoryId}</span>
@@ -171,13 +171,13 @@
                   <option value={status.code}>{status.label}</option>
                 {/each}
               </select>
-              <input type="hidden" name="category_id" bind:value={$form.status} />
+              <input type="hidden" name="categoryId" bind:value={$form.status} />
             </label>
             <label class="label flex flex-col">
               <span class="label-text text-sm">판매일자</span>
               <input
                 type="date"
-                name="sale_date"
+                name="saleDate"
                 placeholder="판매일자"
                 class="input placeholder-surface-200 w-full"
                 bind:value={$form.salesDate}
@@ -225,7 +225,7 @@
             <label class="label">
               <span class="label-text text-sm">판매 가능 수량</span>
               <input
-                name="initial_stock"
+                name="maxQuantity"
                 class="input placeholder-surface-200 w-full text-right"
                 type="number"
                 bind:value={$form.maxQuantity}
@@ -261,7 +261,6 @@
             <label class="label">
               <span class="label-text text-sm">단위 별 수량</span>
               <input
-                name="initial_stock"
                 class="input placeholder-surface-200 w-full"
                 type="number"
                 bind:value={$form.product.quantityPerUnit}
