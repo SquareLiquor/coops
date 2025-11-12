@@ -13,7 +13,7 @@ import type { PageServerLoad } from './$types'
 const { convert } = productDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
-  const { store } = await parent()
+  const { store, hqStore } = await parent()
 
   const initialCoopValues = getInitialCoopValues(store!.id)
   const form = await superValidate(initialCoopValues, valibot(CoopCreateSchema), { errors: false })
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ parent }) => {
   const unitTypes = [...Object.values(UnitType)]
   const salesStatuses = [...Object.values(SalesStatus)]
 
-  return { form, categories, unitTypes, salesStatuses }
+  return { form, categories, unitTypes, salesStatuses, hqStore }
 }
 
 export const actions: Actions = {

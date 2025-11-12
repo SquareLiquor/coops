@@ -72,7 +72,14 @@ export const productImageDataConverter = () => {
   const convertAll = (datas: any[]): ImageData[] | [] => {
     if (!datas) return []
 
-    return datas.map(convert).filter((item): item is ImageData => item !== null)
+    return datas
+      .map(convert)
+      .filter((item): item is ImageData => item !== null)
+      .sort((a, b) => {
+        if (a.representative && !b.representative) return -1
+        if (!a.representative && b.representative) return 1
+        return a.sortOrder - b.sortOrder
+      })
   }
 
   return { convert, convertAll }

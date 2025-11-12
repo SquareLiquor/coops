@@ -13,7 +13,7 @@
   let { data }: PageProps = $props()
   let { categories, statuses } = data
   let products: ProductData[] = $state([])
-  let selectedProductId: string | null = $state(null)
+  let selectedProduct: ProductData | null = $state(null)
   let debouncedFilterSubmit: ReturnType<typeof debounce>
 
   onMount(async () => {
@@ -201,7 +201,7 @@
               <button
                 type="button"
                 class="text-primary-500 m-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium hover:underline"
-                onclick={() => (selectedProductId = product.id)}
+                onclick={() => (selectedProduct = product)}
               >
                 {product.name}
               </button>
@@ -250,6 +250,6 @@
   </div>
 </div>
 
-{#if selectedProductId}
-  <ProductDetailModal productId={selectedProductId} onClose={() => (selectedProductId = null)} />
+{#if selectedProduct}
+  <ProductDetailModal product={selectedProduct} onClose={() => (selectedProduct = null)} />
 {/if}

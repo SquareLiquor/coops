@@ -1,3 +1,5 @@
+import type { ImageData } from './image'
+
 export interface CategoryData {
   id: string
   storeId: string
@@ -22,17 +24,6 @@ export interface ProductData {
   quantityPerUnit: number
   images: ImageData[]
   active: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export interface ImageData {
-  id: string
-  productId: string
-  url: string
-  path: string
-  representative: boolean
-  sortOrder: number
   createdAt: string
   updatedAt: string
 }

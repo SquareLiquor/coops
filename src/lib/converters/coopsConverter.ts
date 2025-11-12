@@ -23,6 +23,7 @@ export const coopDataConverter = () => {
       max_quantity,
       current_quantity = 0,
       status,
+      images,
       created_at,
       updated_at,
     } = data
@@ -31,6 +32,7 @@ export const coopDataConverter = () => {
       id,
       name,
       description,
+      images: coopImageDataConverter().convertAll(images),
       storeId: store_id,
       store: storeDataConverter().convert(store),
       productId: product_id,
@@ -46,6 +48,7 @@ export const coopDataConverter = () => {
       currentQuantity: current_quantity ?? 0,
       remainingQuantity: Math.max(max_quantity - current_quantity, 0),
       progress: Math.min(Math.round((current_quantity / max_quantity) * 100), 100),
+
       createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
@@ -55,6 +58,40 @@ export const coopDataConverter = () => {
     if (!datas) return []
 
     return datas.map(convert).filter((item): item is CoopData => item !== null)
+  }
+
+  return { convert, convertAll }
+}
+
+export const coopImageDataConverter = () => {
+  const convert = (data: any): ImageData | undefined => {
+    if (!data) return undefined
+
+    const { id, product_id, url, path, representative, sort_order, created_at, updated_at } = data
+
+    return {
+      id,
+      productId: product_id,
+      url,
+      path,
+      representative,
+      sortOrder: sort_order,
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    }
+  }
+
+  const convertAll = (datas: any[]): ImageData[] | [] => {
+    if (!datas) return []
+
+    return datas
+      .map(convert)
+      .filter((item): item is ImageData => item !== null)
+      .sort((a, b) => {
+        if (a.representative && !b.representative) return -1
+        if (!a.representative && b.representative) return 1
+        return a.sortOrder - b.sortOrder
+      })
   }
 
   return { convert, convertAll }

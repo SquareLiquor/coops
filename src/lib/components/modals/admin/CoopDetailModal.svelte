@@ -1,89 +1,131 @@
 <script lang="ts">
-  import type { CoopData } from '$lib/types/entities/coop'
+  import { goto } from '$app/navigation'
+  import Carousel from '$lib/components/ui/Carousel.svelte'
+  import type { CoopData } from '$lib/types'
+
   let { coop, onClose }: { coop: CoopData | null; onClose: () => void } = $props()
+
+  function handleEdit() {
+    goto(`/admin/coops/${coop?.id}`)
+    onClose()
+  }
 </script>
 
-{#if coop}
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="relative mx-auto flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl">
-      <!-- 헤더 -->
-      <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
-        <h2 class="text-surface-900 text-xl font-bold">판매상품 상세정보 (TODO: 디자인 개선)</h2>
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+  role="dialog"
+  tabindex="0"
+  onkeydown={(e) => {
+    if (e.key === 'Escape') {
+      onClose()
+    }
+  }}
+  onclick={(e) => {
+    // 오버레이 클릭 시 닫기, 내부 section 클릭은 stopPropagation
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }}
+>
+  <section class="relative max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-lg bg-white shadow-xl" role="document">
+    <!-- 헤더 -->
+    <div class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
+      <div class="flex items-center space-x-3">
+        <h2 class="text-xl font-semibold text-gray-900">상품 상세정보</h2>
+      </div>
+
+      <div class="flex items-center space-x-2">
         <button
           type="button"
-          class="text-xl text-gray-400 hover:text-gray-600 focus:outline-none"
-          onclick={onClose}
-          aria-label="닫기"
+          class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          onclick={handleEdit}
         >
-          &times;
+          편집
+        </button>
+        <button
+          type="button"
+          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
+          onclick={onClose}
+        >
+          닫기
         </button>
       </div>
-      <!-- 본문 -->
-      <div class="flex flex-col gap-6 overflow-y-auto p-6 md:flex-row">
-        <!-- 좌측: 기본정보 -->
-        <section class="border-surface-100 mb-4 min-w-[220px] flex-1 rounded-lg border bg-white p-4 md:mb-0">
-          <h3 class="mb-2 text-lg font-semibold">기본정보</h3>
-          <hr class="hr mb-3" />
-          <div class="mb-2">
-            <div class="text-surface-900 mb-1 text-base font-bold">{coop.name}</div>
-            <div class="text-surface-400 mb-1 text-xs">카테고리: {coop.product?.category?.name}</div>
-          </div>
-          <div>
-            <div class="label-text mb-1 text-xs font-medium">상세정보</div>
-            <div class="border-surface-100 bg-surface-50 min-h-[80px] rounded border p-3 text-sm">
-              {@html coop.description}
-            </div>
-          </div>
-        </section>
-        <!-- 우측: 판매 정보 -->
-        <section class="border-surface-100 min-w-[220px] flex-1 rounded-lg border bg-white p-4">
-          <h3 class="mb-2 text-lg font-semibold">판매 정보</h3>
-          <hr class="hr mb-3" />
-          <div class="mb-2 grid grid-cols-2 gap-2">
-            <div>
-              <div class="label-text mb-1 text-xs font-medium">상태</div>
-              <div class="input bg-surface-50 border-surface-200 cursor-default">{coop.status?.label}</div>
-            </div>
-            <div>
-              <div class="label-text mb-1 text-xs font-medium">가격</div>
-              <div class="input bg-surface-50 border-surface-200 cursor-default">
-                {coop.salesPrice?.toLocaleString()}원
-              </div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <div class="label-text mb-1 text-xs font-medium">판매일</div>
-              <div class="input bg-surface-50 border-surface-200 cursor-default">{coop.salesDate}</div>
-            </div>
-            <div>
-              <div class="label-text mb-1 text-xs font-medium">진행률</div>
-              <div class="input bg-surface-50 border-surface-200 cursor-default">
-                {coop.currentQuantity} / {coop.maxQuantity}
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
     </div>
-  </div>
-{/if}
+    <!-- 스크롤 가능한 본문 -->
+    <div class="max-h-[calc(90vh-80px)] overflow-y-auto">
+      {#if coop}
+        <!-- 공동구매 정보 -->
+        <div class="p-6">
+          <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <!-- 좌측: 이미지 -->
+            <div class="space-y-4">
+              {#if coop.images && coop.images.length > 0}
+                <div class="relative aspect-square overflow-hidden rounded-lg">
+                  <Carousel images={coop.images} />
+                </div>
+              {:else}
+                <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                  <div class="flex h-full items-center justify-center">
+                    <span class="text-6xl">📦</span>
+                  </div>
+                </div>
+              {/if}
+            </div>
 
-<style>
-  .hr {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 0;
-  }
-  .input {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: #f9fafb;
-    color: #222;
-    font-size: 0.95rem;
-    min-height: 2.25rem;
-    display: flex;
-    align-items: center;
-  }
-</style>
+            <!-- 우측: 공동구매 정보 -->
+            <div class="space-y-6">
+              <div>
+                <h1 class="mb-2 text-2xl font-bold text-gray-900">{coop.name}</h1>
+                <div class="space-y-1 text-gray-600">
+                  <div>카테고리: <span class="font-medium">{coop.category?.name || '미분류'}</span></div>
+                  <div>
+                    등록일: <span class="font-medium">{new Date(coop.createdAt).toLocaleDateString('ko-KR')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-3 rounded-lg bg-gray-50 p-4">
+                <h3 class="font-semibold text-gray-900">가격 정보</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <div class="text-sm text-gray-500">판매 가격</div>
+                    <div class="text-xl font-bold text-gray-900">
+                      {new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
+                        coop.salesPrice || 0
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-500">원가</div>
+                    <div class="text-lg font-semibold text-gray-700">
+                      {new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
+                        coop.product?.price || 0
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <div class="text-sm text-gray-500">판매일</div>
+                    <div class="font-medium">{coop.salesDate}</div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-500">최대 수량</div>
+                    <div class="font-medium">{coop.maxQuantity?.toLocaleString()}개</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500">진행 현황</div>
+                  <div class="font-medium">
+                    {coop.currentQuantity} / {coop.maxQuantity}
+                    <span class="text-sm text-gray-500">({coop.progress}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {/if}
+    </div>
+  </section>
+</div>

@@ -1,35 +1,12 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import Carousel from '$lib/components/ui/Carousel.svelte'
-  import { getProductById } from '$lib/supabase'
   import type { ProductData } from '$lib/types'
-  import { onMount } from 'svelte'
 
-  let { productId, onClose }: { productId: string; onClose: () => void } = $props()
-
-  let product: ProductData | null = $state(null)
-  let loading = $state(true)
-  let error = $state(false)
-
-  onMount(async () => {
-    try {
-      loading = true
-      const result = await getProductById(productId)
-      if (result.product) {
-        product = result.product
-      } else {
-        error = true
-      }
-    } catch (err) {
-      console.error('상품 조회 오류:', err)
-      error = true
-    } finally {
-      loading = false
-    }
-  })
+  let { product, onClose }: { product: ProductData | null; onClose: () => void } = $props()
 
   function handleEdit() {
-    goto(`/hq/products/${productId}`)
+    goto(`/hq/products/${product?.id}`)
     onClose()
   }
 </script>
@@ -56,17 +33,6 @@
     <div class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
       <div class="flex items-center space-x-3">
         <h2 class="text-xl font-semibold text-gray-900">상품 상세정보</h2>
-        {#if product}
-          <span
-            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-            class:bg-green-100={product.active}
-            class:text-green-800={product.active}
-            class:bg-red-100={!product.active}
-            class:text-red-800={!product.active}
-          >
-            {product.active ? '판매중' : '판매중지'}
-          </span>
-        {/if}
       </div>
 
       <div class="flex items-center space-x-2">
@@ -74,7 +40,6 @@
           type="button"
           class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           onclick={handleEdit}
-          disabled={loading || error}
         >
           편집
         </button>
@@ -90,24 +55,7 @@
 
     <!-- 스크롤 가능한 본문 -->
     <div class="max-h-[calc(90vh-80px)] overflow-y-auto">
-      {#if loading}
-        <!-- 로딩 상태 -->
-        <div class="flex items-center justify-center p-12">
-          <div class="text-center">
-            <div class="border-primary-600 mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-            <div class="text-gray-600">상품 정보를 불러오는 중...</div>
-          </div>
-        </div>
-      {:else if error}
-        <!-- 에러 상태 -->
-        <div class="flex items-center justify-center p-12">
-          <div class="text-center">
-            <div class="mb-4 text-4xl text-red-500">⚠️</div>
-            <div class="mb-2 font-medium text-gray-900">상품 정보를 불러올 수 없습니다</div>
-            <div class="text-sm text-gray-600">잠시 후 다시 시도해주세요.</div>
-          </div>
-        </div>
-      {:else if product}
+      {#if product}
         <!-- 상품 정보 -->
         <div class="p-6">
           <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -171,15 +119,6 @@
                   <div class="font-medium">{product.initialStock?.toLocaleString()}개</div>
                 </div>
               </div>
-
-              {#if product.description}
-                <div>
-                  <h3 class="mb-2 font-semibold text-gray-900">상품 설명</h3>
-                  <div class="prose max-w-none rounded-lg bg-gray-50 p-4 text-sm leading-relaxed text-gray-700">
-                    {@html product.description}
-                  </div>
-                </div>
-              {/if}
             </div>
           </div>
         </div>

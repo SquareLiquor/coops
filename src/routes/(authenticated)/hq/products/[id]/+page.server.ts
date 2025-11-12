@@ -71,20 +71,20 @@ const updateProduct = async (supabase: SupabaseClient, formData: ProductUpdateIn
 }
 
 const updateProductImages = async (supabase: SupabaseClient, productId: string, images: ImageInput[]) => {
-  // 기존 이미지 삭제
   const { error: deleteError } = await supabase.from('product_images').delete().eq('product_id', productId)
 
   if (deleteError) throw deleteError
 
-  // 새 이미지 추가
   const { error: insertError } = await supabase.from('product_images').insert(
-    images.map((image, index) => ({
-      product_id: productId,
-      url: image.url,
-      path: image.path,
-      representative: image.representative,
-      sort_order: index,
-    }))
+    images
+      .filter((image) => image.use)
+      .map((image, index) => ({
+        product_id: productId,
+        url: image.url,
+        path: image.path,
+        representative: image.representative,
+        sort_order: index,
+      }))
   )
 
   if (insertError) throw insertError

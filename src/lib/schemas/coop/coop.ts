@@ -61,3 +61,50 @@ export const getInitialCoopValues = (storeId: string) => {
     salesDate: dayjs().format('YYYY-MM-DD'),
   }
 }
+
+export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
+  const {
+    id,
+    storeId,
+    productId,
+    categoryId,
+    name,
+    description,
+    status,
+    maxQuantity,
+    salesPrice,
+    salesDate,
+    product,
+    images,
+  } = coop
+
+  console.log(coop)
+  return {
+    id,
+    storeId,
+    product_id: productId,
+    categoryId,
+    name,
+    description,
+    status: status?.code || status,
+    maxQuantity,
+    salesPrice,
+    salesDate: dayjs(salesDate).format('YYYY-MM-DD'),
+    product: {
+      originId: product.originId || product.id,
+      price: product.price,
+      unit: product.unit,
+      quantityPerUnit: product.quantityPerUnit,
+    },
+    images:
+      images?.map((image: any) => ({
+        id: image.id,
+        url: image.url,
+        path: image.path,
+        representative: image.representative,
+        sortOrder: image.sortOrder,
+        use: true,
+        new: false,
+      })) || [],
+  }
+}
