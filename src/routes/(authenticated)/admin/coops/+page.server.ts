@@ -1,5 +1,5 @@
 import { coopDataConverter } from '$lib/converters'
-import { CoopsFilterSchema, getInitialProductsFilterValues } from '$lib/schemas'
+import { CoopsFilterSchema, getInitialCoopsFilterValues as getInitialFilter } from '$lib/schemas'
 import { getCategories } from '$lib/supabase'
 import { SalesStatus } from '$lib/types'
 import { superValidate } from 'sveltekit-superforms'
@@ -18,10 +18,10 @@ const coopSelectQuery = `
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
-  const initialFilterValues = getInitialProductsFilterValues(store?.id)
-  const filterForm = await superValidate(initialFilterValues, valibot(CoopsFilterSchema))
+  const initialFilter = getInitialFilter(store!.id)
+  const filterForm = await superValidate(initialFilter, valibot(CoopsFilterSchema))
 
-  const { categories } = await getCategories(store?.id)
+  const { categories } = await getCategories(store!.id)
 
   const salesStatuses = [{ code: undefined, label: '전체' }, ...Object.values(SalesStatus)]
 
@@ -35,21 +35,20 @@ export const load: PageServerLoad = async ({ parent }) => {
 export const actions: Actions = {
   fetch: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(CoopsFilterSchema))
-    const { store_id, category_id, name, status, date_from, date_to } = form.data
-
     if (!form.valid) return { form }
 
+    const { storeId, categoryId, name, status, dateFrom, dateTo } = form.data
     const query = supabase
       .from('coops')
       .select(coopSelectQuery)
-      .eq('store_id', store_id)
-      .order('created_at', { ascending: false })
+      .eq('store_id', storeId)
+      .order('sales_date', { ascending: false })
 
-    if (category_id) query.eq('category_id', category_id)
+    if (categoryId) query.eq('category_id', categoryId)
     if (name) query.ilike('name', `%${name}%`)
     if (status) query.eq('status', status)
-    if (date_from) query.gte('created_at', date_from)
-    if (date_to) query.lte('created_at', date_to)
+    if (dateFrom) query.gte('sales_date', dateFrom)
+    if (dateTo) query.lte('sales_date', dateTo)
 
     const { data, error } = await query
 

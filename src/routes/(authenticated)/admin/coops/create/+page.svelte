@@ -7,7 +7,7 @@
   import { convertProductToCoop } from '$lib/converters'
   import { CoopCreateSchema } from '$lib/schemas'
   import { createCategory } from '$lib/supabase'
-  import type { ProductData, ProductImageData } from '$lib/types'
+  import type { ImageData, ProductData } from '$lib/types'
   import { type ActionResult } from '@sveltejs/kit'
   import { superForm } from 'sveltekit-superforms'
   import { valibot } from 'sveltekit-superforms/adapters'
@@ -39,17 +39,14 @@
 
     if (!!category) {
       categories = [...categories, category].sort((a, b) => a.name.localeCompare(b.name))
-      $form.category_id = category.id
+      $form.categoryId = category.id
     }
   }
 
-  const handleSelectProduct = ({ product, images }: { product: ProductData; images: ProductImageData[] }) => {
+  const handleSelectProduct = ({ product, images }: { product: ProductData; images: ImageData[] }) => {
     $form = {
       ...$form,
-      name: product.name,
-      description: product.description,
-      sales_price: product.price,
-      product: convertProductToCoop({ product, images }),
+      ...convertProductToCoop({ product, images }),
     }
   }
 </script>
@@ -64,7 +61,7 @@
   </div>
 {/if}
 <form method="POST" use:enhance class="flex h-full flex-1 flex-col">
-  <input type="hidden" name="store_id" value={$form.store_id} />
+  <input type="hidden" name="store_id" value={$form.storeId} />
   <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
     <div class="flex items-center space-x-4">
       <h1 class="text-surface-900 text-2xl font-bold">상품 등록</h1>
@@ -76,7 +73,7 @@
         class="btn btn-sm bg-primary-100 text-primary-700 border-primary-200 ml-2 rounded border px-2 py-1"
         onclick={() => (productMappingModalOpen = true)}
       >
-        본사 상품 불러오기
+        상품 정보 가져오기
       </button>
     </div>
 
@@ -113,7 +110,7 @@
                 class="input placeholder-surface-200 w-full"
                 bind:value={$form.name}
                 placeholder="상품명"
-                disabled={!$form.product.origin_id}
+                disabled={!$form.product.originId}
                 {...$constraints.name}
               />
               <div class="mt-1 min-h-[20px]">
@@ -125,15 +122,15 @@
             <label class="label col-span-2 flex flex-col">
               <span class="label-text text-sm">카테고리</span>
               <Combobox
-                bind:selected={$form.category_id}
+                bind:selected={$form.categoryId}
                 data={categories}
                 options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleAddNewCategory }}
-                disabled={!$form.product.origin_id}
+                disabled={!$form.product.originId}
               />
-              <input type="hidden" name="category_id" bind:value={$form.category_id} />
+              <input type="hidden" name="category_id" bind:value={$form.categoryId} />
               <div class="mt-1 min-h-[20px]">
-                {#if $errors?.category_id}
-                  <span class="text-xs text-red-500">{$errors?.category_id}</span>
+                {#if $errors?.categoryId}
+                  <span class="text-xs text-red-500">{$errors?.categoryId}</span>
                 {/if}
               </div>
             </label>
@@ -141,14 +138,9 @@
           <label class="label flex min-h-0 flex-1 flex-col">
             <span class="label-text text-sm">상세정보</span>
             <div class="h-full min-h-0 flex-1">
-              <Editor bind:description={$form.description} disabled={!$form.product.origin_id} />
+              <Editor bind:description={$form.description} disabled={!$form.product.originId} />
             </div>
-            <input
-              type="hidden"
-              name="description"
-              bind:value={$form.description}
-              disabled={!$form.product.origin_id}
-            />
+            <input type="hidden" name="description" bind:value={$form.description} disabled={!$form.product.originId} />
             <div class="mt-1 min-h-[20px]">
               {#if $errors.description}
                 <span class="text-xs text-red-500">{$errors.description}</span>
@@ -172,7 +164,7 @@
                 name="unit"
                 class="select h-9 w-full px-3 align-middle"
                 bind:value={$form.status}
-                disabled={!$form.product.origin_id}
+                disabled={!$form.product.originId}
                 {...$constraints.status}
               >
                 {#each salesStatuses as status}
@@ -188,13 +180,13 @@
                 name="sale_date"
                 placeholder="판매일자"
                 class="input placeholder-surface-200 w-full"
-                bind:value={$form.sales_date}
-                disabled={!$form.product.origin_id}
-                {...$constraints.sales_date}
+                bind:value={$form.salesDate}
+                disabled={!$form.product.originId}
+                {...$constraints.salesDate}
               />
               <div class="mt-1 min-h-[20px]">
-                {#if $errors.sales_date}
-                  <span class="text-xs text-red-500">{$errors.sales_date}</span>
+                {#if $errors.salesDate}
+                  <span class="text-xs text-red-500">{$errors.salesDate}</span>
                 {/if}
               </div>
             </label>
@@ -206,15 +198,15 @@
                 name="price"
                 class="input placeholder-surface-200 w-full text-right"
                 type="number"
-                bind:value={$form.sales_price}
+                bind:value={$form.salesPrice}
                 min="0"
                 placeholder="가격"
-                disabled={!$form.product.origin_id}
-                {...$constraints.sales_price}
+                disabled={!$form.product.originId}
+                {...$constraints.salesPrice}
               />
               <div class="mt-1 min-h-[20px]">
-                {#if $errors.sales_price}
-                  <span class="text-xs text-red-500">{$errors.sales_price}</span>
+                {#if $errors.salesPrice}
+                  <span class="text-xs text-red-500">{$errors.salesPrice}</span>
                 {/if}
               </div>
             </label>
@@ -236,15 +228,15 @@
                 name="initial_stock"
                 class="input placeholder-surface-200 w-full text-right"
                 type="number"
-                bind:value={$form.max_quantity}
+                bind:value={$form.maxQuantity}
                 min="0"
                 placeholder="판매 가능 수량"
-                disabled={!$form.product.origin_id}
-                {...$constraints.max_quantity}
+                disabled={!$form.product.originId}
+                {...$constraints.maxQuantity}
               />
               <div class="mt-1 min-h-[20px]">
-                {#if $errors.max_quantity}
-                  <span class="text-xs text-red-500">{$errors.max_quantity}</span>
+                {#if $errors.maxQuantity}
+                  <span class="text-xs text-red-500">{$errors.maxQuantity}</span>
                 {/if}
               </div>
             </label>
@@ -256,8 +248,8 @@
                 name="unit"
                 class="select h-9 w-full px-3 align-middle"
                 bind:value={$form.product.unit}
-                disabled={!$form.product.origin_id}
-                onchange={() => ($form.product.quantity_per_unit = 1)}
+                disabled={!$form.product.originId}
+                onchange={() => ($form.product.quantityPerUnit = 1)}
                 {...$constraints.product?.unit}
               >
                 <option value="" disabled selected>선택</option>
@@ -272,11 +264,11 @@
                 name="initial_stock"
                 class="input placeholder-surface-200 w-full"
                 type="number"
-                bind:value={$form.product.quantity_per_unit}
-                disabled={!$form.product.origin_id || $form.product.unit === 'EA'}
+                bind:value={$form.product.quantityPerUnit}
+                disabled={!$form.product.originId || $form.product.unit === 'EA'}
                 min="0"
                 placeholder="단위 당 수량"
-                {...$constraints.product?.quantity_per_unit}
+                {...$constraints.product?.quantityPerUnit}
               />
             </label>
           </div>
@@ -287,11 +279,11 @@
         <hr class="hr my-4" />
         <label for="product-images" class="text-surface-700 block font-medium">
           <FileUploader
-            bind:images={$form.product.images}
-            options={{ maxFiles: 5, removeable: false }}
-            disabled={!$form.product.origin_id}
+            bind:images={$form.images}
+            options={{ maxFiles: 5, removeable: false, bucket: 'coops' }}
+            disabled={!$form.product.originId}
           />
-          <input type="hidden" name="images" bind:value={$form.product.images} disabled={!$form.product.origin_id} />
+          <input type="hidden" name="images" bind:value={$form.images} disabled={!$form.product.originId} />
         </label>
       </section>
     </div>

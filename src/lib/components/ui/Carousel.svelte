@@ -1,10 +1,10 @@
 <script lang="ts">
   import { browser } from '$app/environment'
-  import type { ProductImageData } from '$lib/types'
+  import type { ImageData } from '$lib/types'
   import Carousel from 'svelte-carousel'
 
   let carousel = $state<InstanceType<typeof Carousel> | null>(null)
-  let { images }: { images: ProductImageData[] } = $props()
+  let { images }: { images: ImageData[] } = $props()
 </script>
 
 {#if browser}

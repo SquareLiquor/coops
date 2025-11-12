@@ -15,10 +15,10 @@ const { convert } = productDataConverter()
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
-  const initialCoopValues = getInitialCoopValues(store?.id)
+  const initialCoopValues = getInitialCoopValues(store!.id)
   const form = await superValidate(initialCoopValues, valibot(CoopCreateSchema), { errors: false })
 
-  const { categories } = await getCategories(store?.id)
+  const { categories } = await getCategories(store!.id)
   const unitTypes = [...Object.values(UnitType)]
   const salesStatuses = [...Object.values(SalesStatus)]
 
@@ -32,12 +32,16 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      const { shared } = await createCoopHook.runBefore({ coop: form.data, product: form.data.product })
+      const { shared } = await createCoopHook.runBefore({ coop: form.data })
 
       const { data } = await createCoop(supabase, form.data, shared.get('productId'))
+      shared.set('coopId', data.id)
+
+      await createCoopHook.runAfter({ images: form.data.images })
 
       return { form }
     } catch (error) {
+      console.log('error', error)
       if (isAppError(error)) {
         error.errorHandler()
         await createCoopHook.runCleanup({})
@@ -47,19 +51,19 @@ export const actions: Actions = {
   },
 }
 
-const createCoop = async (supabase: SupabaseClient, formData: CoopCreateInput, product_id: string) => {
-  const { store_id, name, category_id, status, max_quantity, sales_price, sales_date, description } = formData
+const createCoop = async (supabase: SupabaseClient, formData: CoopCreateInput, productId: string) => {
+  const { storeId, name, categoryId, status, maxQuantity, salesPrice, salesDate, description } = formData
 
   const { data, error } = await supabase
     .from('coops')
     .insert({
-      store_id,
-      product_id,
-      category_id,
+      store_id: storeId,
+      product_id: productId,
+      category_id: categoryId,
       status,
-      max_quantity,
-      sales_price,
-      sales_date,
+      max_quantity: maxQuantity,
+      sales_price: salesPrice,
+      sales_date: salesDate,
       name,
       description,
     })

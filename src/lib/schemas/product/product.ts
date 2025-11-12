@@ -1,14 +1,6 @@
+import type { ProductData } from '$lib/types'
 import * as v from 'valibot'
-
-export const ProductImagesSchema = v.pipe(
-  v.object({
-    id: v.optional(v.string()),
-    url: v.string(),
-    representative: v.boolean(),
-    sort_order: v.number(),
-    toDelete: v.optional(v.boolean(), false),
-  })
-)
+import { ImageSchema } from '../common/image'
 
 export const ProductSchema = v.pipe(
   v.object({
@@ -20,7 +12,7 @@ export const ProductSchema = v.pipe(
     price: v.pipe(v.number()),
     unit: v.string(),
     quantity_per_unit: v.pipe(v.number()),
-    images: v.array(ProductImagesSchema),
+    images: v.array(ImageSchema),
     active: v.optional(v.boolean()),
   })
 )
@@ -41,7 +33,6 @@ export const ProductUpdateSchema = v.pipe(
 
 export type ProductCreateInput = v.InferInput<typeof ProductCreateSchema>
 export type ProductUpdateInput = v.InferInput<typeof ProductUpdateSchema>
-export type ProductImagesInput = v.InferInput<typeof ProductImagesSchema>
 
 export const createInitialProductValues = (store_id: string | undefined) => {
   if (!store_id) return {}
@@ -56,5 +47,27 @@ export const createInitialProductValues = (store_id: string | undefined) => {
     unit: 'EA',
     quantity_per_unit: 1,
     images: [],
+  }
+}
+
+export const productDataToUpdateInput = (product: ProductData): ProductUpdateInput => {
+  const { id, store_id, category_id, name, description, price, unit, quantity_per_unit, images, active } = product
+
+  return {
+    id,
+    store_id,
+    category_id,
+    name,
+    description,
+    price,
+    unit,
+    quantity_per_unit,
+    images: images.map((image) => ({
+      id: image.id,
+      url: image.url,
+      representative: image.representative,
+      sortOrder: image.sortOrder,
+    })),
+    active: product.active,
   }
 }

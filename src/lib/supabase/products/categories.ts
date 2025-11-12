@@ -14,14 +14,12 @@ export type CategoryInput = v.InferInput<typeof categorySchema>
 
 const { convert, convertAll } = categoryDataConverter()
 
-export const getCategories = async (store_id: string | undefined) => {
-  if (!store_id) return { categories: [] }
-
+export const getCategories = async (storeId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
   const { data, error } = await supabase
     .from('categories')
     .select('*')
-    .eq('store_id', store_id)
+    .eq('store_id', storeId)
     .order('name', { ascending: true })
 
   if (error) return { categories: [] }

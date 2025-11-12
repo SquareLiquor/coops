@@ -16,6 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
   }
 
   // 수정용 폼 데이터 준비
+  // product data to input
   const productFormData = {
     id: product.id,
     store_id: product.store_id,

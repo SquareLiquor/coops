@@ -20,18 +20,19 @@ export interface ProductData {
   initial_stock: number
   unit: string
   quantity_per_unit: number
-  images: ProductImageData[]
+  images: ImageData[]
   active: boolean
   created_at: string
   updated_at: string
 }
 
-export interface ProductImageData {
+export interface ImageData {
   id: string
-  product_id: string
+  productId: string
   url: string
+  path: string
   representative: boolean
-  sort_order: number
+  sortOrder: number
   created_at: string
   updated_at: string
 }

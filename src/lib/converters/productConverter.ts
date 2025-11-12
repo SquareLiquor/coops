@@ -1,4 +1,4 @@
-import type { CategoryData, ProductData, ProductImageData } from '$lib/types'
+import type { CategoryData, ImageData, ProductData } from '$lib/types'
 import dayjs from 'dayjs'
 
 export const productDataConverter = () => {
@@ -52,26 +52,26 @@ export const productDataConverter = () => {
 }
 
 export const productImageDataConverter = () => {
-  const convert = (data: any): ProductImageData | undefined => {
+  const convert = (data: any): ImageData | undefined => {
     if (!data) return undefined
 
     const { id, product_id, url, representative, sort_order, created_at, updated_at } = data
 
     return {
       id,
-      product_id,
+      productId: product_id,
       url,
       representative,
-      sort_order,
+      sortOrder: sort_order,
       created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
       updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 
-  const convertAll = (datas: any[]): ProductImageData[] | [] => {
+  const convertAll = (datas: any[]): ImageData[] | [] => {
     if (!datas) return []
 
-    return datas.map(convert).filter((item): item is ProductImageData => item !== null)
+    return datas.map(convert).filter((item): item is ImageData => item !== null)
   }
 
   return { convert, convertAll }

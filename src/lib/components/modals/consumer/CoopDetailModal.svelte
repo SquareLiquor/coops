@@ -1,6 +1,6 @@
 <script lang="ts">
   import Carousel from '$lib/components/ui/Carousel.svelte'
-  import type { CoopData, ProductImageData } from '$lib/types'
+  import type { CoopData, ImageData } from '$lib/types'
   import { onMount } from 'svelte'
 
   let { selectedCoopId = $bindable(), coops }: { selectedCoopId: string | null; coops: CoopData[] } = $props()
@@ -9,11 +9,11 @@
     return coops.find((c) => c.id === selectedCoopId)!
   })
 
-  let images: ProductImageData[] = $derived.by(() => {
+  let images: ImageData[] = $derived.by(() => {
     return coop.product.images.slice().sort((a, b) => {
       if (a.representative && !b.representative) return -1
       if (!a.representative && b.representative) return 1
-      return a.sort_order - b.sort_order
+      return a.sortOrder - b.sortOrder
     })
   })
 

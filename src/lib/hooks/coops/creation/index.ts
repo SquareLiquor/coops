@@ -1,9 +1,11 @@
 import { createHook } from '$lib/hooks/hooksManager'
 import type { CreateCoopHookContext } from '$lib/types'
-import { copyProductHook } from './copyProductHook'
-import { copyProductImagesHook } from './copyProductImagesHook'
+import { createCoopImagesHook } from './createCoopImagesHook'
+import { createProductHook } from './createProductHook'
+import { deleteCoopHook } from './deleteCoopHook'
 
 export const createCoopHook = createHook<CreateCoopHookContext>()
 
-createCoopHook.before(copyProductHook)
-createCoopHook.before(copyProductImagesHook)
+createCoopHook.cleanup(deleteCoopHook)
+createCoopHook.before(createProductHook)
+createCoopHook.after(createCoopImagesHook)

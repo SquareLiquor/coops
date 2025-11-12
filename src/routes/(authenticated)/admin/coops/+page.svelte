@@ -92,7 +92,7 @@
 </div>
 <div class="relative p-6">
   <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
-    <input type="hidden" name="store_id" bind:value={$filterForm.store_id} />
+    <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
 
     <div class="flex flex-col">
       <div class="flex items-center gap-4">
@@ -101,24 +101,24 @@
           <div class="flex items-center gap-2">
             <input
               type="date"
-              name="date_from"
-              bind:value={$filterForm.date_from}
+              name="dateFrom"
+              bind:value={$filterForm.dateFrom}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.date_from}
-              class:text-primary-700={$filterForm.date_from}
-              class:border-surface-100={!$filterForm.date_from}
-              {...$filterConstraints.date_from}
+              class:border-primary-500={$filterForm.dateFrom}
+              class:text-primary-700={$filterForm.dateFrom}
+              class:border-surface-100={!$filterForm.dateFrom}
+              {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
             <input
               type="date"
-              name="date_to"
-              bind:value={$filterForm.date_to}
+              name="dateTo"
+              bind:value={$filterForm.dateTo}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.date_to}
-              class:text-primary-700={$filterForm.date_to}
-              class:border-surface-100={!$filterForm.date_to}
-              {...$filterConstraints.date_to}
+              class:border-primary-500={$filterForm.dateTo}
+              class:text-primary-700={$filterForm.dateTo}
+              class:border-surface-100={!$filterForm.dateTo}
+              {...$filterConstraints.dateTo}
             />
           </div>
         </div>
@@ -126,8 +126,8 @@
         <!-- 카테고리 필터 -->
         <select
           class="border-surface-100 focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          name="category_id"
-          bind:value={$filterForm.category_id}
+          name="categoryId"
+          bind:value={$filterForm.categoryId}
         >
           <option value={undefined} selected>전체</option>
           {#each categories as category}
@@ -148,13 +148,13 @@
         />
       </div>
 
-      {#if $filterErrors.date_from || $filterErrors.date_to}
+      {#if $filterErrors.dateFrom || $filterErrors.dateTo}
         <div class="mt-1 flex flex-col gap-1">
-          {#if $filterErrors.date_from}
-            <div class="text-error-500 text-sm">{$filterErrors.date_from}</div>
+          {#if $filterErrors.dateFrom}
+            <div class="text-error-500 text-sm">{$filterErrors.dateFrom}</div>
           {/if}
-          {#if $filterErrors.date_to}
-            <div class="text-error-500 text-sm">{$filterErrors.date_to}</div>
+          {#if $filterErrors.dateTo}
+            <div class="text-error-500 text-sm">{$filterErrors.dateTo}</div>
           {/if}
         </div>
       {/if}
@@ -233,7 +233,6 @@
             </td>
             <td>
               <div class="text-surface-700 text-xs">{dayjs(coop.sales_date).format('YYYY-MM-DD')}</div>
-              <div class="text-surface-300 text-xs">{dayjs(coop.sales_date).format('HH:mm:ss')}</div>
             </td>
 
             <td class="px-4 py-4 text-center">

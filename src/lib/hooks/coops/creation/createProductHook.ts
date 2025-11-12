@@ -1,32 +1,33 @@
 import { SupabaseError } from '$lib/errors'
 import type { HookContext } from '$lib/hooks/hooksManager'
-import { createServerClient } from '$lib/supabase'
+import { createBrowserClient, createServerClient } from '$lib/supabase'
 import type { CreateCoopHookContext } from '$lib/types'
+import { isBrowser } from '@supabase/ssr'
 
 /**
  * copy product images
  * copy product
  */
-const copyProduct = async (context: CreateCoopHookContext, shared: any) => {
-  const supabase = createServerClient()
+const createProduct = async (context: CreateCoopHookContext, shared: any) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { coop, product } = context
-  const { store_id, name, category_id, sales_price, description } = coop || {}
-  const { origin_id } = product || {}
+  const { coop } = context
+  const { storeId, name, categoryId, salesPrice, description } = coop || {}
+  const { originId, unit, quantityPerUnit } = coop!.product || {}
 
   const { data: copiedData, error: copiedError } = await supabase
     .from('products')
     .insert([
       {
-        store_id,
-        origin_id,
-        category_id,
+        store_id: storeId,
+        origin_id: originId,
+        category_id: categoryId,
         name,
         description,
-        price: sales_price,
-        unit: 'EA',
+        price: salesPrice,
+        unit,
         initial_stock: 0,
-        quantity_per_unit: 1,
+        quantity_per_unit: quantityPerUnit,
         active: true,
       },
     ])
@@ -37,7 +38,7 @@ const copyProduct = async (context: CreateCoopHookContext, shared: any) => {
   shared.set('productId', copiedData?.id)
 }
 
-const deleteCopiedProduct = async (context: CreateCoopHookContext, shared: any) => {
+const deleteProduct = async (context: CreateCoopHookContext, shared: any) => {
   const supabase = createServerClient()
 
   // shared state에서 복사된 productId 가져오기
@@ -50,7 +51,7 @@ const deleteCopiedProduct = async (context: CreateCoopHookContext, shared: any) 
   if (error) throw new SupabaseError('Failed to delete product during cleanup')
 }
 
-export const copyProductHook: HookContext<CreateCoopHookContext> = {
-  hook: copyProduct,
-  cleanup: deleteCopiedProduct,
+export const createProductHook: HookContext<CreateCoopHookContext> = {
+  hook: createProduct,
+  cleanup: deleteProduct,
 }

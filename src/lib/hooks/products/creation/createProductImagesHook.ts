@@ -10,10 +10,11 @@ const createProductImages = async ({ product, productId }: CreateProductHookCont
 
   const { images = [] } = product || {}
   const { data, error } = await supabase.from('product_images').insert([
-    ...images.map((img, index) => ({
+    ...images.map((image, index) => ({
       product_id: productId,
-      url: img.url,
-      representative: img.representative,
+      url: image.url,
+      path: image.path,
+      representative: image.representative,
       sort_order: index,
     })),
   ])
