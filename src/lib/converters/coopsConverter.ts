@@ -31,23 +31,23 @@ export const coopDataConverter = () => {
       id,
       name,
       description,
-      store_id,
+      storeId: store_id,
       store: storeDataConverter().convert(store),
-      product_id,
+      productId: product_id,
       product: productDataConverter().convert(product),
-      category_id,
+      categoryId: category_id,
       category: categoryDataConverter().convert(category),
       status: lookupEnum(SalesStatus, status),
-      sales_price,
-      sales_date: dayjs(sales_date).format('YYYY-MM-DD HH:mm:ss'),
-      is_today: dayjs().isSame(dayjs(sales_date), 'day'),
-      remaining_time: dayjs(sales_date).diff(dayjs(), 'second').toString(),
-      max_quantity,
-      current_quantity: current_quantity ?? 0,
-      remaining_quantity: Math.max(max_quantity - current_quantity, 0),
+      salesPrice: sales_price,
+      salesDate: dayjs(sales_date).format('YYYY-MM-DD HH:mm:ss'),
+      isToday: dayjs().isSame(dayjs(sales_date), 'day'),
+      remainingTime: dayjs(sales_date).diff(dayjs(), 'second').toString(),
+      maxQuantity: max_quantity,
+      currentQuantity: current_quantity ?? 0,
+      remainingQuantity: Math.max(max_quantity - current_quantity, 0),
       progress: Math.min(Math.round((current_quantity / max_quantity) * 100), 100),
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 
@@ -64,7 +64,7 @@ export const coopDataConverter = () => {
  * 상품 데이터를
  */
 export const convertProductToCoop = ({ product, images }: { product: ProductData; images: ImageData[] }) => {
-  const { id, name, description, price, unit, quantity_per_unit } = product
+  const { id, name, description, price, unit, quantityPerUnit: quantity_per_unit } = product
 
   return {
     name,

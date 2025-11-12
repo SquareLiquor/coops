@@ -12,9 +12,9 @@ export const profileDataConverter = () => {
       name,
       email,
       phone,
-      profile_image,
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+      profileImage: profile_image,
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 

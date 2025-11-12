@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 export const actions: Actions = {
   fetch: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(FilterSchema))
-    const { status, store_id, date_from, date_to } = form.data
+    const { status, storeId, dateFrom, dateTo } = form.data
 
     if (!form.valid) fail(400, { form })
 
@@ -53,9 +53,9 @@ export const actions: Actions = {
       .order('created_at', { ascending: false })
 
     if (status) query.eq('status', status)
-    if (store_id) query.eq('store_id', store_id)
-    if (date_from) query.gte('requested_at', date_from)
-    if (date_to) query.lte('requested_at', date_to)
+    if (storeId) query.eq('store_id', storeId)
+    if (dateFrom) query.gte('requested_at', dateFrom)
+    if (dateTo) query.lte('requested_at', dateTo)
 
     const { data } = await query
 
@@ -66,23 +66,23 @@ export const actions: Actions = {
   },
 
   approve: async ({ request, locals: { supabase, user } }) => {
-    const { id, store_id, user_id } = await extractFormData(await request.formData(), ['id', 'store_id', 'user_id'])
+    const { id, storeId, userId } = await extractFormData(await request.formData(), ['id', 'storeId', 'userId'])
 
-    if (!id || !user?.id || !store_id || !user_id) {
+    if (!id || !user?.id || !storeId || !userId) {
       return fail(400, { message: '승인 요청 ID가 제공되지 않았습니다.' })
     }
 
     try {
       const { data } = await approve(supabase, id, user.id)
 
-      await approveRequestHook.runAfter({ storeId: store_id, userId: user_id })
+      await approveRequestHook.runAfter({ storeId, userId })
 
       return { success: true, request: convert(data) }
     } catch (error) {
       console.error('Error in approve action:', error)
       if (isAppError(error)) {
         error.errorHandler()
-        await approveRequestHook.runCleanup({ storeId: store_id, userId: user.id })
+        await approveRequestHook.runCleanup({ storeId, userId: user.id })
       }
 
       return fail(500, { message: '승인 처리 중 오류가 발생했습니다.' })
@@ -90,23 +90,23 @@ export const actions: Actions = {
   },
 
   reject: async ({ request, locals: { supabase, user } }) => {
-    const { id, store_id, user_id } = await extractFormData(await request.formData(), ['id', 'store_id', 'user_id'])
+    const { id, storeId, userId } = await extractFormData(await request.formData(), ['id', 'storeId', 'userId'])
 
-    if (!id || !user?.id || !store_id || !user_id) {
+    if (!id || !user?.id || !storeId || !userId) {
       return fail(400, { message: '승인 요청 ID가 제공되지 않았습니다.' })
     }
 
     try {
       const { data } = await reject(supabase, id, user.id)
 
-      await rejectRequestHook.runAfter({ storeId: store_id, userId: user_id })
+      await rejectRequestHook.runAfter({ storeId, userId })
 
       return { success: true, request: convert(data) }
     } catch (error) {
       console.error('Error in reject action:', error)
       if (isAppError(error)) {
         error.errorHandler()
-        await rejectRequestHook.runCleanup({ storeId: store_id, userId: user.id })
+        await rejectRequestHook.runCleanup({ storeId, userId: user.id })
       }
 
       return fail(500, { message: '거부 처리 중 오류가 발생했습니다.' })

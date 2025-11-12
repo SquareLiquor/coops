@@ -25,20 +25,20 @@ export const productDataConverter = () => {
 
     return {
       id,
-      store_id,
-      origin_id,
-      category_id,
+      storeId: store_id,
+      originId: origin_id,
+      categoryId: category_id,
       category: categoryDataConverter().convert(category),
       name,
       description,
       price,
-      initial_stock,
+      initialStock: initial_stock,
       unit,
-      quantity_per_unit,
+      quantityPerUnit: quantity_per_unit,
       images,
       active,
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 
@@ -55,16 +55,17 @@ export const productImageDataConverter = () => {
   const convert = (data: any): ImageData | undefined => {
     if (!data) return undefined
 
-    const { id, product_id, url, representative, sort_order, created_at, updated_at } = data
+    const { id, product_id, url, path, representative, sort_order, created_at, updated_at } = data
 
     return {
       id,
       productId: product_id,
       url,
+      path,
       representative,
       sortOrder: sort_order,
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 
@@ -85,12 +86,12 @@ export const categoryDataConverter = () => {
 
     return {
       id,
-      store_id,
+      storeId: store_id,
       name,
       description,
       active,
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 

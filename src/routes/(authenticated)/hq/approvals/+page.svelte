@@ -90,23 +90,23 @@
             <input
               type="date"
               name="date_from"
-              bind:value={$filterForm.date_from}
+              bind:value={$filterForm.dateFrom}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.date_from}
-              class:text-primary-700={$filterForm.date_from}
-              class:border-surface-100={!$filterForm.date_from}
-              {...$filterConstraints.date_from}
+              class:border-primary-500={$filterForm.dateFrom}
+              class:text-primary-700={$filterForm.dateFrom}
+              class:border-surface-100={!$filterForm.dateFrom}
+              {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
             <input
               type="date"
               name="date_to"
-              bind:value={$filterForm.date_to}
+              bind:value={$filterForm.dateTo}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.date_to}
-              class:text-primary-700={$filterForm.date_to}
-              class:border-surface-100={!$filterForm.date_to}
-              {...$filterConstraints.date_to}
+              class:border-primary-500={$filterForm.dateTo}
+              class:text-primary-700={$filterForm.dateTo}
+              class:border-surface-100={!$filterForm.dateTo}
+              {...$filterConstraints.dateTo}
             />
           </div>
         </div>
@@ -114,11 +114,11 @@
         <!-- 매장 선택 필터 -->
         <select
           name="store_id"
-          bind:value={$filterForm.store_id}
+          bind:value={$filterForm.storeId}
           class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          class:border-primary-500={$filterForm.store_id}
-          class:text-primary-700={$filterForm.store_id}
-          class:border-surface-100={!$filterForm.store_id}
+          class:border-primary-500={$filterForm.storeId}
+          class:text-primary-700={$filterForm.storeId}
+          class:border-surface-100={!$filterForm.storeId}
         >
           <option value={undefined} selected>전체</option>
           {#each stores as store}
@@ -127,13 +127,13 @@
         </select>
       </div>
 
-      {#if $filterErrors.date_from || $filterErrors.date_to}
+      {#if $filterErrors.dateFrom || $filterErrors.dateTo}
         <div class="mt-1 flex flex-col gap-1">
-          {#if $filterErrors.date_from}
-            <div class="text-error-500 text-sm">{$filterErrors.date_from}</div>
+          {#if $filterErrors.dateFrom}
+            <div class="text-error-500 text-sm">{$filterErrors.dateFrom}</div>
           {/if}
-          {#if $filterErrors.date_to}
-            <div class="text-error-500 text-sm">{$filterErrors.date_to}</div>
+          {#if $filterErrors.dateTo}
+            <div class="text-error-500 text-sm">{$filterErrors.dateTo}</div>
           {/if}
         </div>
       {/if}
@@ -209,8 +209,8 @@
               </span>
             </td>
             <td>
-              <div class="text-surface-700 text-xs">{dayjs(request.requested_at).format('YYYY-MM-DD')}</div>
-              <div class="text-surface-300 text-xs">{dayjs(request.requested_at).format('HH:mm:ss')}</div>
+              <div class="text-surface-700 text-xs">{dayjs(request.requestedAt).format('YYYY-MM-DD')}</div>
+              <div class="text-surface-300 text-xs">{dayjs(request.requestedAt).format('HH:mm:ss')}</div>
             </td>
             <td>
               {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
@@ -223,13 +223,13 @@
                   class:text-warning-500={equalsEnum(ApprovalStatus.PENDING, request.status)}
                 >
                   {equalsEnum(ApprovalStatus.APPROVED, request.status)
-                    ? dayjs(request.approved_at).format('YYYY-MM-DD')
-                    : dayjs(request.cancelled_at).format('YYYY-MM-DD')}
+                    ? dayjs(request.approvedAt).format('YYYY-MM-DD')
+                    : dayjs(request.cancelledAt).format('YYYY-MM-DD')}
                 </div>
                 <div class="text-surface-300 text-xs">
                   {equalsEnum(ApprovalStatus.APPROVED, request.status)
-                    ? dayjs(request.approved_at).format('HH:mm:ss')
-                    : dayjs(request.cancelled_at).format('HH:mm:ss')}
+                    ? dayjs(request.approvedAt).format('HH:mm:ss')
+                    : dayjs(request.cancelledAt).format('HH:mm:ss')}
                 </div>
               {/if}
             </td>
@@ -247,8 +247,8 @@
             <td>
               <form method="POST" use:enhance={requestFormEnhance}>
                 <input type="hidden" name="id" value={request.id} />
-                <input type="hidden" name="user_id" value={request.applicant_id} />
-                <input type="hidden" name="store_id" value={request.store_id} />
+                <input type="hidden" name="userId" value={request.applicantId} />
+                <input type="hidden" name="storeId" value={request.storeId} />
                 <div class="relative flex items-center justify-center gap-1">
                   {#if isRowLoading.includes(request.id)}
                     <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">

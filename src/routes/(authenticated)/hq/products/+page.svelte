@@ -81,7 +81,7 @@
 <div class="relative p-6">
   <!-- 좌측 필터 영역 -->
   <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
-    <input type="hidden" name="store_id" bind:value={$filterForm.store_id} />
+    <input type="hidden" name="store_id" bind:value={$filterForm.storeId} />
     <div class="flex flex-col">
       <div class="flex items-center gap-5">
         <!-- 날짜 필터 -->
@@ -90,23 +90,23 @@
             <input
               type="date"
               name="date_from"
-              bind:value={$filterForm.date_from}
+              bind:value={$filterForm.dateFrom}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.date_from}
-              class:text-primary-700={$filterForm.date_from}
-              class:border-surface-100={!$filterForm.date_from}
-              {...$filterConstraints.date_from}
+              class:border-primary-500={$filterForm.dateFrom}
+              class:text-primary-700={$filterForm.dateFrom}
+              class:border-surface-100={!$filterForm.dateFrom}
+              {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
             <input
               type="date"
               name="date_to"
-              bind:value={$filterForm.date_to}
+              bind:value={$filterForm.dateTo}
               class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.date_to}
-              class:text-primary-700={$filterForm.date_to}
-              class:border-surface-100={!$filterForm.date_to}
-              {...$filterConstraints.date_to}
+              class:border-primary-500={$filterForm.dateTo}
+              class:text-primary-700={$filterForm.dateTo}
+              class:border-surface-100={!$filterForm.dateTo}
+              {...$filterConstraints.dateTo}
             />
           </div>
         </div>
@@ -115,7 +115,7 @@
         <select
           class="border-surface-100 focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
           name="category_id"
-          bind:value={$filterForm.category_id}
+          bind:value={$filterForm.categoryId}
         >
           <option value={undefined} selected>전체</option>
           {#each categories as category}
@@ -128,22 +128,22 @@
         <input
           type="text"
           name="product_name"
-          bind:value={$filterForm.product_name}
+          bind:value={$filterForm.productName}
           placeholder="상품명 검색"
           class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          class:border-primary-500={$filterForm.product_name}
-          class:text-primary-700={$filterForm.product_name}
-          class:border-surface-100={!$filterForm.product_name}
+          class:border-primary-500={$filterForm.productName}
+          class:text-primary-700={$filterForm.productName}
+          class:border-surface-100={!$filterForm.productName}
         />
       </div>
 
-      {#if $filterErrors.date_from || $filterErrors.date_to}
+      {#if $filterErrors.dateFrom || $filterErrors.dateTo}
         <div class="mt-1 flex flex-col gap-1">
-          {#if $filterErrors.date_from}
-            <div class="text-error-500 text-sm">{$filterErrors.date_from}</div>
+          {#if $filterErrors.dateFrom}
+            <div class="text-error-500 text-sm">{$filterErrors.dateFrom}</div>
           {/if}
-          {#if $filterErrors.date_to}
-            <div class="text-error-500 text-sm">{$filterErrors.date_to}</div>
+          {#if $filterErrors.dateTo}
+            <div class="text-error-500 text-sm">{$filterErrors.dateTo}</div>
           {/if}
         </div>
       {/if}
@@ -215,7 +215,7 @@
                 <!-- {product.currentStock}/{product.initialStock} -->
               </div>
               <div class="text-surface-500 text-xs">
-                {product.initial_stock}
+                {product.initialStock}
               </div>
             </td>
             <td class="px-4 py-4">
@@ -225,7 +225,7 @@
             </td>
             <td class="px-4 py-4">
               <div class="text-surface-400 text-xs">
-                {dayjs(product.created_at).format('YYYY-MM-DD')}
+                {dayjs(product.createdAt).format('YYYY-MM-DD')}
               </div>
             </td>
           </tr>

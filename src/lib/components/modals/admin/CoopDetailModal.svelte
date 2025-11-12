@@ -47,19 +47,19 @@
             <div>
               <div class="label-text mb-1 text-xs font-medium">가격</div>
               <div class="input bg-surface-50 border-surface-200 cursor-default">
-                {coop.sales_price?.toLocaleString()}원
+                {coop.salesPrice?.toLocaleString()}원
               </div>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <div class="label-text mb-1 text-xs font-medium">판매일</div>
-              <div class="input bg-surface-50 border-surface-200 cursor-default">{coop.sales_date}</div>
+              <div class="input bg-surface-50 border-surface-200 cursor-default">{coop.salesDate}</div>
             </div>
             <div>
               <div class="label-text mb-1 text-xs font-medium">진행률</div>
               <div class="input bg-surface-50 border-surface-200 cursor-default">
-                {coop.current_quantity} / {coop.max_quantity}
+                {coop.currentQuantity} / {coop.maxQuantity}
               </div>
             </div>
           </div>

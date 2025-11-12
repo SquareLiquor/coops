@@ -27,15 +27,15 @@ export const storeDataConverter = () => {
       name,
       type,
       address,
-      address_detail,
+      addressDetail: address_detail,
       latitude,
       longitude,
-      place_id,
+      placeId: place_id,
       phone,
-      owner_id,
+      ownerId: owner_id,
       owner: profileDataConverter().convert(owner),
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 
@@ -56,11 +56,11 @@ export const storeMemberDataConverter = () => {
 
     return {
       id,
-      store_id,
-      user_id,
+      storeId: store_id,
+      userId: user_id,
       store: storeDataConverter().convert(store),
       profile: profileDataConverter().convert(profile),
-      created_at: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 

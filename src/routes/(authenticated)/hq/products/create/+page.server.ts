@@ -15,10 +15,10 @@ const { convert } = productDataConverter()
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
 
-  const initialProductValues = createInitialProductValues(store?.id)
+  const initialProductValues = createInitialProductValues(store!.id)
   const form = await superValidate(initialProductValues, valibot(ProductCreateSchema), { errors: false })
 
-  const { categories } = await getCategories(store?.id)
+  const { categories } = await getCategories(store!.id)
   const unitTypes = [...Object.values(UnitType)]
 
   return { form, categories, unitTypes }
@@ -46,19 +46,19 @@ export const actions: Actions = {
 }
 
 const createProduct = async (supabase: SupabaseClient, formData: ProductCreateInput) => {
-  const { store_id, category_id, name, description, price, initial_stock, unit, quantity_per_unit } = formData
+  const { storeId, categoryId, name, description, price, initialStock, unit, quantityPerUnit } = formData
 
   const { data, error } = await supabase
     .from('products')
     .insert({
-      store_id,
-      category_id,
+      store_id: storeId,
+      category_id: categoryId,
       name,
       description,
       price,
-      initial_stock,
+      initial_stock: initialStock,
       unit,
-      quantity_per_unit,
+      quantity_per_unit: quantityPerUnit,
       active: true,
     })
     .select('*')

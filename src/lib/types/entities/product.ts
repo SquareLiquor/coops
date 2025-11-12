@@ -1,29 +1,29 @@
 export interface CategoryData {
   id: string
-  store_id: string
+  storeId: string
   name: string
   description: string
   active: boolean
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ProductData {
   id: string
-  store_id: string
-  origin_id?: string | null
-  category_id: string
+  storeId: string
+  originId?: string | null
+  categoryId: string
   category?: CategoryData
   name: string
   description: string
   price: number
-  initial_stock: number
+  initialStock: number
   unit: string
-  quantity_per_unit: number
+  quantityPerUnit: number
   images: ImageData[]
   active: boolean
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ImageData {
@@ -33,6 +33,6 @@ export interface ImageData {
   path: string
   representative: boolean
   sortOrder: number
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }

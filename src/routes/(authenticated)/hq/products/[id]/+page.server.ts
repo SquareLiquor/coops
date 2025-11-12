@@ -1,5 +1,5 @@
 import { isAppError } from '$lib/errors'
-import { ProductUpdateSchema, type ProductUpdateInput } from '$lib/schemas'
+import { productDataToUpdateInput, ProductUpdateSchema, type ProductUpdateInput } from '$lib/schemas'
 import { getCategories, getProductById } from '$lib/supabase'
 import { UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -15,23 +15,9 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, '상품을 찾을 수 없습니다.')
   }
 
-  // 수정용 폼 데이터 준비
-  // product data to input
-  const productFormData = {
-    id: product.id,
-    store_id: product.store_id,
-    category_id: product.category_id,
-    name: product.name,
-    description: product.description,
-    price: product.price,
-    unit: product.unit,
-    quantity_per_unit: product.quantity_per_unit,
-    images: product.images || [],
-    active: product.active ?? true,
-  }
-
-  const form = await superValidate(productFormData, valibot(ProductUpdateSchema), { errors: false })
-  const { categories } = await getCategories(product.store_id)
+  const productInput = productDataToUpdateInput(product)
+  const form = await superValidate(productInput, valibot(ProductUpdateSchema), { errors: false })
+  const { categories } = await getCategories(product.storeId)
   const unitTypes = [...Object.values(UnitType)]
 
   return {
@@ -77,17 +63,17 @@ export const actions: Actions = {
 }
 
 const updateProduct = async (supabase: SupabaseClient, formData: ProductUpdateInput) => {
-  const { id, store_id, category_id, name, description, price, unit, quantity_per_unit, images, active } = formData
+  const { id, storeId, categoryId, name, description, price, unit, quantityPerUnit, images, active } = formData
 
   const { error: updateError } = await supabase
     .from('products')
     .update({
-      category_id,
+      category_id: categoryId,
       name,
       description,
       price,
       unit,
-      quantity_per_unit,
+      quantity_per_unit: quantityPerUnit,
       active,
       updated_at: new Date().toISOString(),
     })

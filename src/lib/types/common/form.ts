@@ -24,8 +24,8 @@ export type FormError = string | FormValidationError | undefined
 
 export interface ApprovalRequestSearchFormData {
   status: string | undefined
-  store_id: string | undefined
-  date_from: string | undefined
-  date_to: string | undefined
+  storeId: string | undefined
+  dateFrom: string | undefined
+  dateTo: string | undefined
   pagination: Record<string, any>
 }

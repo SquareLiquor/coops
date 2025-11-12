@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import ProductForm from '$lib/components/hq/ProductForm.svelte'
+  import ProductForm from '$lib/components/form/hq/ProductForm.svelte'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()

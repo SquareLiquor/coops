@@ -133,7 +133,7 @@
                 <div class="space-y-1 text-gray-600">
                   <div>카테고리: <span class="font-medium">{product.category?.name || '미분류'}</span></div>
                   <div>
-                    등록일: <span class="font-medium">{new Date(product.created_at).toLocaleDateString('ko-KR')}</span>
+                    등록일: <span class="font-medium">{new Date(product.createdAt).toLocaleDateString('ko-KR')}</span>
                   </div>
                 </div>
               </div>
@@ -151,7 +151,7 @@
                     <div class="text-sm text-gray-500">개당 가격</div>
                     <div class="text-lg font-semibold text-gray-700">
                       {new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
-                        product.price / product.quantity_per_unit
+                        product.price / product.quantityPerUnit
                       )}
                     </div>
                   </div>
@@ -163,12 +163,12 @@
                   </div>
                   <div>
                     <div class="text-sm text-gray-500">단위별 수량</div>
-                    <div class="font-medium">{product.quantity_per_unit}개</div>
+                    <div class="font-medium">{product.quantityPerUnit}개</div>
                   </div>
                 </div>
                 <div>
                   <div class="text-sm text-gray-500">초기 재고</div>
-                  <div class="font-medium">{product.initial_stock?.toLocaleString()}개</div>
+                  <div class="font-medium">{product.initialStock?.toLocaleString()}개</div>
                 </div>
               </div>
 

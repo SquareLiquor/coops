@@ -4,14 +4,14 @@ import { ImageSchema } from '../common/image'
 
 export const ProductSchema = v.pipe(
   v.object({
-    store_id: v.string(),
-    origin_id: v.optional(v.nullable(v.string())),
-    category_id: v.string(),
+    storeId: v.string(),
+    originId: v.optional(v.nullable(v.string())),
+    categoryId: v.string(),
     name: v.string(),
     description: v.string(),
     price: v.pipe(v.number()),
     unit: v.string(),
-    quantity_per_unit: v.pipe(v.number()),
+    quantityPerUnit: v.pipe(v.number()),
     images: v.array(ImageSchema),
     active: v.optional(v.boolean()),
   })
@@ -20,7 +20,7 @@ export const ProductSchema = v.pipe(
 export const ProductCreateSchema = v.pipe(
   v.object({
     ...ProductSchema.entries,
-    initial_stock: v.pipe(v.number()),
+    initialStock: v.pipe(v.number()),
   })
 )
 
@@ -34,40 +34,43 @@ export const ProductUpdateSchema = v.pipe(
 export type ProductCreateInput = v.InferInput<typeof ProductCreateSchema>
 export type ProductUpdateInput = v.InferInput<typeof ProductUpdateSchema>
 
-export const createInitialProductValues = (store_id: string | undefined) => {
-  if (!store_id) return {}
+export const createInitialProductValues = (storeId: string | undefined) => {
+  if (!storeId) return {}
 
   return {
-    store_id: store_id,
-    category_id: undefined,
+    storeId,
+    categoryId: undefined,
     name: undefined,
     description: undefined,
     price: 1,
-    initial_stock: 1,
+    initialStock: 1,
     unit: 'EA',
-    quantity_per_unit: 1,
+    quantityPerUnit: 1,
     images: [],
   }
 }
 
 export const productDataToUpdateInput = (product: ProductData): ProductUpdateInput => {
-  const { id, store_id, category_id, name, description, price, unit, quantity_per_unit, images, active } = product
+  const { id, storeId, categoryId, name, description, price, unit, quantityPerUnit, images, active } = product
 
   return {
     id,
-    store_id,
-    category_id,
+    storeId,
+    categoryId,
     name,
     description,
     price,
     unit,
-    quantity_per_unit,
+    quantityPerUnit,
     images: images.map((image) => ({
       id: image.id,
       url: image.url,
+      path: image.path,
       representative: image.representative,
       sortOrder: image.sortOrder,
+      use: true,
+      new: false,
     })),
-    active: product.active,
+    active: active,
   }
 }

@@ -6,21 +6,21 @@ export interface CoopData {
   id: string
   name: string
   description: string
-  store_id: string
+  storeId: string
   store: StoreData
-  product_id: string
+  productId: string
   product: ProductData
-  category_id: string
+  categoryId: string
   category: CategoryData
   status: SalesStatus
-  sales_price: number
-  sales_date: string
-  is_today: boolean
-  remaining_time: string
-  max_quantity: number
-  current_quantity: number
-  remaining_quantity: number
+  salesPrice: number
+  salesDate: string
+  isToday: boolean
+  remainingTime: string
+  maxQuantity: number
+  currentQuantity: number
+  remainingQuantity: number
   progress: number
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }

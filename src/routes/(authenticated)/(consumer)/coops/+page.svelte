@@ -32,7 +32,7 @@
   let categories = $state<CategoryData[]>([])
   let filteredCoops = $derived.by(() => {
     return coops.filter((coop) => {
-      const matchesDate = dayjs(coop.sales_date).isSame(dayjs(selectedDate), 'day')
+      const matchesDate = dayjs(coop.salesDate).isSame(dayjs(selectedDate), 'day')
       const matchesCategory = selectedCategory ? coop.category.id === selectedCategory : true
       return matchesDate && matchesCategory
     })
@@ -103,8 +103,8 @@
 
     const {
       name,
-      sales_price: price,
-      sales_date,
+      salesPrice: price,
+      salesDate: sales_date,
       product: { images },
     } = coop
 
@@ -201,12 +201,12 @@
               </svg>
               <div class="absolute inset-0 flex items-center justify-center">
                 <span class="text-xs font-bold text-white drop-shadow-md"
-                  >{coop.current_quantity} / {coop.max_quantity}</span
+                  >{coop.currentQuantity} / {coop.maxQuantity}</span
                 >
               </div>
             </div>
             <div class="rounded bg-black/60 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
-              {#if dayjs().isSame(dayjs(coop.sales_date), 'day')}
+              {#if dayjs().isSame(dayjs(coop.salesDate), 'day')}
                 <!-- {coop.remaining_time}일 남음 -->
                 오늘 마감
               {/if}
@@ -220,7 +220,7 @@
                 {coop.name}
               </h3>
               <div class="mt-0.5 flex items-center space-x-1">
-                <span class="text-primary-600 text-sm font-bold">{formatCurrency(coop.sales_price)}</span>
+                <span class="text-primary-600 text-sm font-bold">{formatCurrency(coop.salesPrice)}</span>
               </div>
             </div>
             <div

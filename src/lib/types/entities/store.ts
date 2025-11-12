@@ -9,15 +9,15 @@ export interface StoreData {
   name: string
   type: StoreType
   address?: string
-  address_detail?: string
+  addressDetail?: string
   latitude?: number
   longitude?: number
-  place_id?: string
+  placeId?: string
   phone?: string
-  owner_id?: string
+  ownerId?: string
   owner?: ProfileData
-  created_at?: string
-  updated_at?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 // Public view interface (limited fields)
@@ -32,9 +32,9 @@ export interface StorePublic {
 // Store members table interface
 export interface StoreMemberData {
   id: string
-  store_id: string
-  user_id: string
+  storeId: string
+  userId: string
   store?: StoreData
   profile?: ProfileData
-  created_at?: string
+  createdAt?: string
 }
