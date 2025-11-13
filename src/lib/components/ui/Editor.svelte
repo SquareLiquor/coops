@@ -7,6 +7,7 @@
   let conf = {
     menubar: false,
     height: 500,
+    resize: true,
     plugins: [
       'advlist',
       'autolink',
@@ -34,5 +35,12 @@
 </script>
 
 <main>
-  <Editor apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {disabled} {conf} />
+  <Editor
+    apiKey={PUBLIC_TINYMCE_API_KEY}
+    bind:value={description}
+    inline={true}
+    {disabled}
+    {conf}
+    cssClass="border border-surface-100 p-4 rounded-md focus-within:border-primary-500 overflow-hidden prose"
+  />
 </main>
