@@ -53,7 +53,6 @@ export const actions: Actions = {
 
     const { data, error } = await query
 
-    console.log(data)
     return {
       form,
       coops: data ? convertAll(data) : [],

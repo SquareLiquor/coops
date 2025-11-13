@@ -71,13 +71,6 @@ export function setupAuthStateListener() {
         return
       }
 
-      console.log('onAuthStateChange', {
-        event,
-        prevSession: prevSession?.expires_at,
-        newSession: currentSession?.expires_at,
-        user: user?.email,
-      })
-
       // 사용자 상태를 AuthState 스토어에 동기화
       syncUserToAuthState(user, currentSession)
     } catch (error) {

@@ -11,6 +11,7 @@ export const OrderItemSchema = v.object({
 })
 export const OrderSchema = v.object({
   user_id: v.string(),
+  user_name: v.string(),
   store_id: v.string(),
   total_price: v.number(),
   items: v.array(OrderItemSchema),
@@ -37,6 +38,7 @@ export const convertCartDataToOrderInput = (auth: AuthState, store: StoreData, d
 
   return {
     user_id: auth.id,
+    user_name: auth.user?.user_metadata.user_name,
     store_id: store.id,
     total_price: totalPrice,
     items: items.map(convertCartItemDataToOrderItemInput),

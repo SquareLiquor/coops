@@ -78,7 +78,6 @@ export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
     images,
   } = coop
 
-  console.log(coop)
   return {
     id,
     storeId,

@@ -166,7 +166,7 @@
       >
         <div class="from-surface-100 to-surface-200 relative aspect-[5/3] bg-gradient-to-br">
           <img
-            src={coop.product.images.find((image) => image.representative)?.url}
+            src={coop.images.find((image) => image.representative)?.url}
             alt={coop.name}
             class="h-full w-full object-cover"
             loading="lazy"

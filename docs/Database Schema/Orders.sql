@@ -8,7 +8,8 @@ BEGIN
     CREATE TYPE order_status AS ENUM (
       'ORDERED',    -- 주문 생성
       'COMPLETED',  -- 주문 완료(픽업 포함)
-      'CANCELLED'   -- 주문 취소
+      'CANCELLED',  -- 주문 취소
+      'PARTIAL_CANCELLED' -- 부분 취소
     );
   END IF;
 END$$;
@@ -16,6 +17,7 @@ END$$;
 CREATE TABLE public.orders (
 	id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_name text,
 	store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
 	total_price numeric NOT NULL,
 	status order_status NOT NULL,
@@ -50,6 +52,7 @@ CREATE TABLE public.order_items (
 	coop_id uuid NOT NULL REFERENCES public.coops(id) ON DELETE CASCADE,
 	quantity integer NOT NULL,
 	price numeric NOT NULL,
+  total_price numeric NOT NULL,
 	status order_status NOT NULL -- 주문 상태(ORDERED, COMPLETED, CANCELLED)
 );
 COMMENT ON TABLE public.order_items IS '공동구매 주문 상세(공동구매별) 정보';

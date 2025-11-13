@@ -10,7 +10,7 @@
   })
 
   let images: ImageData[] = $derived.by(() => {
-    return coop.product.images.slice().sort((a, b) => {
+    return coop.images.slice().sort((a, b) => {
       if (a.representative && !b.representative) return -1
       if (!a.representative && b.representative) return 1
       return a.sortOrder - b.sortOrder

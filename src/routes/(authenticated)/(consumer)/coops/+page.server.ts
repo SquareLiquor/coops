@@ -9,7 +9,9 @@ import type { Actions, PageServerLoad } from './$types'
 
 const coopsSelectQuery = `
   *,
-  product:product_id(*, images:product_images(*)),
+  store:store_id(*),
+  images:coop_images(*),
+  product:product_id(*),
   category:category_id(*)
 `
 
@@ -41,13 +43,14 @@ export const actions: Actions = {
 }
 
 const createOrder = async (supabase: any, formData: any) => {
-  const { user_id, store_id, total_price } = formData
+  const { user_id, user_name, store_id, total_price } = formData
 
   // create order
   const { data, error } = await supabase
     .from('orders')
     .insert({
       user_id,
+      user_name,
       store_id,
       total_price,
       status: OrderStatus.ORDERED.code,

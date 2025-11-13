@@ -1,4 +1,4 @@
-import { coopDataConverter } from '$lib/converters/coopsConverter'
+import { coopDataConverter } from '$lib/converters/'
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient } from '../clients/browser'
 import { createServerClient } from '../clients/server'

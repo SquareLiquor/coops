@@ -1,4 +1,5 @@
-export * from './coopsConverter'
+export * from './coopConverter'
+export * from './orderConverter'
 export * from './productConverter'
 export * from './profileConverter'
 export * from './signupConverter'

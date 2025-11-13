@@ -16,6 +16,7 @@ const createOrderItems = async ({ order, orderId }: CreateOrderHookContext, shar
       coop_id: item.coop_id,
       quantity: item.quantity,
       price: item.price,
+      total_price: item.quantity * item.price,
       status: OrderStatus.ORDERED.code,
     }))
   )
