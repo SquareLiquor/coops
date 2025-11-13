@@ -14,10 +14,11 @@
     }
     mode?: 'create' | 'edit'
     onSubmit?: () => void
+    onError?: () => void
     onCancel?: () => void
   }
 
-  let { data, mode = 'create', onSubmit, onCancel }: Props = $props()
+  let { data, mode = 'create', onSubmit, onError, onCancel }: Props = $props()
   let { categories, unitTypes } = $derived(data)
 
   const {
@@ -30,11 +31,8 @@
   } = superForm(data.form, {
     dataType: 'json',
     onResult: async ({ result }) => {
-      if (result.type === 'success') {
-        onSubmit?.()
-      } else if (result.type === 'error') {
-        console.error(`상품 ${mode === 'create' ? '등록' : '수정'} 중 오류가 발생했습니다.`)
-      }
+      if (result.type === 'success') onSubmit?.()
+      else if (result.type === 'failure') onError?.()
     },
     invalidateAll: false,
   })
