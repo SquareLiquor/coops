@@ -18,10 +18,11 @@
     }
     mode?: 'create' | 'edit'
     onSubmit?: () => void
+    onError?: () => void
     onCancel?: () => void
   }
 
-  let { data, mode = 'create', onSubmit, onCancel }: Props = $props()
+  let { data, mode = 'create', onSubmit, onError, onCancel }: Props = $props()
   let { categories, unitTypes, salesStatuses, hqStore } = $derived(data)
 
   // 상품 매핑 모달
@@ -37,11 +38,8 @@
   } = superForm(data.form, {
     dataType: 'json',
     onResult: async ({ result }) => {
-      if (result.type === 'success') {
-        onSubmit?.()
-      } else if (result.type === 'error') {
-        console.error(`공동구매 ${mode === 'create' ? '등록' : '수정'} 중 오류가 발생했습니다.`)
-      }
+      if (result.type === 'success') onSubmit?.()
+      else if (result.type === 'failure') onError?.()
     },
     invalidateAll: false,
   })

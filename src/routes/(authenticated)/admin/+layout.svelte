@@ -1,5 +1,6 @@
 <script lang="ts">
   import Sidebar from '$lib/components/Sidebar.svelte'
+  import Toast from '$lib/components/ui/Toast.svelte'
   import { setStore } from '$lib/stores'
   import { onMount } from 'svelte'
 
@@ -37,6 +38,7 @@
     <main>
       <div class="border-surface-400 border-l bg-white md:h-[calc(100vh)] md:overflow-auto">
         {@render children?.()}
+        <Toast />
       </div>
     </main>
   </div>

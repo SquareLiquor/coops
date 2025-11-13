@@ -1,16 +1,29 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import CoopForm from '$lib/components/form/admin/CoopForm.svelte'
+  import { toaster } from '$lib/utils'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
 
-  const goBack = () => {
-    goto('/admin/coops')
-  }
-
   const handleSubmit = async () => {
-    await goto('/admin/coops')
+    toaster.success({
+      description: '상품 정보 수정을 성공했습니다.',
+      duration: 5000,
+      action: {
+        label: '확인',
+        onClick: () => goto('/admin/coops'),
+      },
+    })
+  }
+  const handleError = async () => {
+    toaster.error({
+      description: '상품 정보 수정 중 오류가 발생했습니다.',
+      duration: 5000,
+    })
+  }
+  const handleCancel = () => {
+    goto('/admin/coops')
   }
 </script>
 
@@ -19,7 +32,7 @@
 </svelte:head>
 
 {#if data.form}
-  <CoopForm {data} mode="edit" onSubmit={handleSubmit} onCancel={goBack} />
+  <CoopForm {data} mode="edit" onSubmit={handleSubmit} onError={handleError} onCancel={handleCancel} />
 {:else}
   <!-- 로딩 상태 -->
   <div class="flex h-full items-center justify-center">
