@@ -130,7 +130,7 @@
   <div class="container mx-auto">
     <div class="flex items-center space-x-4">
       <div class="w-35 flex-shrink-0">
-        <DatePicker bind:selectedDate />
+        <DatePicker bind:selectedDate options={{ useLimit: true }} />
       </div>
 
       <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
