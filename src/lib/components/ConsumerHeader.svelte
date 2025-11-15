@@ -7,6 +7,19 @@
   const store = $derived(getStore())
 
   let showUserMenu = $state(false)
+  let userMenuRef = $state<HTMLDivElement | null>(null)
+
+  // 외부 클릭 시 닫힘 처리
+  $effect(() => {
+    if (!showUserMenu) return
+    const handleClick = (e: MouseEvent) => {
+      if (userMenuRef && !userMenuRef.contains(e.target as Node)) {
+        showUserMenu = false
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  })
 </script>
 
 {#if store}
@@ -55,21 +68,35 @@
             <!-- 드롭다운 메뉴 -->
             {#if showUserMenu}
               <div
+                bind:this={userMenuRef}
                 class="absolute top-full right-0 mt-2 w-48 rounded-lg border bg-white shadow-lg"
                 style="border-color: #a6adc8;"
               >
                 <form method="POST">
                   <div class="py-2">
-                    <a href="/orders" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm">
+                    <a
+                      href="/orders"
+                      class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"
+                      onclick={() => (showUserMenu = false)}
+                    >
                       주문 내역
                     </a>
-                    <a href="/settings" class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"> 설정 </a>
+                    <a
+                      href="/settings"
+                      class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"
+                      onclick={() => (showUserMenu = false)}
+                    >
+                      설정
+                    </a>
                     <hr class="my-2" style="border-color: #a6adc8;" />
                     <button
                       class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                       type="submit"
                       formaction="/auth/signout?redirectTo=/"
-                      onclick={() => localStorage.removeItem('store')}
+                      onclick={() => {
+                        localStorage.removeItem('store')
+                        showUserMenu = false
+                      }}
                     >
                       로그아웃
                     </button>

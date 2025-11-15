@@ -80,13 +80,11 @@
           d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
         />
       </svg>
-      <h3 class="text-surface-900 dark:text-surface-100 mb-2 text-lg font-semibold">주문 내역이 없습니다</h3>
-      <p class="text-surface-600 dark:text-surface-400">선택한 조건에 해당하는 주문이 없어요.</p>
+      <h3 class="text-surface-900 dark:text-surface-100 mb-2 text-lg font-semibold">주문 내역이 없습니다.</h3>
     </div>
   {:else}
-    <!-- Orders List -->
     <div class="space-y-4">
-      {#each filteredOrders as order}
+      {#each filteredOrders as order (order.id)}
         <div
           class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 overflow-hidden rounded-xl border bg-white shadow-sm"
         >
@@ -100,28 +98,34 @@
                     /* TODO: 주문 상세 레이어 호출 */
                   }}
                 >
-                  <div class="text-primary-600 hover:text-primary-700 text-sm font-semibold transition-colors">
-                    주문번호 #{order.id}
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-semibold"
+                    >
+                      주문번호:
+                      <span class="ml-1 max-w-[120px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
+                        {order.id}
+                      </span>
+                    </span>
                   </div>
                   <div class="text-surface-600 dark:text-surface-400 text-xs">
-                    {dayjs(order.orderedAt).format('YYYY-MM-DD')}
-                    {dayjs(order.orderedAt).format('HH:mm:ss')}
+                    <span class="text-surface-700 text-sm">{dayjs(order.orderedAt).format('YYYY-MM-DD')}</span>
+                    <span class="text-surface-400 text-xs">{dayjs(order.orderedAt).format('HH:mm:ss')}</span>
                   </div>
                 </button>
               </div>
 
               <div class="flex items-center space-x-2">
-                <!-- {#if canCancelOrder(order)}
-                  <button
-                    class="rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
-                    onclick={() => cancelOrder(order.id)}
-                  >
-                    취소
-                  </button>
-                {/if}
-                <span class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(order.status)}`}>
-                  {getStatusText(order.status)}
-                </span> -->
+                <span
+                  class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-${order.status.color}-400 text-white`}
+                >
+                  {order.status.label}
+                </span>
+                <button
+                  class="rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                >
+                  취소
+                </button>
               </div>
             </div>
           </div>
