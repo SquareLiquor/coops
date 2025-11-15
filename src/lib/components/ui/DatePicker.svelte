@@ -2,23 +2,20 @@
   import { DatePicker, parseDate, Portal } from '@skeletonlabs/skeleton-svelte'
   import dayjs from 'dayjs'
 
-  let { selectedDate = $bindable() } = $props()
+  let { selectedDate = $bindable(), options = {} }: { selectedDate?: string; options?: { useLimit?: boolean } } =
+    $props()
+  const { useLimit = false } = options
 
-  const today = dayjs().format('YYYY-MM-DD')
-  const maxDate = dayjs().add(2, 'week').format('YYYY-MM-DD')
+  const defaultValue = selectedDate ? [parseDate(selectedDate)] : undefined
+  const min = useLimit ? parseDate(dayjs().format('YYYY-MM-DD')) : undefined
+  const max = useLimit ? parseDate(dayjs().add(2, 'week').format('YYYY-MM-DD')) : undefined
 
   const handleValueChange = (details: any) => {
     selectedDate = details.valueAsString
   }
 </script>
 
-<DatePicker
-  locale="ko-KR"
-  defaultValue={[parseDate(today)]}
-  min={parseDate(today)}
-  max={parseDate(maxDate)}
-  onValueChange={handleValueChange}
->
+<DatePicker locale="ko-KR" {defaultValue} {min} {max} onValueChange={handleValueChange}>
   <DatePicker.Control class="">
     <DatePicker.Input placeholder="yyyy/mm/dd" class="h-9 items-center text-sm" />
     <DatePicker.Trigger />

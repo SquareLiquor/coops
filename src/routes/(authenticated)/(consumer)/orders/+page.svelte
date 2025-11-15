@@ -2,23 +2,26 @@
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { orderDataConverter } from '$lib/converters/orderConverter'
   import { getAuth, getStore } from '$lib/stores'
-  import type { OrderData, OrderStatus } from '$lib/types'
+  import { type OrderData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
   import { onMount, tick } from 'svelte'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { supabase, ordersSelectQuery } = data
+  let { supabase, ordersSelectQuery, statuses } = data
 
   let orders = $state<OrderData[]>([])
-  let statuses = $state<OrderStatus[]>([])
   let filteredOrders = $derived.by(() => {
-    return orders
+    return orders.filter((order) => {
+      const matchesDate = selectedDate ? dayjs(order.orderedAt).isSame(dayjs(selectedDate), 'day') : true
+      const matchesStatus = selectedStatus ? order.status.code === selectedStatus : true
+      return matchesDate && matchesStatus
+    })
   })
 
   let selectOrderId = $state<string | null>(null)
-  let selectedDate = $state<string>(dayjs().format('YYYY-MM-DD'))
+  let selectedDate = $state<string | undefined>(undefined)
   let selectedStatus = $state<string | undefined>(undefined)
 
   onMount(async () => {
@@ -43,23 +46,23 @@
         <DatePicker bind:selectedDate />
       </div>
 
-      <!-- <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
-        {#each [{ id: undefined, name: '전체' }, ...categories] as category}
+      <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
+        {#each [{ code: undefined, label: '전체' }, ...statuses] as status}
           <button
             class="rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap"
-            class:text-white={selectedCategory === category.id}
-            class:bg-primary-500={selectedCategory === category.id}
-            class:text-surface-700={selectedCategory !== category.id}
-            class:border-surface-200={selectedCategory !== category.id}
-            class:hover:bg-surface-50={selectedCategory !== category.id}
-            class:border={selectedCategory !== category.id}
-            class:bg-white={selectedCategory !== category.id}
-            onclick={() => (selectedCategory = category.id)}
+            class:text-white={selectedStatus === status.code}
+            class:bg-primary-500={selectedStatus === status.code}
+            class:text-surface-700={selectedStatus !== status.code}
+            class:border-surface-200={selectedStatus !== status.code}
+            class:hover:bg-surface-50={selectedStatus !== status.code}
+            class:border={selectedStatus !== status.code}
+            class:bg-white={selectedStatus !== status.code}
+            onclick={() => (selectedStatus = status.code)}
           >
-            {category.name}
+            {status.label}
           </button>
         {/each}
-      </div> -->
+      </div>
     </div>
   </div>
 </div>

@@ -1,3 +1,4 @@
+import { OrderStatus } from '$lib/types'
 import type { PageServerLoad } from './$types'
 
 const ordersSelectQuery = `
@@ -7,7 +8,7 @@ const ordersSelectQuery = `
 `
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  // filter form, category
-  // order status change form
-  return { ordersSelectQuery }
+  const statuses = Object.values(OrderStatus)
+
+  return { ordersSelectQuery, statuses }
 }

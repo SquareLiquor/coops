@@ -38,8 +38,8 @@ export const SalesStatus: { [key: string]: SalesStatus } = {
 
 export type OrderStatus = EnumItem & { color?: string }
 export const OrderStatus: { [key: string]: OrderStatus } = {
-  ORDERED: { code: 'ORDERED', label: '주문 생성', color: 'green' },
-  COMPLETED: { code: 'COMPLETED', label: '주문 완료', color: 'blue' },
+  ORDERED: { code: 'ORDERED', label: '주문 완료', color: 'green' },
+  COMPLETED: { code: 'COMPLETED', label: '픽업 완료', color: 'blue' },
   CANCELLED: { code: 'CANCELLED', label: '주문 취소', color: 'red' },
   PARTIAL_CANCELLED: { code: 'PARTIAL_CANCELLED', label: '부분 취소', color: 'red' },
 }
