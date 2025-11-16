@@ -36,10 +36,9 @@ export const actions: Actions = {
 
       return { form }
     } catch (error) {
-      if (isAppError(error)) {
-        error.errorHandler()
-        await createProductHook.runCleanup({})
-      }
+      if (isAppError(error)) error.errorHandler()
+
+      await createProductHook.runCleanup({})
       return setError(form, '상품 등록 중 오류가 발생했습니다.')
     }
   },

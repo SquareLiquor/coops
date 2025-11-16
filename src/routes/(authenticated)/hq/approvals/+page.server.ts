@@ -80,11 +80,9 @@ export const actions: Actions = {
       return { success: true, request: convert(data) }
     } catch (error) {
       console.error('Error in approve action:', error)
-      if (isAppError(error)) {
-        error.errorHandler()
-        await approveRequestHook.runCleanup({ storeId, userId: user.id })
-      }
+      if (isAppError(error)) error.errorHandler()
 
+      await approveRequestHook.runCleanup({ storeId, userId: user.id })
       return fail(500, { message: '승인 처리 중 오류가 발생했습니다.' })
     }
   },
@@ -104,11 +102,9 @@ export const actions: Actions = {
       return { success: true, request: convert(data) }
     } catch (error) {
       console.error('Error in reject action:', error)
-      if (isAppError(error)) {
-        error.errorHandler()
-        await rejectRequestHook.runCleanup({ storeId, userId: user.id })
-      }
+      if (isAppError(error)) error.errorHandler()
 
+      await rejectRequestHook.runCleanup({ storeId, userId: user.id })
       return fail(500, { message: '거부 처리 중 오류가 발생했습니다.' })
     }
   },

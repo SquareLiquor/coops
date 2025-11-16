@@ -30,7 +30,7 @@
     <div class="px-4 py-2">
       <div class="relative flex items-center">
         <!-- 로고 (왼쪽) -->
-        <Store class="text-white" size={24} onclick={() => goto('/coops')} />
+        <Store class="text-xs text-white" size={24} onclick={() => goto('/coops')} />
         <!-- <div class="flex items-center">
         <button
           type="button"
@@ -74,29 +74,31 @@
               >
                 <form method="POST">
                   <div class="py-2">
-                    <a
-                      href="/orders"
-                      class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"
-                      onclick={() => (showUserMenu = false)}
+                    <button
+                      type="button"
+                      class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
+                      onclick={() => {
+                        showUserMenu = false
+                        goto('/orders')
+                      }}
                     >
                       주문 내역
-                    </a>
-                    <a
-                      href="/settings"
-                      class="text-surface-700 hover:bg-surface-50 block px-4 py-2 text-sm"
-                      onclick={() => (showUserMenu = false)}
+                    </button>
+                    <button
+                      type="button"
+                      class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
+                      onclick={() => {
+                        showUserMenu = false
+                        goto('/settings')
+                      }}
                     >
                       설정
-                    </a>
+                    </button>
                     <hr class="my-2" style="border-color: #a6adc8;" />
                     <button
                       class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                       type="submit"
                       formaction="/auth/signout?redirectTo=/"
-                      onclick={() => {
-                        localStorage.removeItem('store')
-                        showUserMenu = false
-                      }}
                     >
                       로그아웃
                     </button>

@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 }
 
 export const actions: Actions = {
-  default: async ({ request, locals: { supabase } }) => {
+  create: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(CoopCreateSchema))
 
     if (!form.valid) return fail(400, { form })
@@ -41,10 +41,9 @@ export const actions: Actions = {
 
       return { form }
     } catch (error) {
-      if (isAppError(error)) {
-        error.errorHandler()
-        await createCoopHook.runCleanup({})
-      }
+      if (isAppError(error)) error.errorHandler()
+
+      await createCoopHook.runCleanup({})
       return setError(form, '판매 상품 등록 중 오류가 발생했습니다.')
     }
   },

@@ -269,7 +269,6 @@
                 name="productUnit"
                 class="select h-9 w-full px-3 align-middle"
                 bind:value={$formData.product.unit}
-                disabled
               >
                 <option value="" disabled selected>선택</option>
                 {#each unitTypes as unit}
@@ -284,7 +283,6 @@
                 class="input placeholder-surface-200 w-full"
                 type="number"
                 bind:value={$formData.product.quantityPerUnit}
-                disabled
                 min="0"
                 placeholder="단위 당 수량"
               />

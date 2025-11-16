@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
 import * as v from 'valibot'
 
-export const CoopsFilterSchema = v.pipe(
+export const OrdersFilterSchema = v.pipe(
   v.object({
     storeId: v.string(),
+    name: v.pipe(v.optional(v.string())),
+    categoryId: v.pipe(v.optional(v.string())),
+    status: v.pipe(v.optional(v.string())),
     dateFrom: v.pipe(v.optional(v.string())),
     dateTo: v.pipe(v.optional(v.string())),
-    categoryId: v.pipe(v.optional(v.string())),
-    name: v.pipe(v.optional(v.string())),
-    status: v.pipe(v.optional(v.string())),
     // pagination: v.optional(v.object({
     //   page: v.number().min(1).default(1),
     //   pageSize: v.number().min(1).default(10),
@@ -30,9 +30,8 @@ export const CoopsFilterSchema = v.pipe(
     ['dateFrom']
   )
 )
+export type OrdersFilterInput = v.InferInput<typeof OrdersFilterSchema>
 
-export type CoopsFilterInput = v.InferInput<typeof CoopsFilterSchema>
-
-export const getInitialCoopsFilterValues = (storeId: string) => {
+export const getInitialOrdersFilterValues = (storeId: string) => {
   return { storeId }
 }

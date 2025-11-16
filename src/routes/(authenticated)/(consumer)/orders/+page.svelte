@@ -1,7 +1,7 @@
 <script lang="ts">
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
-  import { orderDataConverter } from '$lib/converters/orderConverter'
-  import { getAuth, getStore } from '$lib/stores'
+  import { getAuth } from '$lib/stores'
+  import { getOrdersByUserId } from '$lib/supabase'
   import { type OrderData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
@@ -9,7 +9,7 @@
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { supabase, ordersSelectQuery, statuses } = data
+  let { statuses } = data
 
   let orders = $state<OrderData[]>([])
   let filteredOrders = $derived.by(() => {
@@ -27,11 +27,10 @@
   onMount(async () => {
     await tick()
     const { user } = getAuth()
-    const store = getStore()
 
-    const { data: orderDatas } = await supabase.from('orders').select(ordersSelectQuery).eq('user_id', user!.id)
+    const { orders: orderList } = await getOrdersByUserId(user!)
 
-    orders = orderDataConverter().convertAll(orderDatas ?? [])
+    orders = orderList
   })
 </script>
 
@@ -117,7 +116,7 @@
 
               <div class="flex items-center space-x-2">
                 <span
-                  class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-${order.status.color}-400 text-white`}
+                  class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white bg-${order.status.color}-500`}
                 >
                   {order.status.label}
                 </span>

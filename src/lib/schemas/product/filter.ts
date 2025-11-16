@@ -31,7 +31,7 @@ export const ProductsFilterSchema = v.pipe(
   )
 )
 
-export type ProductsFilterForm = v.InferInput<typeof ProductsFilterSchema>
+export type ProductsFilterInput = v.InferInput<typeof ProductsFilterSchema>
 
 export const getInitialProductsFilterValues = (storeId: string) => {
   return { storeId }
