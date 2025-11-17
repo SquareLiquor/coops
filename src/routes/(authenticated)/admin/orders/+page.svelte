@@ -1,7 +1,7 @@
 <script lang="ts">
   import { OrdersFilterSchema as FilterSchema } from '$lib/schemas'
   import { type OrderData } from '$lib/types'
-  import { debounce, formatCurrency } from '$lib/utils'
+  import { debounce, formatCurrency, toaster } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
@@ -54,6 +54,21 @@
     onResult: ({ result }: { result: ActionResult }) => {
       if (result?.type === 'success') orders = result.data?.orders || []
       if (result?.type === 'failure') orders = []
+    },
+  })
+
+  const { form, enhance, submitting } = superForm(data.form, {
+    onResult: async ({ result }: { result: ActionResult }) => {
+      console.log(result)
+      if (result.type === 'success' || result.type === 'failure') {
+        const toast = result.type === 'success' ? toaster.success : toaster.error
+
+        filterSubmit()
+        toast({
+          description: result.data?.form.message,
+          duration: 5000,
+        })
+      }
     },
   })
 </script>
@@ -160,13 +175,13 @@
           <th class="w-8 px-4 py-3 text-center">
             <span class="text-surface-500 text-xs font-medium">#</span>
           </th>
-          <!-- <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 주문 번호 </th> -->
+          <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 주문 번호 </th>
           <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 주문 상태 </th>
           <th class="text-surface-500 w-[25%] px-4 py-3 text-sm font-bold"> 상품명 </th>
           <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 주문 금액 </th>
           <th class="text-surface-500 w-[10%] px-4 py-3 text-sm font-bold"> 구매자 </th>
           <th class="text-surface-500 w-[15%] px-4 py-3 text-sm font-bold whitespace-nowrap"> 구매일자 </th>
-          <th class="px-4 py-3"></th>
+          <th class="text-surface-500 w-[10%] px-6 text-center font-bold"></th>
         </tr>
       </thead>
       <tbody class="divide-surface-100 divide-y bg-white">
@@ -175,7 +190,11 @@
             <td class="text-surface-500 py-4 text-sm">
               {index + 1}
             </td>
-            <!-- <td class="text-surface-500 px-6 py-4 text-sm">{order.id}</td> -->
+            <td class="text-surface-500 px-6 py-4 text-sm">
+              <span class="block max-w-[120px] truncate" title={order.id}>
+                {order.id}
+              </span>
+            </td>
             <td class="text-surface-500 px-6 py-4 text-sm">
               <span
                 class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-white bg-${order.status?.color}-500`}
@@ -202,7 +221,22 @@
               {dayjs(order.orderedAt).format('HH:mm:ss')}
             </td>
 
-            <td class="px-4 py-4"></td>
+            <td>
+              {#if order.cancelable}
+                <form method="POST" use:enhance>
+                  <input type="hidden" name="orderId" value={order.id} />
+
+                  <div class="relative flex items-center justify-center gap-1">
+                    <button
+                      class="bg-error-500 hover:bg-error-200 rounded px-4 py-2 text-xs font-medium text-white"
+                      formaction="?/cancel"
+                    >
+                      주문 취소
+                    </button>
+                  </div>
+                </form>
+              {/if}
+            </td>
           </tr>
         {/each}
       </tbody>
