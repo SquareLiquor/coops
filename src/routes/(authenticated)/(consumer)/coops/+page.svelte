@@ -55,8 +55,8 @@
     coops = coopDataConverter().convertAll(coopsRes.data ?? [])
     categories = categoriesRes.categories
 
-    $cartForm.store_id = store.id
-    $cartForm.user_id = getAuth().user!.id
+    $cartForm.storeId = store.id
+    $cartForm.userId = getAuth().user!.id
   })
 
   const {

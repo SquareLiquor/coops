@@ -19,12 +19,13 @@ export const orderDataConverter = () => {
       totalPrice: total_price,
       status: lookupEnum(OrderStatus, status)!,
       items: orderItemDataConverter().convertAll(items),
+      cancelable: status === OrderStatus.ORDERED.code,
       orderedAt: dayjs(ordered_at).format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 
-  const convertAll = (datas: any[]): OrderData[] => {
+  const convertAll = (datas: any[] | null): OrderData[] => {
     if (!datas) return []
 
     return datas.map(convert).filter((item): item is OrderData => item !== null)
@@ -47,6 +48,7 @@ export const orderItemDataConverter = () => {
       quantity,
       price,
       totalPrice: total_price,
+      cancelable: status === OrderStatus.ORDERED.code,
       status: lookupEnum(OrderStatus, status)!,
       images: coopImageDataConverter().convertAll(coop.images), //TODO 이미지 컨버터 공통화
     }

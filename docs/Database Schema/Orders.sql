@@ -24,6 +24,7 @@ CREATE TABLE public.orders (
 	ordered_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz DEFAULT now()
 );
+COMMENT ON TABLE public.orders IS '공동구매 주문 정보';
 
 -- ==============================
 -- 2) update trigger
@@ -40,7 +41,65 @@ CREATE TRIGGER trg_update_orders_updated_at
 BEFORE UPDATE ON public.orders
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
-COMMENT ON TABLE public.orders IS '공동구매 주문 정보';
+
+-- ==============================
+-- 3) 주문 상태 동기화 트리거 함수들
+-- ==============================
+
+-- 주문이 취소될 때 모든 order_items를 취소로 변경
+CREATE OR REPLACE FUNCTION public.sync_order_items_on_order_cancel()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- 주문 상태가 CANCELLED로 변경되었을 때
+  IF OLD.status != 'CANCELLED' AND NEW.status = 'CANCELLED' THEN
+    UPDATE public.order_items
+    SET status = 'CANCELLED'
+    WHERE order_id = NEW.id AND status != 'CANCELLED';
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- order_items가 취소될 때 모든 아이템이 취소되면 주문도 취소로 변경
+CREATE OR REPLACE FUNCTION public.sync_order_on_all_items_cancel()
+RETURNS TRIGGER AS $$
+DECLARE
+  remaining_items_count INTEGER;
+BEGIN
+  -- order_item이 CANCELLED로 변경되었을 때만 처리
+  IF (TG_OP = 'UPDATE' AND OLD.status != 'CANCELLED' AND NEW.status = 'CANCELLED') OR
+     (TG_OP = 'INSERT' AND NEW.status = 'CANCELLED') THEN
+    
+    -- 해당 주문의 취소되지 않은 아이템 수 확인
+    SELECT COUNT(*)
+    INTO remaining_items_count
+    FROM public.order_items
+    WHERE order_id = COALESCE(NEW.order_id, OLD.order_id) AND status != 'CANCELLED';
+    
+    -- 모든 아이템이 취소되었으면 주문도 취소로 변경
+    IF remaining_items_count = 0 THEN
+      UPDATE public.orders
+      SET status = 'CANCELLED'
+      WHERE id = COALESCE(NEW.order_id, OLD.order_id) AND status != 'CANCELLED';
+    END IF;
+  END IF;
+  
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 트리거 생성
+CREATE TRIGGER trg_sync_order_items_on_order_cancel
+AFTER UPDATE ON public.orders
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_order_items_on_order_cancel();
+
+CREATE TRIGGER trg_sync_order_on_all_items_cancel
+AFTER INSERT OR UPDATE ON public.order_items
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_order_on_all_items_cancel();
+
 
 
 -- ==============================

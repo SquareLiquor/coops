@@ -30,7 +30,17 @@ export const OrdersFilterSchema = v.pipe(
     ['dateFrom']
   )
 )
+
+export const ConsumerOrdersFilterSchema = v.pipe(
+  v.object({
+    userId: v.string(),
+    status: v.pipe(v.optional(v.string())),
+    dateAt: v.pipe(v.optional(v.string())),
+  })
+)
+
 export type OrdersFilterInput = v.InferInput<typeof OrdersFilterSchema>
+export type ConsumerOrdersFilterInput = v.InferInput<typeof ConsumerOrdersFilterSchema>
 
 export const getInitialOrdersFilterValues = (storeId: string) => {
   return { storeId }

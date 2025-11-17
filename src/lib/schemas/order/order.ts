@@ -4,16 +4,16 @@ import * as v from 'valibot'
 
 // basic
 export const OrderItemSchema = v.object({
-  coop_id: v.string(),
-  product_id: v.string(),
+  coopId: v.string(),
+  productId: v.string(),
   quantity: v.number(),
   price: v.number(),
 })
 export const OrderSchema = v.object({
-  user_id: v.string(),
-  user_name: v.string(),
-  store_id: v.string(),
-  total_price: v.number(),
+  userId: v.string(),
+  userName: v.string(),
+  storeId: v.string(),
+  totalPrice: v.number(),
   items: v.array(OrderItemSchema),
 })
 
@@ -30,17 +30,24 @@ export const OrderCreateSchema = v.pipe(
   })
 )
 
+export const OrderUpdateSchema = v.pipe(
+  v.object({
+    orderId: v.string(),
+  })
+)
+
 export type OrderCreateInput = v.InferInput<typeof OrderCreateSchema>
 export type OrderItemCreateInput = v.InferInput<typeof OrderItemCreateSchema>
+export type OrderUpdateInput = v.InferInput<typeof OrderUpdateSchema>
 
 export const convertCartDataToOrderInput = (auth: AuthState, store: StoreData, data: CartData): OrderCreateInput => {
   const { totalPrice, items } = data
 
   return {
-    user_id: auth.id,
-    user_name: auth.user?.user_metadata.user_name,
-    store_id: store.id,
-    total_price: totalPrice,
+    userId: auth.id,
+    userName: auth.user?.user_metadata.user_name,
+    storeId: store.id,
+    totalPrice: totalPrice,
     items: items.map(convertCartItemDataToOrderItemInput),
   }
 }
@@ -49,8 +56,8 @@ const convertCartItemDataToOrderItemInput = (item: CartItemData): OrderItemCreat
   const { coopId, productId, quantity, price } = item
 
   return {
-    coop_id: coopId,
-    product_id: productId,
+    coopId,
+    productId,
     quantity,
     price,
   }
