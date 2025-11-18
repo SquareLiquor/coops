@@ -1,7 +1,7 @@
 <script lang="ts">
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { ConsumerOrdersFilterSchema as FilterSchema } from '$lib/schemas'
-  import { type OrderData } from '$lib/types'
+  import { equalsEnum, OrderStatus, type OrderData } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
@@ -55,9 +55,16 @@
   <title>주문내역 - 공동구매</title>
 </svelte:head>
 
+{#if $submitting || $filterSubmitting}
+  <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+    <span class="loader-giant"></span>
+  </div>
+{/if}
+
 <div class="border-surface-200 from-primary-500/5 border-b bg-gradient-to-b to-white px-4 pt-2 pb-4">
   <form method="POST" action="?/fetch" use:filterEnhance>
     <input type="hidden" name="userId" value={$filterForm.userId} />
+
     <div class="container mx-auto">
       <div class="flex items-center space-x-4">
         <div class="w-35 flex-shrink-0">
@@ -88,16 +95,8 @@
   </form>
 </div>
 
-<!-- Main Content -->
 <main class="container mx-auto px-4 py-4 pb-20">
-  {#if $filterSubmitting}
-    <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
-      <span class="loader-giant"></span>
-    </div>
-  {/if}
-
   {#if orders.length === 0}
-    <!-- Empty State -->
     <div class="flex flex-col items-center justify-center py-16 text-center">
       <svg class="text-surface-400 mb-4 h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -115,15 +114,9 @@
         <form method="POST" use:enhance>
           <input type="hidden" name="orderId" value={order.id} />
 
-          {#if $submitting}
-            <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-              <span class="loader"></span>
-            </div>
-          {/if}
           <div
             class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 overflow-hidden rounded-xl border bg-white shadow-sm"
           >
-            <!-- Order Header -->
             <div class="border-surface-300 dark:border-surface-600 border-b border-dashed p-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
@@ -138,7 +131,7 @@
                         class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-semibold"
                       >
                         주문번호:
-                        <span class="ml-1 max-w-[120px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
+                        <span class="ml-1 max-w-[100px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
                           {order.id}
                         </span>
                       </span>
@@ -168,7 +161,6 @@
               </div>
             </div>
 
-            <!-- Order Items -->
             <div class="p-4">
               <div class="space-y-3">
                 {#each order.items as item}
@@ -180,14 +172,23 @@
                       loading="lazy"
                     />
                     <div class="min-w-0 flex-1">
-                      <p class="text-surface-900 dark:text-surface-100 truncate text-sm font-medium">
+                      <p
+                        class="text-surface-900 dark:text-surface-100 truncate text-sm font-medium"
+                        class:line-through={equalsEnum(item.status, OrderStatus.CANCELLED)}
+                      >
                         {item.coop.name}
                       </p>
-                      <p class="text-surface-600 dark:text-surface-400 text-xs">
+                      <p
+                        class="text-surface-600 dark:text-surface-400 text-xs"
+                        class:line-through={equalsEnum(item.status, OrderStatus.CANCELLED)}
+                      >
                         {formatCurrency(item.price)} × {item.quantity}개
                       </p>
                     </div>
-                    <div class="text-surface-900 dark:text-surface-100 text-sm font-semibold">
+                    <div
+                      class="text-surface-900 dark:text-surface-100 text-sm font-semibold"
+                      class:line-through={equalsEnum(item.status, OrderStatus.CANCELLED)}
+                    >
                       {formatCurrency(item.totalPrice)}
                     </div>
                   </div>
@@ -195,13 +196,18 @@
               </div>
             </div>
 
-            <!-- Order Footer -->
             <div class="border-surface-300 dark:border-surface-600 border-t border-dashed bg-white p-4 dark:bg-white">
               <div class="flex items-center justify-between">
-                <div class="text-surface-600 dark:text-surface-400 text-sm">
+                <div
+                  class="text-surface-600 dark:text-surface-400 text-sm"
+                  class:line-through={equalsEnum(order.status, OrderStatus.CANCELLED)}
+                >
                   총 {order.items.length}개 상품
                 </div>
-                <div class="text-primary-600 text-lg font-bold">
+                <div
+                  class="text-primary-600 text-lg font-bold"
+                  class:line-through={equalsEnum(order.status, OrderStatus.CANCELLED)}
+                >
                   {formatCurrency(order.totalPrice)}
                 </div>
               </div>

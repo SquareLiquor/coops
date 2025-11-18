@@ -2,6 +2,7 @@ import { orderDataConverter } from '$lib/converters'
 import { ConsumerOrdersFilterSchema as FilterSchema, OrderUpdateSchema } from '$lib/schemas'
 import { cancelOrder, checkCancelable, getOrdersByUserId } from '$lib/supabase'
 import { OrderStatus } from '$lib/types'
+import { fail } from '@sveltejs/kit'
 import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
@@ -20,25 +21,25 @@ export const load: PageServerLoad = async ({ parent }) => {
 }
 
 export const actions: Actions = {
+  /**
+   * 주문 목록 조회
+   */
   fetch: async ({ request }) => {
     const form = await superValidate(request, valibot(FilterSchema))
+    if (!form.valid) return fail(400, { form })
 
-    if (!form.valid) return { form }
+    const { orders } = await getOrdersByUserId(form.data)
 
-    try {
-      const { orders } = await getOrdersByUserId(form.data)
-
-      return { form, orders: convertAll(orders) }
-    } catch (error) {
-      console.error('주문 조회 오류:', error)
-      return { form }
-    }
+    return { form, orders: convertAll(orders) }
   },
+  /**
+   * 주문 취소
+   */
   cancel: async ({ request }) => {
     const form = await superValidate(request, valibot(OrderUpdateSchema))
     const { orderId } = form.data
 
-    if (!form.valid) return { form }
+    if (!form.valid) return fail(400, { form })
 
     try {
       const cancelable = await checkCancelable(orderId)
@@ -50,7 +51,6 @@ export const actions: Actions = {
 
       return message(form, '주문 취소가 완료되었습니다.')
     } catch (error) {
-      console.error(error)
       return message(form, '주문 취소 중 오류가 발생했습니다.', { status: 400 })
     }
   },
