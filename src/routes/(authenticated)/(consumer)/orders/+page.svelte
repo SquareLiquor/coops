@@ -120,12 +120,7 @@
             <div class="border-surface-300 dark:border-surface-600 border-b border-dashed p-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                  <button
-                    class="text-left"
-                    onclick={() => {
-                      /* TODO: 주문 상세 레이어 호출 */
-                    }}
-                  >
+                  <div class="text-left">
                     <div class="flex items-center gap-2">
                       <span
                         class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-semibold"
@@ -140,7 +135,7 @@
                       <span class="text-surface-700 text-sm">{dayjs(order.orderedAt).format('YYYY-MM-DD')}</span>
                       <span class="text-surface-400 text-xs">{dayjs(order.orderedAt).format('HH:mm:ss')}</span>
                     </div>
-                  </button>
+                  </div>
                 </div>
 
                 <div class="flex items-center space-x-2">

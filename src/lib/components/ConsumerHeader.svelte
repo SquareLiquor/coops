@@ -84,7 +84,7 @@
                     >
                       주문 내역
                     </button>
-                    <button
+                    <!-- <button
                       type="button"
                       class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
                       onclick={() => {
@@ -93,7 +93,7 @@
                       }}
                     >
                       설정
-                    </button>
+                    </button> -->
                     <hr class="my-2" style="border-color: #a6adc8;" />
                     <button
                       class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"

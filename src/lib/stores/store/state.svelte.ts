@@ -14,6 +14,7 @@ const setStore = (store: StoreData | undefined) => {
 }
 
 const clearStore = () => {
+  if (isBrowser()) localStorage.removeItem('store')
   storeState = undefined
 }
 
