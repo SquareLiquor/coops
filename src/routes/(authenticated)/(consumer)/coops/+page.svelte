@@ -95,13 +95,13 @@
     <input type="hidden" name="storeId" value={isBrowser() ? store?.id : ''} />
 
     <div class="container mx-auto">
-      <div class="flex items-center space-x-4">
-        <div class="w-35 flex-shrink-0">
+      <div class="flex items-center space-x-2">
+        <div class="mt-2 w-35 flex-shrink-0">
           <input type="hidden" name="dateAt" bind:value={$filterForm.dateAt} />
           <DatePicker bind:selectedDate={$filterForm.dateAt} options={{ useLimit: true }} />
         </div>
 
-        <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
+        <div class="scrollbar-hide flex space-x-2 overflow-x-scroll">
           <input type="hidden" name="status" bind:value={$filterForm.status} />
 
           {#each [{ id: undefined, name: '전체' }, ...categories] as category}

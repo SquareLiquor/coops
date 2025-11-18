@@ -1,13 +1,11 @@
 <script lang="ts">
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
-  import { ConsumerOrdersFilterSchema as FilterSchema } from '$lib/schemas'
   import { equalsEnum, OrderStatus, type OrderData } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onMount, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
-  import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
@@ -28,8 +26,10 @@
     submit: filterSubmit,
     submitting: filterSubmitting,
   } = superForm(data.filterForm, {
-    validators: valibot(FilterSchema),
     resetForm: false,
+    onChange: () => {
+      filterSubmit()
+    },
     onResult: ({ result }: { result: ActionResult }) => {
       if (result?.type === 'success') orders = result.data?.orders || []
       if (result?.type === 'failure') orders = []
@@ -66,8 +66,9 @@
     <input type="hidden" name="userId" value={$filterForm.userId} />
 
     <div class="container mx-auto">
-      <div class="flex items-center space-x-4">
-        <div class="w-35 flex-shrink-0">
+      <div class="flex items-center space-x-2">
+        <div class="mt-2 w-35 flex-shrink-0">
+          <input type="hidden" name="dateAt" bind:value={$filterForm.dateAt} />
           <DatePicker bind:selectedDate={$filterForm.dateAt} />
         </div>
 

@@ -11,13 +11,13 @@
   const max = useLimit ? parseDate(dayjs().add(2, 'week').format('YYYY-MM-DD')) : undefined
 
   const handleValueChange = (details: any) => {
-    selectedDate = details.valueAsString
+    selectedDate = details.value.at(0).toString()
   }
 </script>
 
-<DatePicker locale="ko-KR" {defaultValue} {min} {max} onValueChange={handleValueChange}>
+<DatePicker {defaultValue} {min} {max} onValueChange={handleValueChange}>
   <DatePicker.Control class="">
-    <DatePicker.Input placeholder="yyyy/mm/dd" class="h-9 items-center text-sm" />
+    <DatePicker.Input class="h-9 text-sm" placeholder="yyyy/mm/dd" />
     <DatePicker.Trigger />
   </DatePicker.Control>
   <Portal>

@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'
   import { getAuth, getStore } from '$lib/stores'
   import { Store } from '@lucide/svelte'
+  import { isBrowser } from '@supabase/ssr'
 
   const user = $derived(getAuth().user)
   const store = $derived(getStore())
@@ -20,6 +21,11 @@
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   })
+
+  const signout = () => {
+    goto('/auth/signout?redirectTo=/')
+    if (isBrowser()) localStorage.removeItem('store')
+  }
 </script>
 
 {#if store}
@@ -97,8 +103,8 @@
                     <hr class="my-2" style="border-color: #a6adc8;" />
                     <button
                       class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                      type="submit"
-                      formaction="/auth/signout?redirectTo=/"
+                      type="button"
+                      onclick={signout}
                     >
                       로그아웃
                     </button>

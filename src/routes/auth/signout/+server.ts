@@ -1,7 +1,7 @@
 import { clearAuth, clearStore } from '$lib/stores/index.js'
 import { redirect } from '@sveltejs/kit'
 
-export const POST = async ({ url, cookies, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { supabase } }) => {
   const { error } = await supabase.auth.signOut()
 
   if (error) {
