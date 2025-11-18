@@ -54,7 +54,7 @@ export const coopDataConverter = () => {
     }
   }
 
-  const convertAll = (datas: any[]): CoopData[] | [] => {
+  const convertAll = (datas: any[] | null): CoopData[] | [] => {
     if (!datas) return []
 
     return datas.map(convert).filter((item): item is CoopData => item !== null)
@@ -81,7 +81,7 @@ export const coopImageDataConverter = () => {
     }
   }
 
-  const convertAll = (datas: any[]): ImageData[] | [] => {
+  const convertAll = (datas: any[] | null): ImageData[] | [] => {
     if (!datas) return []
 
     return datas

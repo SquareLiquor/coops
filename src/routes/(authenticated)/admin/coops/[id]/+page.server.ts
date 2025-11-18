@@ -1,3 +1,4 @@
+import { coopDataConverter } from '$lib/converters'
 import { isAppError } from '$lib/errors'
 import type { ImageInput } from '$lib/schemas'
 import { coopDataToUpdateInput, CoopUpdateSchema, type CoopUpdateInput } from '$lib/schemas'
@@ -8,6 +9,8 @@ import { error, fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
+
+const { convert } = coopDataConverter()
 
 export const load: PageServerLoad = async ({ params, parent }) => {
   const { store } = await parent()
@@ -24,7 +27,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
   const salesStatuses = [...Object.values(SalesStatus)]
 
   return {
-    coop,
+    coop: convert(coop),
     form,
     categories,
     unitTypes,

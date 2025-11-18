@@ -1,20 +1,12 @@
 import { coopDataConverter } from '$lib/converters'
 import { CoopsFilterSchema, getInitialCoopsFilterValues as getInitialFilter } from '$lib/schemas'
-import { getCategories } from '$lib/supabase'
+import { getCategories, getCoopsByStore } from '$lib/supabase'
 import { SalesStatus } from '$lib/types'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
 
-const { convert, convertAll } = coopDataConverter()
-
-const coopSelectQuery = `
-  *,
-  store:store_id(*),
-  images:coop_images(*),
-  product:product_id(*),
-  category:category_id(*)
-`
+const { convertAll } = coopDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
@@ -38,24 +30,11 @@ export const actions: Actions = {
     const form = await superValidate(request, valibot(CoopsFilterSchema))
     if (!form.valid) return { form }
 
-    const { storeId, categoryId, name, status, dateFrom, dateTo } = form.data
-    const query = supabase
-      .from('coops')
-      .select(coopSelectQuery)
-      .eq('store_id', storeId)
-      .order('sales_date', { ascending: false })
-
-    if (categoryId) query.eq('category_id', categoryId)
-    if (name) query.ilike('name', `%${name}%`)
-    if (status) query.eq('status', status)
-    if (dateFrom) query.gte('sales_date', dateFrom)
-    if (dateTo) query.lte('sales_date', dateTo)
-
-    const { data, error } = await query
+    const { coops } = await getCoopsByStore(form.data)
 
     return {
       form,
-      coops: data ? convertAll(data) : [],
+      coops: convertAll(coops),
     }
   },
 }

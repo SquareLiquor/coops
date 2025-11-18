@@ -31,7 +31,16 @@ export const CoopsFilterSchema = v.pipe(
   )
 )
 
+export const ConsumerCoopsFilterSchema = v.pipe(
+  v.object({
+    storeId: v.string(),
+    status: v.pipe(v.optional(v.string())),
+    dateAt: v.pipe(v.optional(v.string())),
+  })
+)
+
 export type CoopsFilterInput = v.InferInput<typeof CoopsFilterSchema>
+export type ConsumerCoopsFilterSchema = v.InferInput<typeof ConsumerCoopsFilterSchema>
 
 export const getInitialCoopsFilterValues = (storeId: string) => {
   return { storeId }

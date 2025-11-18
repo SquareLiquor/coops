@@ -1,24 +1,14 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'
   import CoopFooter from '$lib/components/CoopFooter.svelte'
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
-  import { coopDataConverter } from '$lib/converters'
-  import { convertCartDataToOrderInput } from '$lib/schemas'
-  import {
-    addToCart,
-    clearCart,
-    getAuth,
-    getCart,
-    getCartItem,
-    getStore,
-    hasCartItem,
-    updateCartItem,
-  } from '$lib/stores'
+  import { convertCartDataToOrderInput, coopDataToCartItemData } from '$lib/schemas'
+  import { addToCart, getAuth, getCart, getCartItem, getStore, hasCartItem, updateCartItem } from '$lib/stores'
   import { getCategories } from '$lib/supabase'
   import type { CategoryData, CoopData } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
+  import { isBrowser } from '@supabase/ssr'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onMount, tick } from 'svelte'
@@ -26,37 +16,39 @@
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
-  let { supabase, coopsSelectQuery } = data
 
   let coops = $state<CoopData[]>([])
   let categories = $state<CategoryData[]>([])
-  let filteredCoops = $derived.by(() => {
-    return coops.filter((coop) => {
-      const matchesDate = dayjs(coop.salesDate).isSame(dayjs(selectedDate), 'day')
-      const matchesCategory = selectedCategory ? coop.category.id === selectedCategory : true
-      return matchesDate && matchesCategory
-    })
-  })
 
   let isCartOpen = $state(false)
   let selectedCoopId = $state<string | null>(null)
-  let selectedDate = $state(dayjs().format('YYYY-MM-DD'))
-  let selectedCategory: string | undefined = $state(undefined)
+
+  const store = $derived(getStore())
 
   onMount(async () => {
     await tick()
-    const store = getStore()
 
-    const [coopsRes, categoriesRes] = await Promise.all([
-      supabase.from('coops').select(coopsSelectQuery).eq('store_id', store.id).eq('status', 'ONGOING'),
-      getCategories(store.id),
-    ])
+    const { categories: _categories } = await getCategories(store.id)
+    categories = _categories
 
-    coops = coopDataConverter().convertAll(coopsRes.data ?? [])
-    categories = categoriesRes.categories
+    filterSubmit()
+  })
 
-    $cartForm.storeId = store.id
-    $cartForm.userId = getAuth().user!.id
+  const {
+    form: filterForm,
+    enhance: filterEnhance,
+    submit: filterSubmit,
+    submitting: filterSubmitting,
+  } = superForm(data.filterForm, {
+    resetForm: false,
+    onChange: async () => {
+      $filterForm.storeId = store.id
+      filterSubmit()
+    },
+    onResult: ({ result }: { result: ActionResult }) => {
+      if (result?.type === 'success') coops = result.data?.coops || []
+      if (result?.type === 'failure') coops = []
+    },
   })
 
   const {
@@ -69,93 +61,73 @@
       $cartForm = convertCartDataToOrderInput(getAuth(), getStore(), getCart())
       isCartOpen = false
     },
-    onResult: async ({ result, ...results }: { result: ActionResult }) => {
-      if (result.type === 'success') {
-        toaster.success({
-          description: '주문이 성공적으로 생성되었습니다.',
-          duration: 5000,
-          action: {
-            label: '확인',
-            onClick: () => {
-              clearCart()
-              goto('/orders')
-            },
-          },
-        })
-      }
+    onResult: async ({ result }: { result: ActionResult }) => {
+      if (result.type === 'success' || result.type === 'failure') {
+        const toast = result.type === 'success' ? toaster.success : toaster.error
 
-      if (result.type === 'failure') {
-        toaster.error({
-          title: '주문 생성 실패',
-          description: '주문 생성에 실패했습니다. 다시 시도해 주세요.',
+        filterSubmit()
+        toast({
+          description: result.data?.form.message,
           duration: 5000,
         })
       }
     },
-    invalidateAll: false,
   })
 
   const handleChangeQuantity = (coop: CoopData, quantity: number) => {
     if (hasCartItem(coop.id)) {
       updateCartItem(coop.id, quantity)
-      return
+    } else {
+      const cartItem = coopDataToCartItemData(coop, quantity)
+      addToCart(cartItem)
     }
-
-    const {
-      name,
-      salesPrice: price,
-      salesDate: sales_date,
-      product: { images },
-    } = coop
-
-    addToCart({
-      coopId: coop.id,
-      productId: coop.product.id,
-      name,
-      quantity,
-      price,
-      sales_date,
-      image: images.find((image) => image.representative)?.url || '',
-    })
   }
 </script>
 
-{#if $submitting}
+{#if $submitting || $filterSubmitting}
   <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
     <span class="loader-giant"></span>
   </div>
 {/if}
 
 <div class="border-surface-200 from-primary-500/5 border-b bg-gradient-to-b to-white px-4 pt-2 pb-4">
-  <div class="container mx-auto">
-    <div class="flex items-center space-x-4">
-      <div class="w-35 flex-shrink-0">
-        <DatePicker bind:selectedDate options={{ useLimit: true }} />
-      </div>
+  <form method="POST" action="?/fetch" use:filterEnhance>
+    <input type="hidden" name="storeId" value={isBrowser() ? store?.id : ''} />
 
-      <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
-        {#each [{ id: undefined, name: '전체' }, ...categories] as category}
-          <button
-            class="rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap"
-            class:text-white={selectedCategory === category.id}
-            class:bg-primary-500={selectedCategory === category.id}
-            class:text-surface-700={selectedCategory !== category.id}
-            class:border-surface-200={selectedCategory !== category.id}
-            class:hover:bg-surface-50={selectedCategory !== category.id}
-            class:border={selectedCategory !== category.id}
-            class:bg-white={selectedCategory !== category.id}
-            onclick={() => (selectedCategory = category.id)}
-          >
-            {category.name}
-          </button>
-        {/each}
+    <div class="container mx-auto">
+      <div class="flex items-center space-x-4">
+        <div class="w-35 flex-shrink-0">
+          <input type="hidden" name="dateAt" bind:value={$filterForm.dateAt} />
+          <DatePicker bind:selectedDate={$filterForm.dateAt} options={{ useLimit: true }} />
+        </div>
+
+        <div class="scrollbar-hide flex flex-1 space-x-2 overflow-x-scroll">
+          <input type="hidden" name="status" bind:value={$filterForm.status} />
+
+          {#each [{ id: undefined, name: '전체' }, ...categories] as category}
+            <button
+              type="button"
+              class="rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap"
+              class:text-white={$filterForm.status === category.id}
+              class:bg-primary-500={$filterForm.status === category.id}
+              class:text-surface-700={$filterForm.status !== category.id}
+              class:border-surface-200={$filterForm.status !== category.id}
+              class:hover:bg-surface-50={$filterForm.status !== category.id}
+              class:border={$filterForm.status !== category.id}
+              class:bg-white={$filterForm.status !== category.id}
+              onclick={() => ($filterForm.status = category.id)}
+            >
+              {category.name}
+            </button>
+          {/each}
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>
 
 <main class="container mx-auto px-4 py-3 pb-20">
-  {#if filteredCoops.length === 0}
+  {#if coops.length === 0}
     <div class="flex flex-col items-center justify-center py-16 text-center">
       <svg class="text-surface-400 mb-4 h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -169,7 +141,7 @@
     </div>
   {:else}
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-      {#each filteredCoops as coop}
+      {#each coops as coop}
         <div
           class="border-surface-200 overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
           role="button"
@@ -281,5 +253,5 @@
 </form>
 
 {#if selectedCoopId}
-  <CoopDetailModal bind:selectedCoopId coops={filteredCoops} />
+  <CoopDetailModal bind:selectedCoopId {coops} />
 {/if}

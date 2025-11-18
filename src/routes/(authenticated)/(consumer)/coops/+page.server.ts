@@ -1,42 +1,54 @@
+import { coopDataConverter } from '$lib/converters'
 import { isAppError } from '$lib/errors'
 import { createOrderHook } from '$lib/hooks/orders'
-import { OrderSchema } from '$lib/schemas'
-import { createOrder } from '$lib/supabase'
+import { ConsumerCoopsFilterSchema as FilterSchema, OrderSchema } from '$lib/schemas'
+import { createOrder, getCoopsForUser } from '$lib/supabase'
 import { fail } from '@sveltejs/kit'
-import { setError, superValidate } from 'sveltekit-superforms'
+import dayjs from 'dayjs'
+import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
 
-const coopsSelectQuery = `
-  *,
-  store:store_id(*),
-  images:coop_images(*),
-  product:product_id(*),
-  category:category_id(*)
-`
+const { convertAll } = coopDataConverter()
 
-export const load: PageServerLoad = async () => {
-  const form = await superValidate(valibot(OrderSchema), { errors: false })
+export const load: PageServerLoad = async ({ parent }) => {
+  const { user } = await parent()
 
-  return { form, coopsSelectQuery }
+  const form = await superValidate({ userId: user.id }, valibot(OrderSchema), { errors: false })
+  const filterForm = await superValidate({ dateAt: dayjs().format('YYYY-MM-DD') }, valibot(FilterSchema))
+
+  return { form, filterForm }
 }
 
 export const actions: Actions = {
-  createOrder: async ({ request, locals: { supabase } }) => {
-    const form = await superValidate(request, valibot(OrderSchema))
+  /**
+   * 공동구매 목록 조회
+   */
+  fetch: async ({ request }) => {
+    const form = await superValidate(request, valibot(FilterSchema))
+    if (!form.valid) return fail(400, { form })
 
+    const { coops } = await getCoopsForUser(form.data)
+
+    return { form, coops: convertAll(coops) }
+  },
+  /**
+   * 주문 생성
+   */
+  createOrder: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderSchema))
     if (!form.valid) return fail(400, { form })
 
     try {
       const { data } = await createOrder(form.data)
       createOrderHook.runAfter({ order: form.data, orderId: data.id })
 
-      return { form }
+      return message(form, '주문이 성공적으로 생성되었습니다.')
     } catch (error) {
       if (isAppError(error)) error.errorHandler()
 
       await createOrderHook.runCleanup({})
-      return setError(form, '주문 생성 중 오류가 발생했습니다.')
+      return message(form, '주문 생성 중 오류가 발생했습니다.', { status: 400 })
     }
   },
 }

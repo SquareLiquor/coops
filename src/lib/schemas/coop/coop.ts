@@ -1,4 +1,4 @@
-import { SalesStatus } from '$lib/types'
+import { SalesStatus, type CoopData } from '$lib/types'
 import dayjs from 'dayjs'
 import * as v from 'valibot'
 import { ImageSchema } from '../common/image'
@@ -105,5 +105,24 @@ export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
         use: true,
         new: false,
       })) || [],
+  }
+}
+
+export const coopDataToCartItemData = (coop: CoopData, quantity: number) => {
+  const {
+    name,
+    salesPrice: price,
+    salesDate: sales_date,
+    product: { images },
+  } = coop
+
+  return {
+    coopId: coop.id,
+    productId: coop.product.id,
+    name,
+    quantity,
+    price,
+    sales_date,
+    image: images.find((image) => image.representative)?.url || '',
   }
 }
