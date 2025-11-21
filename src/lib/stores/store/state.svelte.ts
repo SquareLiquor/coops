@@ -4,13 +4,17 @@ import { isBrowser } from '@supabase/ssr'
 let storeState = $state<StoreData>()
 
 const getStore = () => {
-  if (!isBrowser()) return null
-  const json = localStorage.getItem('store')
-  return json ? JSON.parse(json) : null
+  if (isBrowser()) {
+    const json = localStorage.getItem('store')
+    if (json) return JSON.parse(json)
+  }
+
+  return storeState
 }
 
 const setStore = (store: StoreData | undefined) => {
   if (isBrowser()) localStorage.setItem('store', JSON.stringify(store))
+  storeState = store
 }
 
 const clearStore = () => {

@@ -1,7 +1,8 @@
 import { invalidate } from '$app/navigation'
 import { createBrowserClient } from '$lib/supabase'
 import type { Session } from '@supabase/supabase-js'
-import { setError, setLoading } from './state.svelte'
+import { clearStore } from '../store'
+import { clearAuth, setError, setLoading } from './state.svelte'
 import { syncUserToAuthState } from './sync.svelte'
 
 let sessionState = $state<Session | null>(null)
@@ -57,7 +58,11 @@ export function setupAuthStateListener() {
 
       const sessionChanged = hasSessionChanged(prevSession, currentSession)
       if (sessionChanged) {
-        if (event === 'SIGNED_OUT') window.location.href = '/'
+        if (event === 'SIGNED_OUT') {
+          clearAuth()
+          clearStore()
+          window.location.href = '/'
+        }
         invalidate('supabase:auth')
       }
 

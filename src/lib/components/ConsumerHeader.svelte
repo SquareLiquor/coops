@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { getAuth, getStore } from '$lib/stores'
+  import { signout } from '$lib/supabase'
   import { Store } from '@lucide/svelte'
-  import { isBrowser } from '@supabase/ssr'
 
   const user = $derived(getAuth().user)
   const store = $derived(getStore())
@@ -21,11 +21,6 @@
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   })
-
-  const signout = () => {
-    goto('/auth/signout?redirectTo=/')
-    if (isBrowser()) localStorage.removeItem('store')
-  }
 </script>
 
 {#if store}
@@ -35,7 +30,6 @@
   >
     <div class="px-4 py-2">
       <div class="relative flex items-center">
-        <!-- 로고 (왼쪽) -->
         <Store class="text-xs text-white" size={24} onclick={() => goto('/coops')} />
         <!-- <div class="flex items-center">
         <button
@@ -48,12 +42,10 @@
         </button>
       </div> -->
 
-        <!-- 상점명 (가운데) -->
         <div class="absolute left-1/2 -translate-x-1/2 transform">
           <h1 class="text-base font-bold text-white">{store.name}</h1>
         </div>
 
-        <!-- 사용자 메뉴 (오른쪽) -->
         <div class="relative ml-auto">
           {#if user}
             <button
@@ -71,26 +63,24 @@
               </svg>
             </button>
 
-            <!-- 드롭다운 메뉴 -->
             {#if showUserMenu}
               <div
                 bind:this={userMenuRef}
                 class="absolute top-full right-0 mt-2 w-48 rounded-lg border bg-white shadow-lg"
                 style="border-color: #a6adc8;"
               >
-                <form method="POST">
-                  <div class="py-2">
-                    <button
-                      type="button"
-                      class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
-                      onclick={() => {
-                        showUserMenu = false
-                        goto('/orders')
-                      }}
-                    >
-                      주문 내역
-                    </button>
-                    <!-- <button
+                <div class="py-2">
+                  <button
+                    type="button"
+                    class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
+                    onclick={() => {
+                      showUserMenu = false
+                      goto('/orders')
+                    }}
+                  >
+                    주문 내역
+                  </button>
+                  <!-- <button
                       type="button"
                       class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
                       onclick={() => {
@@ -100,16 +90,15 @@
                     >
                       설정
                     </button> -->
-                    <hr class="my-2" style="border-color: #a6adc8;" />
-                    <button
-                      class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                      type="button"
-                      onclick={signout}
-                    >
-                      로그아웃
-                    </button>
-                  </div>
-                </form>
+                  <hr class="my-2" style="border-color: #a6adc8;" />
+                  <button
+                    class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                    type="button"
+                    onclick={signout}
+                  >
+                    로그아웃
+                  </button>
+                </div>
               </div>
             {/if}
           {/if}
