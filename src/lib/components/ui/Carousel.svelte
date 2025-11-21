@@ -45,13 +45,11 @@
         {#each images as _, index}
           <button
             aria-label={`이미지 ${index + 1}`}
-            class="rounded-full"
-            class:bg-primary-500={currentPageIndex === index}
-            class:h-3={currentPageIndex === index}
-            class:w-3={currentPageIndex === index}
-            class:bg-surface-50={currentPageIndex !== index}
-            class:h-2={currentPageIndex !== index}
-            class:w-2={currentPageIndex !== index}
+            class={[
+              'rounded-full',
+              currentPageIndex === index && 'bg-primary-500 h-3 w-3',
+              currentPageIndex !== index && 'bg-surface-50 h-2 w-2',
+            ]}
             onclick={() => showPage(index)}
           ></button>
         {/each}

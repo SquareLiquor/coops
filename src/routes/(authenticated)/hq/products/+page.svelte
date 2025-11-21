@@ -91,10 +91,11 @@
               type="date"
               name="dateFrom"
               bind:value={$filterForm.dateFrom}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateFrom}
-              class:text-primary-700={$filterForm.dateFrom}
-              class:border-surface-100={!$filterForm.dateFrom}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateFrom && 'border-primary-500 text-primary-700',
+                !$filterForm.dateFrom && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
@@ -102,10 +103,11 @@
               type="date"
               name="dateTo"
               bind:value={$filterForm.dateTo}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateTo}
-              class:text-primary-700={$filterForm.dateTo}
-              class:border-surface-100={!$filterForm.dateTo}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateTo && 'border-primary-500 text-primary-700',
+                !$filterForm.dateTo && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateTo}
             />
           </div>
@@ -130,10 +132,11 @@
           name="productName"
           bind:value={$filterForm.productName}
           placeholder="상품명 검색"
-          class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          class:border-primary-500={$filterForm.productName}
-          class:text-primary-700={$filterForm.productName}
-          class:border-surface-100={!$filterForm.productName}
+          class={[
+            'focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+            $filterForm.productName && 'border-primary-500 text-primary-700',
+            !$filterForm.productName && 'border-surface-100',
+          ]}
         />
       </div>
 
@@ -153,12 +156,11 @@
       <input type="hidden" name="status" bind:value={$filterForm.status} />
       {#each statuses as status}
         <button
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors"
-          class:bg-primary-500={$filterForm.status === status.code}
-          class:text-primary-50={$filterForm.status === status.code}
-          class:shadow-sm={$filterForm.status === status.code}
-          class:text-surface-600={$filterForm.status !== status.code}
-          class:hover:text-surface-800={$filterForm.status !== status.code}
+          class={[
+            'rounded px-3 py-1.5 text-sm font-medium transition-colors',
+            $filterForm.status === status.code && 'bg-primary-500 text-primary-50 shadow-sm',
+            $filterForm.status !== status.code && 'text-surface-600 hover:text-surface-800',
+          ]}
           onclick={() => ($filterForm.status = status.code)}
         >
           {status.label}

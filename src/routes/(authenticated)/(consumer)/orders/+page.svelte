@@ -77,14 +77,12 @@
 
           {#each [{ code: undefined, label: '전체' }, ...statuses] as status}
             <button
-              class="rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap"
-              class:text-white={$filterForm.status === status.code}
-              class:bg-primary-500={$filterForm.status === status.code}
-              class:text-surface-700={$filterForm.status !== status.code}
-              class:border-surface-200={$filterForm.status !== status.code}
-              class:hover:bg-surface-50={$filterForm.status !== status.code}
-              class:border={$filterForm.status !== status.code}
-              class:bg-white={$filterForm.status !== status.code}
+              class={[
+                'rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap',
+                $filterForm.status === status.code && 'bg-primary-500 text-white',
+                $filterForm.status !== status.code &&
+                  'text-surface-700 border-surface-200 hover:bg-surface-50 border bg-white',
+              ]}
               onclick={() => ($filterForm.status = status.code)}
             >
               {status.label}
@@ -169,21 +167,27 @@
                     />
                     <div class="min-w-0 flex-1">
                       <p
-                        class="text-surface-900 dark:text-surface-100 truncate text-sm font-medium"
-                        class:line-through={equalsEnum(item.status, OrderStatus.CANCELLED)}
+                        class={[
+                          'text-surface-900 dark:text-surface-100 truncate text-sm font-medium',
+                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                        ]}
                       >
                         {item.coop.name}
                       </p>
                       <p
-                        class="text-surface-600 dark:text-surface-400 text-xs"
-                        class:line-through={equalsEnum(item.status, OrderStatus.CANCELLED)}
+                        class={[
+                          'text-surface-600 dark:text-surface-400 text-xs',
+                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                        ]}
                       >
                         {formatCurrency(item.price)} × {item.quantity}개
                       </p>
                     </div>
                     <div
-                      class="text-surface-900 dark:text-surface-100 text-sm font-semibold"
-                      class:line-through={equalsEnum(item.status, OrderStatus.CANCELLED)}
+                      class={[
+                        'text-surface-900 dark:text-surface-100 text-sm font-semibold',
+                        equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                      ]}
                     >
                       {formatCurrency(item.totalPrice)}
                     </div>
@@ -195,14 +199,18 @@
             <div class="border-surface-300 dark:border-surface-600 border-t border-dashed bg-white p-4 dark:bg-white">
               <div class="flex items-center justify-between">
                 <div
-                  class="text-surface-600 dark:text-surface-400 text-sm"
-                  class:line-through={equalsEnum(order.status, OrderStatus.CANCELLED)}
+                  class={[
+                    'text-surface-600 dark:text-surface-400 text-sm',
+                    equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                  ]}
                 >
                   총 {order.items.length}개 상품
                 </div>
                 <div
-                  class="text-primary-600 text-lg font-bold"
-                  class:line-through={equalsEnum(order.status, OrderStatus.CANCELLED)}
+                  class={[
+                    'text-primary-600 text-lg font-bold',
+                    equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                  ]}
                 >
                   {formatCurrency(order.totalPrice)}
                 </div>

@@ -102,10 +102,11 @@
               type="date"
               name="dateFrom"
               bind:value={$filterForm.dateFrom}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateFrom}
-              class:text-primary-700={$filterForm.dateFrom}
-              class:border-surface-100={!$filterForm.dateFrom}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateFrom && 'border-primary-500 text-primary-700',
+                !$filterForm.dateFrom && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
@@ -113,10 +114,11 @@
               type="date"
               name="dateTo"
               bind:value={$filterForm.dateTo}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateTo}
-              class:text-primary-700={$filterForm.dateTo}
-              class:border-surface-100={!$filterForm.dateTo}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateTo && 'border-primary-500 text-primary-700',
+                !$filterForm.dateTo && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateTo}
             />
           </div>
@@ -127,10 +129,11 @@
           name="name"
           bind:value={$filterForm.name}
           placeholder="주문자 검색"
-          class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          class:border-primary-500={$filterForm.name}
-          class:text-primary-700={$filterForm.name}
-          class:border-surface-100={!$filterForm.name}
+          class={[
+            'focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+            $filterForm.name && 'border-primary-500 text-primary-700',
+            !$filterForm.name && 'border-surface-100',
+          ]}
         />
       </div>
 
@@ -151,9 +154,11 @@
       {#each salesStatuses as option}
         <button
           type="button"
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {$filterForm.status === option.code
-            ? 'bg-primary-500 text-white shadow-sm'
-            : 'text-surface-600 hover:bg-surface-100'}"
+          class={[
+            'rounded px-3 py-1.5 text-sm font-medium transition-colors',
+            $filterForm.status === option.code && 'bg-primary-500 text-white shadow-sm',
+            $filterForm.status !== option.code && 'text-surface-600 hover:bg-surface-100',
+          ]}
           onclick={() => ($filterForm.status = option.code)}
         >
           {option.label}

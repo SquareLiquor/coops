@@ -107,14 +107,12 @@
           {#each [{ id: undefined, name: '전체' }, ...categories] as category}
             <button
               type="button"
-              class="rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap"
-              class:text-white={$filterForm.status === category.id}
-              class:bg-primary-500={$filterForm.status === category.id}
-              class:text-surface-700={$filterForm.status !== category.id}
-              class:border-surface-200={$filterForm.status !== category.id}
-              class:hover:bg-surface-50={$filterForm.status !== category.id}
-              class:border={$filterForm.status !== category.id}
-              class:bg-white={$filterForm.status !== category.id}
+              class={[
+                'rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap',
+                $filterForm.status === category.id && 'bg-primary-500  text-white',
+                $filterForm.status !== category.id &&
+                  'text-surface-700 border-surface-200 hover:bg-surface-50 border bg-white',
+              ]}
               onclick={() => ($filterForm.status = category.id)}
             >
               {category.name}

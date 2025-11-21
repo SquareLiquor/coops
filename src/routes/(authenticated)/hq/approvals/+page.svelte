@@ -91,10 +91,11 @@
               type="date"
               name="date_from"
               bind:value={$filterForm.dateFrom}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateFrom}
-              class:text-primary-700={$filterForm.dateFrom}
-              class:border-surface-100={!$filterForm.dateFrom}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateFrom && 'border-primary-500 text-primary-700',
+                !$filterForm.dateFrom && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
@@ -102,10 +103,11 @@
               type="date"
               name="date_to"
               bind:value={$filterForm.dateTo}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateTo}
-              class:text-primary-700={$filterForm.dateTo}
-              class:border-surface-100={!$filterForm.dateTo}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateTo && 'border-primary-500 text-primary-700',
+                !$filterForm.dateTo && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateTo}
             />
           </div>
@@ -115,10 +117,11 @@
         <select
           name="store_id"
           bind:value={$filterForm.storeId}
-          class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          class:border-primary-500={$filterForm.storeId}
-          class:text-primary-700={$filterForm.storeId}
-          class:border-surface-100={!$filterForm.storeId}
+          class={[
+            'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+            $filterForm.storeId && 'border-primary-500 text-primary-700',
+            !$filterForm.storeId && 'border-surface-100',
+          ]}
         >
           <option value={undefined} selected>전체</option>
           {#each stores as store}
@@ -145,12 +148,11 @@
       <input type="hidden" name="status" bind:value={$filterForm.status} />
       {#each statuses as option}
         <button
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors"
-          class:bg-primary-500={$filterForm.status === option.code}
-          class:text-primary-50={$filterForm.status === option.code}
-          class:shadow-sm={$filterForm.status === option.code}
-          class:text-surface-600={$filterForm.status !== option.code}
-          class:hover:text-surface-800={$filterForm.status !== option.code}
+          class={[
+            'rounded px-3 py-1.5 text-sm font-medium transition-colors',
+            $filterForm.status === option.code && 'bg-primary-500 text-primary-50 shadow-sm',
+            $filterForm.status !== option.code && 'text-surface-600 hover:text-surface-800',
+          ]}
           onclick={() => ($filterForm.status = option.code)}
         >
           {option.label}
@@ -200,10 +202,10 @@
             </td>
             <td class="text-surface-500 px-6 py-4 text-sm">
               <span
-                class="inline-flex rounded-full px-2 py-1 text-xs font-medium text-white"
-                class:bg-success-500={equalsEnum(ApprovalStatus.APPROVED, request.status)}
-                class:bg-error-500={equalsEnum(ApprovalStatus.REJECTED, request.status)}
-                class:bg-warning-500={equalsEnum(ApprovalStatus.PENDING, request.status)}
+                class={[
+                  'inline-flex rounded-full px-2 py-1 text-xs font-medium text-white',
+                  request.status && `bg-${request.status.color}-500`,
+                ]}
               >
                 {request.status?.label}
               </span>
@@ -216,12 +218,7 @@
               {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
                 -
               {:else}
-                <div
-                  class="text-xs"
-                  class:text-success-500={equalsEnum(ApprovalStatus.APPROVED, request.status)}
-                  class:text-error-500={equalsEnum(ApprovalStatus.REJECTED, request.status)}
-                  class:text-warning-500={equalsEnum(ApprovalStatus.PENDING, request.status)}
-                >
+                <div class={['text-xs', request.status && `text-${request.status.color}-500`]}>
                   {equalsEnum(ApprovalStatus.APPROVED, request.status)
                     ? dayjs(request.approvedAt).format('YYYY-MM-DD')
                     : dayjs(request.cancelledAt).format('YYYY-MM-DD')}

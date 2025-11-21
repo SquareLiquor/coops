@@ -2,7 +2,6 @@
   import CoopDetailModal from '$lib/components/modals/admin/CoopDetailModal.svelte'
   import { CoopsFilterSchema as FilterSchema } from '$lib/schemas'
   import type { CoopData } from '$lib/types'
-  import { equalsEnum, SalesStatus } from '$lib/types'
   import { debounce, formatCurrency } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
@@ -103,10 +102,11 @@
               type="date"
               name="dateFrom"
               bind:value={$filterForm.dateFrom}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateFrom}
-              class:text-primary-700={$filterForm.dateFrom}
-              class:border-surface-100={!$filterForm.dateFrom}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateFrom && 'border-primary-500 text-primary-700',
+                !$filterForm.dateFrom && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateFrom}
             />
             <span class="text-surface-400">~</span>
@@ -114,10 +114,11 @@
               type="date"
               name="dateTo"
               bind:value={$filterForm.dateTo}
-              class="focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-              class:border-primary-500={$filterForm.dateTo}
-              class:text-primary-700={$filterForm.dateTo}
-              class:border-surface-100={!$filterForm.dateTo}
+              class={[
+                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+                $filterForm.dateTo && 'border-primary-500 text-primary-700',
+                !$filterForm.dateTo && 'border-surface-100',
+              ]}
               {...$filterConstraints.dateTo}
             />
           </div>
@@ -141,10 +142,11 @@
           name="name"
           bind:value={$filterForm.name}
           placeholder="상품명 검색"
-          class="focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          class:border-primary-500={$filterForm.name}
-          class:text-primary-700={$filterForm.name}
-          class:border-surface-100={!$filterForm.name}
+          class={[
+            'focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
+            $filterForm.name && 'border-primary-500 text-primary-700',
+            !$filterForm.name && 'border-surface-100',
+          ]}
         />
       </div>
 
@@ -165,9 +167,11 @@
       {#each salesStatuses as option}
         <button
           type="button"
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {$filterForm.status === option.code
-            ? 'bg-primary-500 text-white shadow-sm'
-            : 'text-surface-600 hover:bg-surface-100'}"
+          class={[
+            'rounded px-3 py-1.5 text-sm font-medium transition-colors',
+            $filterForm.status === option.code && 'bg-primary-500 text-white shadow-sm',
+            $filterForm.status !== option.code && 'text-surface-600 hover:bg-surface-100',
+          ]}
           onclick={() => ($filterForm.status = option.code)}
         >
           {option.label}
@@ -205,13 +209,7 @@
             </td>
             <td class="text-surface-500 px-6 py-4 text-sm">
               <span
-                class="inline-flex rounded-full px-2 py-1 text-xs font-medium text-white"
-                class:bg-gray-500={equalsEnum(SalesStatus.PREPARING, coop.status)}
-                class:bg-green-500={equalsEnum(SalesStatus.ONGOING, coop.status)}
-                class:bg-blue-500={equalsEnum(SalesStatus.ENDED, coop.status)}
-                class:bg-yellow-500={equalsEnum(SalesStatus.COMPLETED, coop.status)}
-                class:bg-red-500={equalsEnum(SalesStatus.STOPPED, coop.status)}
-                class:bg-orange-500={equalsEnum(SalesStatus.PAUSED, coop.status)}
+                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-white bg-${coop.status.color}-500`}
               >
                 {coop.status?.label}
               </span>
