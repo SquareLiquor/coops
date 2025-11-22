@@ -63,8 +63,8 @@
   })
 
   // 진행률 색상 클래스 반환 함수
-  function getProgressColor(coop: { currentQuantity: number; maxQuantity: number }) {
-    const percent = Math.round((coop.currentQuantity / coop.maxQuantity) * 100)
+  function getProgressColor(coop: { orderedQuantity: number; maxQuantity: number }) {
+    const percent = Math.round((coop.orderedQuantity / coop.maxQuantity) * 100)
     if (percent >= 90) return 'bg-primary-500'
     if (percent >= 70) return 'bg-primary-400'
     if (percent >= 50) return 'bg-primary-300'
@@ -236,9 +236,9 @@
             <td class="px-4 py-4 text-center">
               <div class="flex flex-col items-center gap-1">
                 <div class="mb-1 flex w-full items-center justify-between text-xs">
-                  <span class="text-surface-700 font-medium">{coop.currentQuantity}</span>
+                  <span class="text-surface-700 font-medium">{coop.orderedQuantity}</span>
                   <span class="text-surface-600 mx-auto text-base font-medium"
-                    >{Math.round((coop.currentQuantity / coop.maxQuantity) * 100)}%</span
+                    >{Math.round((coop.orderedQuantity / coop.maxQuantity) * 100)}%</span
                   >
                   <span class="text-surface-400 font-medium">{coop.maxQuantity}</span>
                 </div>
@@ -246,7 +246,7 @@
                   <div class="bg-surface-50/50 h-2 justify-between overflow-hidden rounded-full">
                     <div
                       class="h-full rounded-full transition-all duration-300 {getProgressColor(coop)}"
-                      style="width: {Math.round((coop.currentQuantity / coop.maxQuantity) * 100)}%"
+                      style="width: {Math.round((coop.orderedQuantity / coop.maxQuantity) * 100)}%"
                     ></div>
                   </div>
                 </div>

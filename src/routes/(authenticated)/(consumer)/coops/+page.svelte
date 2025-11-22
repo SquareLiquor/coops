@@ -102,18 +102,18 @@
         </div>
 
         <div class="scrollbar-hide flex space-x-2 overflow-x-scroll">
-          <input type="hidden" name="status" bind:value={$filterForm.status} />
+          <input type="hidden" name="categoryId" bind:value={$filterForm.categoryId} />
 
           {#each [{ id: undefined, name: '전체' }, ...categories] as category}
             <button
               type="button"
               class={[
                 'rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap',
-                $filterForm.status === category.id && 'bg-primary-500  text-white',
-                $filterForm.status !== category.id &&
+                $filterForm.categoryId === category.id && 'bg-primary-500  text-white',
+                $filterForm.categoryId !== category.id &&
                   'text-surface-700 border-surface-200 hover:bg-surface-50 border bg-white',
               ]}
-              onclick={() => ($filterForm.status = category.id)}
+              onclick={() => ($filterForm.categoryId = category.id)}
             >
               {category.name}
             </button>
@@ -135,7 +135,7 @@
           d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
         />
       </svg>
-      <h3 class="text-surface-900 dark:text-surface-100 mb-2 text-lg font-semibold">진행 중인 공동구매가 없습니다</h3>
+      <h3 class="text-surface-900 dark:text-surface-100 mb-2 text-lg font-semibold">판매중인 상품이 없습니다</h3>
     </div>
   {:else}
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -161,12 +161,12 @@
             </div>
             <div class="absolute right-2 bottom-2 flex flex-col items-end space-y-1">
               <div class="relative rounded-full bg-black/40 p-1 backdrop-blur-sm">
-                <svg class="h-10 w-10 -rotate-90" viewBox="0 0 36 36">
+                <svg class="h-10 w-10" viewBox="0 0 36 36">
                   <path
                     class="text-white/40"
                     d="M18 2.0845
-											a 15.9155 15.9155 0 0 1 0 31.831
-											a 15.9155 15.9155 0 0 1 0 -31.831"
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2.5"
@@ -174,17 +174,18 @@
                   <path
                     class="text-primary-400"
                     d="M18 2.0845
-											a 15.9155 15.9155 0 0 1 0 31.831
-											a 15.9155 15.9155 0 0 1 0 -31.831"
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-dasharray="0, 100"
+                    stroke-width="5"
+                    stroke-dasharray="100, 100"
+                    stroke-dashoffset={100 - coop.progress}
                   />
                 </svg>
                 <div class="absolute inset-0 flex items-center justify-center">
                   <span class="text-xs font-bold text-white drop-shadow-md"
-                    >{coop.currentQuantity} / {coop.maxQuantity}</span
+                    >{coop.orderedQuantity} / {coop.maxQuantity}</span
                   >
                 </div>
               </div>

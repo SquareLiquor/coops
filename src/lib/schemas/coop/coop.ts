@@ -45,7 +45,7 @@ export const CoopUpdateSchema = v.pipe(
   v.object({
     id: v.string(),
     ...CoopSchema.entries,
-    product_id: v.string(),
+    productId: v.string(),
   })
 )
 
@@ -65,30 +65,30 @@ export const getInitialCoopValues = (storeId: string) => {
 export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
   const {
     id,
-    storeId,
-    productId,
-    categoryId,
+    store_id,
+    product_id,
+    category_id,
     name,
     description,
     status,
-    maxQuantity,
-    salesPrice,
-    salesDate,
+    max_quantity,
+    sales_price,
+    sales_date,
     product,
     images,
   } = coop
 
   return {
     id,
-    storeId,
-    product_id: productId,
-    categoryId,
+    storeId: store_id,
+    productId: product_id,
+    categoryId: category_id,
     name,
     description,
     status: status?.code || status,
-    maxQuantity,
-    salesPrice,
-    salesDate: dayjs(salesDate).format('YYYY-MM-DD'),
+    maxQuantity: max_quantity,
+    salesPrice: sales_price,
+    salesDate: dayjs(sales_date).format('YYYY-MM-DD'),
     product: {
       originId: product.originId || product.id,
       price: product.price,

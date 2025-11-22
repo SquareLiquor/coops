@@ -34,7 +34,7 @@ export const CoopsFilterSchema = v.pipe(
 export const ConsumerCoopsFilterSchema = v.pipe(
   v.object({
     storeId: v.string(),
-    status: v.pipe(v.optional(v.string())),
+    categoryId: v.pipe(v.optional(v.string())),
     dateAt: v.pipe(v.optional(v.string())),
   })
 )

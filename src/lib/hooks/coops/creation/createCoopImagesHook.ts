@@ -4,6 +4,7 @@ import type { ImageInput } from '$lib/schemas/common/image'
 import { copyFile, createBrowserClient, createServerClient, deleteFile } from '$lib/supabase'
 import type { CreateCoopHookContext } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
+import dayjs from 'dayjs'
 
 const PRODUCTS_BUCKET = 'products'
 const COOPS_BUCKET = 'coops'
@@ -29,7 +30,12 @@ const createCoopImages = async ({ images }: CreateCoopHookContext, shared: any) 
   const imagesCopied: ImageInput[] = []
   await Promise.all(
     imagesToCopy.map(async (image: ImageInput) => {
-      const { path, publicUrl } = await copyFile(PRODUCTS_BUCKET, COOPS_BUCKET, image.path, image.path)
+      const { path, publicUrl } = await copyFile(
+        PRODUCTS_BUCKET,
+        COOPS_BUCKET,
+        image.path,
+        `${dayjs().format('YYYY-MM-DD')}/${crypto.randomUUID()}`
+      )
       imagesCopied.push({
         ...image,
         url: publicUrl,

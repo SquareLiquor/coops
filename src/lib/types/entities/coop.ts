@@ -7,22 +7,25 @@ export interface CoopData {
   id: string
   name: string
   description: string
-  images: ImageData[]
   storeId: string
+  storeName: string
   store: StoreData
   productId: string
+  productName: string
   product: ProductData
   categoryId: string
+  categoryName: string
   category: CategoryData
   status: SalesStatus
-  salesPrice: number
   salesDate: string
   isToday: boolean
   remainingTime: string
+  salesPrice: number
   maxQuantity: number
-  currentQuantity: number
+  orderedQuantity: number
   remainingQuantity: number
   progress: number
+  images: ImageData[]
   createdAt: string
   updatedAt: string
 }

@@ -15,7 +15,7 @@ export const getCoopsByStore = async (filter: CoopsFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { storeId, categoryId, name, status, dateFrom, dateTo } = filter
-  const query = supabase.from('coops').select(coopSelectQuery).eq('store_id', storeId)
+  const query = supabase.from('coop_list_view').select(coopSelectQuery).eq('store_id', storeId)
 
   if (categoryId) query.eq('category_id', categoryId)
   if (name) query.ilike('name', `%${name}%`)
@@ -33,11 +33,11 @@ export const getCoopsByStore = async (filter: CoopsFilterInput) => {
 export const getCoopsForUser = async (filter: ConsumerCoopsFilterSchema) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { storeId, status, dateAt } = filter
-  const query = supabase.from('coops').select(coopSelectQuery).eq('store_id', storeId)
+  const { storeId, categoryId, dateAt } = filter
+  const query = supabase.from('coop_list_view').select(coopSelectQuery).eq('store_id', storeId).eq('status', 'ONGOING')
 
-  if (status) query.eq('status', status)
   if (dateAt) query.eq('sales_date', dateAt)
+  if (categoryId) query.eq('category_id', categoryId)
 
   const { data, error } = await query
     .order('sales_date', { ascending: false })

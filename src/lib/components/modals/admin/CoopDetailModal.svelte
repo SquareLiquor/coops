@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'
   import Carousel from '$lib/components/ui/Carousel.svelte'
   import type { CoopData } from '$lib/types'
+  import dayjs from 'dayjs'
 
   let { coop, onClose }: { coop: CoopData | null; onClose: () => void } = $props()
 
@@ -107,7 +108,7 @@
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <div class="text-sm text-gray-500">판매일</div>
-                    <div class="font-medium">{coop.salesDate}</div>
+                    <div class="font-medium">{dayjs(coop.salesDate).format('YYYY-MM-DD')}</div>
                   </div>
                   <div>
                     <div class="text-sm text-gray-500">최대 수량</div>
@@ -117,7 +118,7 @@
                 <div>
                   <div class="text-sm text-gray-500">진행 현황</div>
                   <div class="font-medium">
-                    {coop.currentQuantity} / {coop.maxQuantity}
+                    {coop.orderedQuantity} / {coop.maxQuantity}
                     <span class="text-sm text-gray-500">({coop.progress}%)</span>
                   </div>
                 </div>

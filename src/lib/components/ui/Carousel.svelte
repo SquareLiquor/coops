@@ -4,7 +4,9 @@
   import Carousel from 'svelte-carousel'
 
   let carousel = $state<InstanceType<typeof Carousel> | null>(null)
-  let { images }: { images: ImageData[] } = $props()
+  let { images, options = {} }: { images: ImageData[]; options?: { size?: 'small' | 'normal' | 'large' } } = $props()
+
+  const { size = 'normal' } = options
 </script>
 
 {#if browser}
@@ -23,8 +25,12 @@
         <img
           src={image.url}
           alt={index.toString()}
-          class="border-surface-200 mb-2 w-full flex-shrink-0 rounded-lg border object-cover"
-          style="object-fit: cover;"
+          class={[
+            'border-surface-200 mb-2 w-auto flex-shrink-0 rounded-lg border object-cover',
+            size === 'small' && 'h-40',
+            size === 'normal' && 'h-80',
+            size === 'large' && 'h-120',
+          ]}
         />
       {/each}
       <button

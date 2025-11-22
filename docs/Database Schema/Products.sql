@@ -75,21 +75,6 @@ CREATE TABLE public.product_images (
 );
 COMMENT ON TABLE public.product_images IS '상품 이미지(여러 개, 대표 이미지 포함)';
 
--- 공동구매 테이블
-CREATE TABLE public.coops (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
-  product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  status text NOT NULL, -- 모집중, 마감 등
-  max_quantity integer NOT NULL,
-  price numeric NOT NULL,
-  start_at timestamptz NOT NULL,
-  end_at timestamptz NOT NULL,
-  description text,
-  created_at timestamptz DEFAULT now()
-);
-COMMENT ON TABLE public.coops IS '공동구매 정보 (재고에는 직접 영향 없음)';
-
 -- 재고 트랜잭션 테이블
 CREATE TABLE public.stock_transactions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -110,8 +95,6 @@ COMMENT ON TABLE public.stock_transactions IS '상품 재고 변동 내역 (본�
 -- ==============================
 CREATE INDEX idx_products_store_id ON public.products(store_id);
 CREATE INDEX idx_products_origin_id ON public.products(origin_id);
-CREATE INDEX idx_coops_store_id ON public.coops(store_id);
-CREATE INDEX idx_coops_product_id ON public.coops(product_id);
 CREATE INDEX idx_stock_transactions_product_id ON public.stock_transactions(product_id);
 CREATE INDEX idx_stock_transactions_store_id ON public.stock_transactions(store_id);
 
@@ -126,57 +109,6 @@ EXECUTE FUNCTION public.update_updated_at_column();
 -- ==============================
 -- 5) 가맹점 상품 통합 VIEW
 -- ==============================
--- ===================================================
--- 가맹점 상품 통합 VIEW (실재고 + 공동구매 가능 수량 + 재고 경고)
--- ===================================================
-CREATE OR REPLACE VIEW public.store_product_view AS
-SELECT
-    COALESCE(sp.id, hp.id) AS product_id,
-    s.id AS store_id,
-    COALESCE(sp.origin_id, hp.id) AS origin_id,
-    COALESCE(sp.name, hp.name) AS name,
-    COALESCE(sp.description, hp.description) AS description,
-    COALESCE(sp.price, hp.price) AS price,
-    COALESCE(sp.active, hp.active) AS active,
-    
-    -- ① 실제 재고 합계 (stock_transactions 기반)
-    (
-        SELECT COALESCE(SUM(st.quantity), 0)
-        FROM public.stock_transactions st
-        WHERE st.product_id = COALESCE(sp.id, hp.id)
-          AND st.store_id = s.id
-    ) AS stock_quantity,
-    
-    -- ④ 공동구매 정보
-    c.id AS coop_id,
-    c.status AS coop_status,
-    c.max_quantity,
-    c.price AS coop_price,
-    c.start_at,
-    c.end_at,
-    
-    -- ⑤ 공동구매 참여 가능 수량
-    COALESCE((
-        SELECT SUM(o.quantity)
-        FROM public.order_items o
-        WHERE o.coop_id = c.id
-          AND o.status IN ('ORDERED', 'COMPLETED')
-    ), 0) AS ordered_quantity
-
-FROM public.stores s
--- 본사 상품
-JOIN public.products hp
-  ON hp.store_id = (SELECT id FROM public.stores WHERE type = 'hq' LIMIT 1)
--- 가맹점 상품(본사 상품 복사 가능)
-LEFT JOIN public.products sp
-  ON sp.origin_id = hp.id AND sp.store_id = s.id
--- 공동구매 (가맹점 기준)
-LEFT JOIN public.coops c
-  ON c.product_id = COALESCE(sp.id, hp.id)
-  AND c.store_id = s.id
-
-WHERE s.type = 'branch';
-
 
 -- ==============================
 -- 6) Realtime publication (supabase_realtime)

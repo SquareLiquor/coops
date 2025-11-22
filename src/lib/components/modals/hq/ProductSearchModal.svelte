@@ -16,7 +16,8 @@
       .select(
         `
         *,
-        category:category_id ( id, name )
+        category:category_id ( id, name ),
+        images:product_images ( id, product_id, url, representative, path, sort_order )
       `
       )
       .eq('store_id', hqStore.id)
@@ -26,8 +27,7 @@
 
   const _handleSelect = async (index: number) => {
     const product = products[index]
-
-    const { data: images } = await supabase.from('product_images').select('*').eq('product_id', product.id)
+    const images = product.images
     handleSelect({ product, images })
     onClose()
   }

@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 
   const coopInput = coopDataToUpdateInput(coop)
   const form = await superValidate(coopInput, valibot(CoopUpdateSchema), { errors: false })
-  const { categories } = await getCategories(coop.storeId)
+  const { categories } = await getCategories(coop.store_id)
   const unitTypes = [...Object.values(UnitType)]
   const salesStatuses = [...Object.values(SalesStatus)]
 
@@ -49,7 +49,6 @@ export const actions: Actions = {
 
       return { form }
     } catch (err) {
-      console.error(err)
       if (isAppError(err)) {
         err.errorHandler()
       }

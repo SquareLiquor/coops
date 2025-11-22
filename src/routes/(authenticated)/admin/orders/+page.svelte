@@ -59,7 +59,6 @@
 
   const { form, enhance, submitting } = superForm(data.form, {
     onResult: async ({ result }: { result: ActionResult }) => {
-      console.log(result)
       if (result.type === 'success' || result.type === 'failure') {
         const toast = result.type === 'success' ? toaster.success : toaster.error
 

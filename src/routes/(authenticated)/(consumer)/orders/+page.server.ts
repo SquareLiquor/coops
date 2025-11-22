@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ parent }) => {
   const { user } = await parent()
 
   const form = await superValidate(valibot(OrderUpdateSchema), { errors: false })
-  const filterForm = await superValidate({ userId: user.id }, valibot(FilterSchema))
+  const filterForm = await superValidate({ userId: user!.id }, valibot(FilterSchema))
 
   const statuses = Object.values(OrderStatus)
 

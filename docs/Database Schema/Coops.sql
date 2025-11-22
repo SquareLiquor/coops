@@ -108,3 +108,84 @@ USING (EXISTS (
   SELECT 1 FROM public.store_members sm
   WHERE sm.user_id = auth.uid() AND sm.store_id = coops.store_id
 ));
+
+
+-- ==============================
+-- 8) 주문정보가 포함된 뷰
+-- ==============================
+CREATE OR REPLACE VIEW public.coop_list_view
+WITH (security_invoker = true) AS
+SELECT
+  coop.id,
+  coop.name,
+  coop.description,
+
+  coop.store_id,
+  store.name AS store_name,
+
+  coop.product_id,
+  prd.name AS product_name,
+
+  coop.category_id,
+  ct.name AS category_name,
+
+  coop.status,
+  coop.sales_date,
+  coop.sales_price,
+  coop.max_quantity,
+
+  (
+    SELECT url
+    FROM public.coop_images ci
+    WHERE ci.coop_id = coop.id
+      AND ci.representative = true
+    ORDER BY ci.created_at ASC
+    LIMIT 1
+  ) AS representative_image_url,
+
+  (
+    SELECT json_agg(
+      json_build_object(
+        'id', ci.id,
+        'url', ci.url,
+        'representative', ci.representative,
+        'sort_order', ci.sort_order,
+        'created_at', ci.created_at
+      )
+    )
+    FROM public.coop_images ci
+    WHERE ci.coop_id = coop.id
+  ) AS images,
+
+  (
+    SELECT sum(oi.quantity)
+    FROM public.order_items oi
+    WHERE oi.coop_id = coop.id
+      AND oi.status IN ('CREATED', 'COMPLETED')
+  ) AS ordered_quantity,
+
+  coop.created_at,
+  coop.updated_at
+
+FROM public.coops coop
+JOIN public.stores store ON coop.store_id = store.id
+JOIN public.products prd ON coop.product_id = prd.id
+JOIN public.categories ct ON coop.category_id = ct.id
+;
+
+COMMENT ON VIEW public.coop_list_view IS '공동구매 목록 뷰';
+
+-- 상태 검색용
+CREATE INDEX idx_coops_status ON public.coops (status);
+-- 판매일 정렬/검색용
+CREATE INDEX idx_coops_sales_date ON public.coops (sales_date);
+-- 카테고리 검색용
+CREATE INDEX idx_coops_category ON public.coops (category_id);
+-- 스토어 검색용
+CREATE INDEX idx_coops_store ON public.coops (store_id);
+-- 조건에 최적화된 다중 컬럼 인덱스
+CREATE INDEX idx_order_items_coop_status ON public.order_items (coop_id, status);
+CREATE INDEX idx_coop_images_coop_rep ON public.coop_images (coop_id, representative, created_at);
+
+-- Realtime을 사용한다면 추천
+ALTER TABLE public.order_items REPLICA IDENTITY FULL;

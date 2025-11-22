@@ -14,7 +14,7 @@ const { convertAll } = coopDataConverter()
 export const load: PageServerLoad = async ({ parent }) => {
   const { user } = await parent()
 
-  const form = await superValidate({ userId: user.id }, valibot(OrderSchema), { errors: false })
+  const form = await superValidate({ userId: user!.id }, valibot(OrderSchema), { errors: false })
   const filterForm = await superValidate({ dateAt: dayjs().format('YYYY-MM-DD') }, valibot(FilterSchema))
 
   return { form, filterForm }
