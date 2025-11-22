@@ -28,7 +28,7 @@ export const UnitType: { [key: string]: UnitType } = {
 
 export type SalesStatus = EnumItem & { color?: string }
 export const SalesStatus: { [key: string]: SalesStatus } = {
-  PREPARING: { code: 'PREPARING', label: '판매 준비', color: 'gray' },
+  PREPARING: { code: 'PREPARING', label: '판매 준비', color: 'surface' },
   ONGOING: { code: 'ONGOING', label: '판매 진행', color: 'green' },
   ENDED: { code: 'ENDED', label: '판매 종료', color: 'blue' },
   COMPLETED: { code: 'COMPLETED', label: '판매 완료', color: 'yellow' },

@@ -90,10 +90,10 @@ export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
     salesPrice: sales_price,
     salesDate: dayjs(sales_date).format('YYYY-MM-DD'),
     product: {
-      originId: product.originId || product.id,
+      originId: product.origin_id || product.id,
       price: product.price,
       unit: product.unit,
-      quantityPerUnit: product.quantityPerUnit,
+      quantityPerUnit: product.quantity_per_unit,
     },
     images:
       images?.map((image: any) => ({
@@ -101,7 +101,7 @@ export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
         url: image.url,
         path: image.path,
         representative: image.representative,
-        sortOrder: image.sortOrder,
+        sortOrder: image.sort_order,
         use: true,
         new: false,
       })) || [],

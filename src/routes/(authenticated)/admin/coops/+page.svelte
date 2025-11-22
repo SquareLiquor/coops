@@ -126,7 +126,7 @@
 
         <!-- 카테고리 필터 -->
         <select
-          class="border-surface-100 focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
+          class="border-surface-100 focus:border-primary-500 min-w-[100px] border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
           name="categoryId"
           bind:value={$filterForm.categoryId}
         >
@@ -209,7 +209,7 @@
             </td>
             <td class="text-surface-500 px-6 py-4 text-sm">
               <span
-                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-white bg-${coop.status.color}-500`}
+                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-${coop.status.color}-800 bg-${coop.status.color}-100 `}
               >
                 {coop.status?.label}
               </span>

@@ -1,6 +1,7 @@
 import type { ConsumerOrdersFilterInput, OrderCreateInput, OrdersFilterInput } from '$lib/schemas'
 import { OrderStatus } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
+import dayjs from 'dayjs'
 import { createBrowserClient, createServerClient } from '../clients'
 
 const ordersSelectQuery = `
@@ -12,15 +13,16 @@ const ordersSelectQuery = `
 // TODO: order view를 조회
 export const getOrders = async (filter: OrdersFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+  const { storeId, name, categoryId, status, dateFrom, dateTo } = filter
 
   const query = supabase.from('orders').select(ordersSelectQuery)
 
-  if (filter.storeId) query.eq('store_id', filter.storeId)
-  if (filter.name) query.ilike('user_name', `%${filter.name}%`)
-  if (filter.categoryId) query.eq('category_id', filter.categoryId)
-  if (filter.status) query.eq('status', filter.status)
-  if (filter.dateFrom) query.gte('ordered_at', [filter.dateFrom, '00:00:00'].join(' '))
-  if (filter.dateTo) query.lte('ordered_at', [filter.dateTo, '23:59:59'].join(' '))
+  if (storeId) query.eq('store_id', storeId)
+  if (name) query.ilike('user_name', `%${name}%`)
+  if (categoryId) query.eq('category_id', categoryId)
+  if (status) query.eq('status', status)
+  if (dateFrom) query.gte('ordered_at', dayjs(dateFrom).startOf('day').toISOString())
+  if (dateTo) query.lte('ordered_at', dayjs(dateTo).endOf('day').toISOString())
 
   const { data, error } = await query.order('ordered_at', { ascending: false })
 
@@ -29,11 +31,17 @@ export const getOrders = async (filter: OrdersFilterInput) => {
 
 export const getOrdersByUserId = async (filter: ConsumerOrdersFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+  const { userId, status, dateAt } = filter
 
-  const query = supabase.from('orders').select(ordersSelectQuery).eq('user_id', filter.userId)
+  const query = supabase.from('orders').select(ordersSelectQuery).eq('user_id', userId)
 
-  if (filter.status) query.eq('status', filter.status)
-  if (filter.dateAt) query.eq('ordered_at', filter.dateAt)
+  if (status) query.eq('status', status)
+  if (dateAt) {
+    const start = dayjs(dateAt).startOf('day').toISOString()
+    const end = dayjs(dateAt).endOf('day').toISOString()
+
+    query.gte('ordered_at', start).lte('ordered_at', end)
+  }
 
   const { data, error } = await query.order('ordered_at', { ascending: false })
 

@@ -114,7 +114,6 @@
   </div>
 
   <div class="flex flex-1 gap-8 p-8">
-    <!-- 좌측 패널: 기본정보 -->
     <div class="flex w-1/2 flex-col">
       <section class="border-surface-100 flex flex-1 flex-col rounded-lg border bg-white p-6">
         <h2 class="text-lg font-semibold">기본정보</h2>
@@ -173,14 +172,13 @@
       </section>
     </div>
 
-    <!-- 우측 패널: 판매 정보, 기타 -->
     <div class="flex w-1/2 flex-col">
       <section class="border-surface-100 mb-8 rounded-lg border bg-white p-6">
         <h2 class="text-lg font-semibold">판매 정보</h2>
         <hr class="hr my-4" />
         <div class="flex flex-col gap-4">
-          <div class="grid grid-cols-4 gap-2">
-            <label class="label">
+          <div class="grid grid-cols-4 items-end gap-2">
+            <label class="label flex flex-col">
               <span class="label-text text-sm">판매상태</span>
               <select
                 name="status"
@@ -193,6 +191,7 @@
                   <option value={status.code}>{status.label}</option>
                 {/each}
               </select>
+              <div class="mt-1 min-h-[20px]"></div>
             </label>
             <label class="label flex flex-col">
               <span class="label-text text-sm">판매일자</span>
@@ -212,8 +211,8 @@
               </div>
             </label>
           </div>
-          <div class="grid grid-cols-4 gap-2">
-            <label class="label">
+          <div class="grid grid-cols-4 items-end gap-2">
+            <label class="label flex flex-col">
               <span class="label-text text-sm">판매 가격</span>
               <input
                 name="salesPrice"
@@ -231,7 +230,7 @@
                 {/if}
               </div>
             </label>
-            <label class="label">
+            <label class="label flex flex-col">
               <span class="label-text text-sm">원가</span>
               <input
                 name="originalPrice"
@@ -242,8 +241,9 @@
                 placeholder="가격"
                 disabled
               />
+              <div class="mt-1 min-h-[20px]"></div>
             </label>
-            <label class="label">
+            <label class="label flex flex-col">
               <span class="label-text text-sm">판매 가능 수량</span>
               <input
                 name="maxQuantity"
@@ -262,8 +262,8 @@
               </div>
             </label>
           </div>
-          <div class="grid grid-cols-4 gap-2">
-            <label class="label">
+          <div class="grid grid-cols-4 items-end gap-2">
+            <label class="label flex flex-col">
               <span class="label-text text-sm">단위</span>
               <select
                 name="productUnit"
@@ -276,10 +276,10 @@
                 {/each}
               </select>
             </label>
-            <label class="label">
+            <label class="label flex flex-col">
               <span class="label-text text-sm">단위 별 수량</span>
               <input
-                name="productQuantityPerUnit"
+                name="quantityPerUnit"
                 class="input placeholder-surface-200 w-full"
                 type="number"
                 bind:value={$formData.product.quantityPerUnit}

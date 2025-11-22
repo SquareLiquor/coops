@@ -110,43 +110,42 @@
   {:else}
     <div class="space-y-4">
       {#each orders as order (order.id)}
-        <form method="POST" use:enhance>
-          <input type="hidden" name="orderId" value={order.id} />
-
-          <div
-            class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 overflow-hidden rounded-xl border bg-white shadow-sm"
-          >
-            <div class="border-surface-300 dark:border-surface-600 border-b border-dashed p-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                  <div class="text-left">
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-semibold"
-                      >
-                        주문번호:
-                        <span class="ml-1 max-w-[100px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
-                          {order.id}
-                        </span>
+        <div
+          class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 overflow-hidden rounded-xl border bg-white shadow-sm"
+        >
+          <div class="border-surface-300 dark:border-surface-600 border-b border-dashed p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="text-left">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-semibold"
+                    >
+                      주문번호:
+                      <span class="ml-1 max-w-[100px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
+                        {order.id}
                       </span>
-                    </div>
-                    <div class="text-surface-600 dark:text-surface-400 text-xs">
-                      <span class="text-surface-700 text-sm">{dayjs(order.orderedAt).format('YYYY-MM-DD')}</span>
-                      <span class="text-surface-400 text-xs">{dayjs(order.orderedAt).format('HH:mm:ss')}</span>
-                    </div>
+                    </span>
+                  </div>
+                  <div class="text-surface-600 dark:text-surface-400 text-xs">
+                    <span class="text-surface-700 text-sm">{dayjs(order.orderedAt).format('YYYY-MM-DD')}</span>
+                    <span class="text-surface-400 text-xs">{dayjs(order.orderedAt).format('HH:mm:ss')}</span>
                   </div>
                 </div>
+              </div>
 
-                <div class="flex items-center space-x-2">
-                  <!-- 상태 배지 -->
-                  <span
-                    class={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium text-${order.status.color}-700 bg-${order.status.color}-100 `}
-                  >
-                    {order.status.label}
-                  </span>
+              <div class="flex items-center space-x-2">
+                <!-- 상태 배지 -->
+                <span
+                  class={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium text-${order.status.color}-800 bg-${order.status.color}-100 `}
+                >
+                  {order.status.label}
+                </span>
 
-                  <!-- 주문 전체 취소 버튼 -->
-                  {#if order.cancelable}
+                <!-- 주문 전체 취소 버튼 -->
+                {#if order.cancelable}
+                  <form method="POST" use:enhance>
+                    <input type="hidden" name="orderId" value={order.id} />
                     <button
                       type="submit"
                       formaction="?/cancel"
@@ -163,53 +162,54 @@
                         />
                       </svg>
                     </button>
-                  {/if}
-                </div>
+                  </form>
+                {/if}
               </div>
             </div>
+          </div>
 
-            <div class="p-4">
-              <div class="space-y-3">
-                {#each order.items as item}
-                  <input type="hidden" name="orderItemId" value={item.id} />
-
-                  <div class="flex items-center space-x-3">
-                    <img
-                      src={item.images.find((image) => image.representative)?.url}
-                      alt={item.coop.name}
-                      class="h-12 w-12 rounded-lg object-cover"
-                      loading="lazy"
-                    />
-                    <div class="min-w-0 flex-1">
-                      <p
-                        class={[
-                          'text-surface-900 dark:text-surface-100 truncate text-sm font-medium',
-                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
-                        ]}
-                      >
-                        {item.coop.name}
-                      </p>
-                      <p
-                        class={[
-                          'text-surface-600 dark:text-surface-400 text-xs',
-                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
-                        ]}
-                      >
-                        {formatCurrency(item.price)} × {item.quantity}개
-                      </p>
+          <div class="p-4">
+            <div class="space-y-3">
+              {#each order.items as item}
+                <div class="flex items-center space-x-3">
+                  <img
+                    src={item.images.find((image) => image.representative)?.url}
+                    alt={item.coop.name}
+                    class="h-12 w-12 rounded-lg object-cover"
+                    loading="lazy"
+                  />
+                  <div class="min-w-0 flex-1">
+                    <p
+                      class={[
+                        'text-surface-900 dark:text-surface-100 truncate text-sm font-medium',
+                        equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                      ]}
+                    >
+                      {item.coop.name}
+                    </p>
+                    <p
+                      class={[
+                        'text-surface-600 dark:text-surface-400 text-xs',
+                        equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                      ]}
+                    >
+                      {formatCurrency(item.price)} × {item.quantity}개
+                    </p>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div
+                      class={[
+                        'text-surface-900 dark:text-surface-100 text-sm font-semibold',
+                        equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                      ]}
+                    >
+                      {formatCurrency(item.totalPrice)}
                     </div>
-                    <div class="flex items-center space-x-2">
-                      <div
-                        class={[
-                          'text-surface-900 dark:text-surface-100 text-sm font-semibold',
-                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
-                        ]}
-                      >
-                        {formatCurrency(item.totalPrice)}
-                      </div>
 
-                      <!-- 아이템별 취소 버튼 -->
-                      {#if item.cancelable}
+                    <!-- 아이템별 취소 버튼 -->
+                    {#if item.cancelable}
+                      <form method="POST" use:enhance>
+                        <input type="hidden" name="orderItemId" value={item.id} />
                         <button
                           type="submit"
                           formaction="?/cancelItem"
@@ -226,35 +226,35 @@
                             />
                           </svg>
                         </button>
-                      {/if}
-                    </div>
+                      </form>
+                    {/if}
                   </div>
-                {/each}
-              </div>
+                </div>
+              {/each}
             </div>
+          </div>
 
-            <div class="border-surface-300 dark:border-surface-600 border-t border-dashed bg-white p-4 dark:bg-white">
-              <div class="flex items-center justify-between">
-                <div
-                  class={[
-                    'text-surface-600 dark:text-surface-400 text-sm',
-                    equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
-                  ]}
-                >
-                  총 {order.items.length}개 상품
-                </div>
-                <div
-                  class={[
-                    'text-primary-600 text-lg font-bold',
-                    equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
-                  ]}
-                >
-                  {formatCurrency(order.totalPrice)}
-                </div>
+          <div class="border-surface-300 dark:border-surface-600 border-t border-dashed bg-white p-4 dark:bg-white">
+            <div class="flex items-center justify-between">
+              <div
+                class={[
+                  'text-surface-600 dark:text-surface-400 text-sm',
+                  equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                ]}
+              >
+                총 {order.items.length}개 상품
+              </div>
+              <div
+                class={[
+                  'text-primary-600 text-lg font-bold',
+                  equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                ]}
+              >
+                {formatCurrency(order.totalPrice)}
               </div>
             </div>
           </div>
-        </form>
+        </div>
       {/each}
     </div>
   {/if}

@@ -66,22 +66,36 @@ CREATE OR REPLACE FUNCTION public.sync_order_on_all_items_cancel()
 RETURNS TRIGGER AS $$
 DECLARE
   remaining_items_count INTEGER;
+  cancelled_items_count INTEGER;
+  total_items_count INTEGER;
+  order_id_val UUID;
 BEGIN
   -- order_item이 CANCELLED로 변경되었을 때만 처리
   IF (TG_OP = 'UPDATE' AND OLD.status != 'CANCELLED' AND NEW.status = 'CANCELLED') OR
      (TG_OP = 'INSERT' AND NEW.status = 'CANCELLED') THEN
     
-    -- 해당 주문의 취소되지 않은 아이템 수 확인
-    SELECT COUNT(*)
-    INTO remaining_items_count
-    FROM public.order_items
-    WHERE order_id = COALESCE(NEW.order_id, OLD.order_id) AND status != 'CANCELLED';
-    
+    order_id_val := COALESCE(NEW.order_id, OLD.order_id);
+    -- 전체 아이템 수
+    SELECT COUNT(*) INTO total_items_count FROM public.order_items WHERE order_id = order_id_val;
+    -- 취소된 아이템 수
+    SELECT COUNT(*) INTO cancelled_items_count FROM public.order_items WHERE order_id = order_id_val AND status = 'CANCELLED';
+    -- 취소되지 않은 아이템 수
+    remaining_items_count := total_items_count - cancelled_items_count;
+
+    IF total_items_count = 0 THEN
+      RETURN COALESCE(NEW, OLD);
+    END IF;
+
     -- 모든 아이템이 취소되었으면 주문도 취소로 변경
-    IF remaining_items_count = 0 THEN
+    IF cancelled_items_count = total_items_count THEN
       UPDATE public.orders
       SET status = 'CANCELLED'
-      WHERE id = COALESCE(NEW.order_id, OLD.order_id) AND status != 'CANCELLED';
+      WHERE id = order_id_val AND status != 'CANCELLED';
+    -- 일부만 취소된 경우 PARTIAL_CANCELLED로 변경
+    ELSIF cancelled_items_count > 0 AND cancelled_items_count < total_items_count THEN
+      UPDATE public.orders
+      SET status = 'PARTIAL_CANCELLED'
+      WHERE id = order_id_val AND status NOT IN ('CANCELLED', 'PARTIAL_CANCELLED');
     END IF;
   END IF;
   
@@ -113,10 +127,15 @@ CREATE TABLE public.order_items (
 	price numeric NOT NULL,
   total_price numeric NOT NULL,
 	status order_status NOT NULL -- 주문 상태(ORDERED, COMPLETED, CANCELLED)
+  ordered_at timestamptz NOT NULL DEFAULT now(),
+	updated_at timestamptz DEFAULT now()
 );
 COMMENT ON TABLE public.order_items IS '공동구매 주문 상세(공동구매별) 정보';
 
-
+CREATE TRIGGER trg_update_order_items_updated_at
+BEFORE UPDATE ON public.order_items
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
 -- ==============================
 -- 인덱스
 -- ==============================

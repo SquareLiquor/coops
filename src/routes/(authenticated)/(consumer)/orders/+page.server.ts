@@ -70,12 +70,12 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      const cancelable = await checkOrderItemCancelable(orderItemId!)
+      const cancelable = await checkOrderItemCancelable(orderItemId)
       if (!cancelable) {
         return message(form, '취소가 불가능한 상태입니다.', { status: 409 })
       }
 
-      await cancelOrderItem(orderItemId!)
+      await cancelOrderItem(orderItemId)
 
       return message(form, '취소가 완료되었습니다.')
     } catch (error) {

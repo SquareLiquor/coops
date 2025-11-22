@@ -107,7 +107,7 @@ export const coopImageDataConverter = () => {
  * 상품 데이터를
  */
 export const convertProductToCoop = ({ product, images }: { product: ProductData; images: ImageData[] }) => {
-  const { id, name, description, price, unit, quantityPerUnit: quantity_per_unit } = product
+  const { id, name, description, price, unit, quantityPerUnit } = product
 
   return {
     name,
@@ -117,7 +117,7 @@ export const convertProductToCoop = ({ product, images }: { product: ProductData
       originId: id,
       price,
       unit,
-      quantityPerUnit: quantity_per_unit,
+      quantityPerUnit,
     },
     images: images.map((image) => ({
       url: image.url,

@@ -1,10 +1,8 @@
 import { coopDataConverter } from '$lib/converters'
 import { isAppError } from '$lib/errors'
-import type { ImageInput } from '$lib/schemas'
-import { coopDataToUpdateInput, CoopUpdateSchema, type CoopUpdateInput } from '$lib/schemas'
-import { getCategories, getCoopById } from '$lib/supabase'
+import { coopDataToUpdateInput, CoopUpdateSchema } from '$lib/schemas'
+import { getCategories, getCoopById, updateCoop, updateCoopImages } from '$lib/supabase'
 import { SalesStatus, UnitType } from '$lib/types'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { error, fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
@@ -36,7 +34,6 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 }
 
 export const actions: Actions = {
-  // 공동구매 수정
   update: async ({ request, params, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(CoopUpdateSchema))
     const { id, images } = form.data
@@ -44,57 +41,14 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      await updateCoop(supabase, form.data)
-      await updateProductImages(supabase, id, images)
+      await updateCoop(form.data)
+      await updateCoopImages(id, images)
 
       return { form }
-    } catch (err) {
-      if (isAppError(err)) {
-        err.errorHandler()
-      }
+    } catch (error) {
+      if (isAppError(error)) error.errorHandler()
+
       return setError(form, '공동구매 수정 중 오류가 발생했습니다.')
     }
   },
-}
-
-const updateCoop = async (supabase: SupabaseClient, formData: CoopUpdateInput) => {
-  const { id, storeId, categoryId, name, description, status, maxQuantity, salesPrice, salesDate } = formData
-
-  const { error: updateError } = await supabase
-    .from('coops')
-    .update({
-      category_id: categoryId,
-      name,
-      description,
-      status,
-      max_quantity: maxQuantity,
-      sales_price: salesPrice,
-      sales_date: salesDate,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-
-  if (updateError) throw updateError
-
-  return { success: true }
-}
-
-const updateProductImages = async (supabase: SupabaseClient, coopId: string, images: ImageInput[]) => {
-  const { error: deleteError } = await supabase.from('coop_images').delete().eq('coop_id', coopId)
-
-  if (deleteError) throw deleteError
-
-  const { error: insertError } = await supabase.from('coop_images').insert(
-    images
-      .filter((image) => image.use)
-      .map((image, index) => ({
-        coop_id: coopId,
-        url: image.url,
-        path: image.path,
-        representative: image.representative,
-        sort_order: index,
-      }))
-  )
-
-  if (insertError) throw insertError
 }

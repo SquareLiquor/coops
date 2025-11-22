@@ -4,7 +4,16 @@
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { convertCartDataToOrderInput, coopDataToCartItemData } from '$lib/schemas'
-  import { addToCart, getAuth, getCart, getCartItem, getStore, hasCartItem, updateCartItem } from '$lib/stores'
+  import {
+    addToCart,
+    clearCart,
+    getAuth,
+    getCart,
+    getCartItem,
+    getStore,
+    hasCartItem,
+    updateCartItem,
+  } from '$lib/stores'
   import { getCategories } from '$lib/supabase'
   import type { CategoryData, CoopData } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
@@ -71,6 +80,8 @@
           duration: 5000,
         })
       }
+
+      if (result.type === 'success') clearCart()
     },
   })
 
