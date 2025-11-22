@@ -18,6 +18,15 @@ export const getOrderItemsByOrderId = async (orderId: string) => {
   return { orderItems: data }
 }
 
+export const checkConfirmable = async (orderItemId: string) => {}
+export const confirmOrderItem = async (orderItemId: string) => {}
+
+export const checkOrderItemCancelable = async (orderItemId: string) => {
+  const { orderItem } = await getOrderItemById(orderItemId)
+
+  return orderItem?.status === OrderStatus.CREATED.code
+}
+
 export const cancelOrderItem = async (orderItemId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
@@ -39,8 +48,5 @@ export const cancelOrderItem = async (orderItemId: string) => {
   return { orderItem: data }
 }
 
-export const checkOrderItemCancelable = async (orderItemId: string) => {
-  const { orderItem } = await getOrderItemById(orderItemId)
-
-  return orderItem?.status === OrderStatus.CREATED.code
-}
+export const checkRestorable = async (orderItemId: string) => {}
+export const restoreOrderItem = async (orderItemId: string) => {}
