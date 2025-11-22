@@ -1,6 +1,6 @@
 import { orderDataConverter } from '$lib/converters'
 import { getInitialOrdersFilterValues as getInitialFilter, OrdersFilterSchema, OrderUpdateSchema } from '$lib/schemas'
-import { cancelOrder, checkCancelable, getCategories, getOrders } from '$lib/supabase'
+import { cancelOrder, checkOrderItemCancelable, getCategories, getOrders } from '$lib/supabase'
 import { OrderStatus } from '$lib/types'
 import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
@@ -48,7 +48,7 @@ export const actions: Actions = {
     if (!form.valid) return { form }
 
     try {
-      const cancelable = await checkCancelable(orderId)
+      const cancelable = await checkOrderItemCancelable(orderId)
       if (!cancelable) {
         return message(form, '주문 취소가 불가능한 상태입니다.', { status: 409 })
       }

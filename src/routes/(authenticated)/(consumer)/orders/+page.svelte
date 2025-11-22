@@ -171,6 +171,8 @@
             <div class="p-4">
               <div class="space-y-3">
                 {#each order.items as item}
+                  <input type="hidden" name="orderItemId" value={item.id} />
+
                   <div class="flex items-center space-x-3">
                     <img
                       src={item.images.find((image) => image.representative)?.url}

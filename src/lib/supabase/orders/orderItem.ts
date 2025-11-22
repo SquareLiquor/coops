@@ -21,7 +21,7 @@ export const getOrderItemsByOrderId = async (orderId: string) => {
 export const cancelOrderItem = async (orderItemId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const cancelable = await checkCancelable(orderItemId)
+  const cancelable = await checkOrderItemCancelable(orderItemId)
 
   if (!cancelable) {
     throw new Error('Order item is not cancelable')
@@ -39,7 +39,7 @@ export const cancelOrderItem = async (orderItemId: string) => {
   return { orderItem: data }
 }
 
-const checkCancelable = async (orderItemId: string) => {
+export const checkOrderItemCancelable = async (orderItemId: string) => {
   const { orderItem } = await getOrderItemById(orderItemId)
 
   return orderItem?.status === OrderStatus.CREATED.code

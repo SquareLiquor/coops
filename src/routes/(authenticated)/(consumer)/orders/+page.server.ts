@@ -1,6 +1,12 @@
 import { orderDataConverter } from '$lib/converters'
 import { ConsumerOrdersFilterSchema as FilterSchema, OrderUpdateSchema } from '$lib/schemas'
-import { cancelOrder, checkCancelable, getOrdersByUserId } from '$lib/supabase'
+import {
+  cancelOrder,
+  cancelOrderItem,
+  checkCancelable,
+  checkOrderItemCancelable,
+  getOrdersByUserId,
+} from '$lib/supabase'
 import { OrderStatus } from '$lib/types'
 import { fail } from '@sveltejs/kit'
 import { message, superValidate } from 'sveltekit-superforms'
@@ -52,6 +58,28 @@ export const actions: Actions = {
       return message(form, '주문 취소가 완료되었습니다.')
     } catch (error) {
       return message(form, '주문 취소 중 오류가 발생했습니다.', { status: 400 })
+    }
+  },
+  /**
+   * 주문 상품 개별 취소
+   */
+  cancelItem: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderUpdateSchema))
+    const { orderItemId } = form.data
+
+    if (!form.valid) return fail(400, { form })
+
+    try {
+      const cancelable = await checkOrderItemCancelable(orderItemId!)
+      if (!cancelable) {
+        return message(form, '취소가 불가능한 상태입니다.', { status: 409 })
+      }
+
+      await cancelOrderItem(orderItemId!)
+
+      return message(form, '취소가 완료되었습니다.')
+    } catch (error) {
+      return message(form, '취소 중 오류가 발생했습니다.', { status: 400 })
     }
   },
 }

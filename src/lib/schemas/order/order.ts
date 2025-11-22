@@ -33,6 +33,7 @@ export const OrderCreateSchema = v.pipe(
 export const OrderUpdateSchema = v.pipe(
   v.object({
     orderId: v.string(),
+    orderItemId: v.optional(v.string()),
   })
 )
 
