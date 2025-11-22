@@ -13,7 +13,9 @@ export interface OrderData {
   totalPrice: number
   status: OrderStatus
   items: OrderItemData[]
+  completable: boolean
   cancelable: boolean
+  restorable: boolean
   orderedAt: string
   updatedAt: string
 }
@@ -27,6 +29,8 @@ export interface OrderItemData {
   price: number
   totalPrice: number
   status: OrderStatus
+  completable: boolean
   cancelable: boolean
+  restorable: boolean
   images: ImageData[]
 }

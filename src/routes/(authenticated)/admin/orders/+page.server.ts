@@ -41,6 +41,12 @@ export const actions: Actions = {
       return { form }
     }
   },
+  confirm: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderUpdateSchema))
+    const { orderId } = form.data
+
+    if (!form.valid) return { form }
+  },
   cancel: async ({ request }) => {
     const form = await superValidate(request, valibot(OrderUpdateSchema))
     const { orderId } = form.data
@@ -59,5 +65,29 @@ export const actions: Actions = {
     } catch (error) {
       return message(form, '주문 취소 중 오류가 발생했습니다.', { status: 400 })
     }
+  },
+  restore: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderUpdateSchema))
+    const { orderId } = form.data
+
+    if (!form.valid) return { form }
+  },
+  confirmOrderItem: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderUpdateSchema))
+    const { orderItemId } = form.data
+
+    if (!form.valid) return { form }
+  },
+  cancelOrderItem: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderUpdateSchema))
+    const { orderItemId } = form.data
+
+    if (!form.valid) return { form }
+  },
+  restoreOrderItem: async ({ request }) => {
+    const form = await superValidate(request, valibot(OrderUpdateSchema))
+    const { orderItemId } = form.data
+
+    if (!form.valid) return { form }
   },
 }

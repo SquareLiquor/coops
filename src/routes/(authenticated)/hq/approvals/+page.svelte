@@ -200,12 +200,9 @@
             <td class="items-center px-4 py-4">
               <div class="text-surface-900 text-sm font-medium">{request.store?.name}</div>
             </td>
-            <td class="text-surface-500 px-6 py-4 text-sm">
+            <td class="px-6 py-4 text-sm">
               <span
-                class={[
-                  'inline-flex rounded-full px-2 py-1 text-xs font-medium text-white',
-                  request.status && `bg-${request.status.color}-500`,
-                ]}
+                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-${request.status?.color}-800 bg-${request.status?.color}-100`}
               >
                 {request.status?.label}
               </span>

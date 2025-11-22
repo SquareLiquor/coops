@@ -1,4 +1,5 @@
 <script lang="ts">
+  import OrderDetailModal from '$lib/components/modals/admin/OrderDetailModal.svelte'
   import { OrdersFilterSchema as FilterSchema } from '$lib/schemas'
   import { type OrderData } from '$lib/types'
   import { debounce, formatCurrency, toaster } from '$lib/utils'
@@ -13,6 +14,7 @@
   let { salesStatuses } = data
   let orders: OrderData[] = $state([])
   let selectedOrderId: string | null = $state(null)
+  let selectedOrder: OrderData | null = $state(null)
   let debouncedFilterSubmit: ReturnType<typeof debounce>
 
   onMount(async () => {
@@ -201,19 +203,26 @@
             </td>
             <td class="text-surface-500 px-6 py-4 text-sm">
               <span
-                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-white bg-${order.status?.color}-500`}
+                class={`inline-flex rounded-md px-2 py-1 text-xs font-medium text-${order.status?.color}-800 bg-${order.status?.color}-100`}
               >
                 {order.status?.label}
               </span>
             </td>
             <td class="px-4 py-4 text-left">
               <div class="flex flex-col items-start">
-                <span class="text-surface-900 text-sm font-medium"
-                  >{order.items[0]?.coop.name}
+                <button
+                  type="button"
+                  class="text-primary-600 text-sm font-medium outline-none hover:underline focus:underline"
+                  onclick={() => {
+                    selectedOrderId = order.id
+                    selectedOrder = order
+                  }}
+                >
+                  {order.items[0]?.coop.name}
                   {#if order.items.length && order.items.length > 1}
                     외 {order.items.length - 1}건
                   {/if}
-                </span>
+                </button>
               </div>
             </td>
             <td class="text-surface-900 px-4 py-4 text-center text-sm font-medium whitespace-nowrap"
@@ -226,20 +235,39 @@
             </td>
 
             <td>
-              {#if order.cancelable}
-                <form method="POST" use:enhance>
-                  <input type="hidden" name="orderId" value={order.id} />
+              <form method="POST" use:enhance>
+                <input type="hidden" name="orderId" value={order.id} />
 
-                  <div class="relative flex items-center justify-center gap-1">
+                <div class="flex flex-row flex-wrap items-center justify-center gap-1">
+                  {#if order.completable}
                     <button
-                      class="bg-error-500 hover:bg-error-200 rounded px-4 py-2 text-xs font-medium text-white"
+                      class="bg-success-500 hover:bg-success-600 min-w-[60px] rounded px-2 py-1 text-xs font-medium text-white"
+                      formaction="?/confirm"
+                      onclick={(e) => !confirm('주문 완료 처리 하시겠습니까?') && e.preventDefault()}
+                    >
+                      주문 완료
+                    </button>
+                  {/if}
+                  {#if order.cancelable}
+                    <button
+                      class="bg-error-500 hover:bg-error-600 min-w-[60px] rounded px-2 py-1 text-xs font-medium text-white"
                       formaction="?/cancel"
+                      onclick={(e) => !confirm('주문 취소 처리 하시겠습니까?') && e.preventDefault()}
                     >
                       주문 취소
                     </button>
-                  </div>
-                </form>
-              {/if}
+                  {/if}
+                  {#if order.restorable}
+                    <button
+                      class="bg-warning-500 hover:bg-warning-600 min-w-[60px] rounded px-2 py-1 text-xs font-medium text-white"
+                      formaction="?/restore"
+                      onclick={(e) => !confirm('주문 복구 처리 하시겠습니까?') && e.preventDefault()}
+                    >
+                      주문 복구
+                    </button>
+                  {/if}
+                </div>
+              </form>
             </td>
           </tr>
         {/each}
@@ -253,3 +281,7 @@
     {/if}
   </div>
 </div>
+
+{#if selectedOrder}
+  <OrderDetailModal order={selectedOrder} onClose={() => (selectedOrder = null)} />
+{/if}

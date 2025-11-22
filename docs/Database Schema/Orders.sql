@@ -46,8 +46,8 @@ EXECUTE FUNCTION public.update_updated_at_column();
 -- 3) 주문 상태 동기화 트리거 함수들
 -- ==============================
 
--- 주문이 취소될 때 모든 order_items를 취소로 변경
-CREATE OR REPLACE FUNCTION public.sync_order_items_on_order_cancel()
+-- 주문 상태가 CANCELLED, COMPLETED, CREATED로 변경될 때 모든 order_items 상태 동기화
+CREATE OR REPLACE FUNCTION public.sync_order_items_on_order_status_change()
 RETURNS TRIGGER AS $$
 BEGIN
   -- 주문 상태가 CANCELLED로 변경되었을 때
@@ -56,31 +56,55 @@ BEGIN
     SET status = 'CANCELLED'
     WHERE order_id = NEW.id AND status != 'CANCELLED';
   END IF;
-  
+
+  -- 주문 상태가 COMPLETED로 변경되었을 때
+  IF OLD.status != 'COMPLETED' AND NEW.status = 'COMPLETED' THEN
+    UPDATE public.order_items
+    SET status = 'COMPLETED'
+    WHERE order_id = NEW.id AND status != 'COMPLETED';
+  END IF;
+
+  -- 주문 상태가 CREATED로 변경되었을 때 (복구)
+  IF OLD.status != 'CREATED' AND NEW.status = 'CREATED' THEN
+    UPDATE public.order_items
+    SET status = 'CREATED'
+    WHERE order_id = NEW.id AND status != 'CREATED';
+  END IF;
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- order_items가 취소될 때 모든 아이템이 취소되면 주문도 취소로 변경
-CREATE OR REPLACE FUNCTION public.sync_order_on_all_items_cancel()
+
+
+-- order_items가 취소, 완료, 복구될 때 주문 상태 동기화
+CREATE OR REPLACE FUNCTION public.sync_order_on_all_items_status_change()
 RETURNS TRIGGER AS $$
 DECLARE
-  remaining_items_count INTEGER;
   cancelled_items_count INTEGER;
+  completed_items_count INTEGER;
+  created_items_count INTEGER;
   total_items_count INTEGER;
   order_id_val UUID;
 BEGIN
-  -- order_item이 CANCELLED로 변경되었을 때만 처리
-  IF (TG_OP = 'UPDATE' AND OLD.status != 'CANCELLED' AND NEW.status = 'CANCELLED') OR
-     (TG_OP = 'INSERT' AND NEW.status = 'CANCELLED') THEN
-    
+  -- order_item이 CANCELLED, COMPLETED, CREATED로 변경되었을 때만 처리
+  IF (
+    (TG_OP = 'UPDATE' AND (
+      (OLD.status != 'CANCELLED' AND NEW.status = 'CANCELLED') OR
+      (OLD.status != 'COMPLETED' AND NEW.status = 'COMPLETED') OR
+      (OLD.status != 'CREATED' AND NEW.status = 'CREATED')
+    )) OR
+    (TG_OP = 'INSERT' AND (NEW.status = 'CANCELLED' OR NEW.status = 'COMPLETED' OR NEW.status = 'CREATED'))
+  ) THEN
     order_id_val := COALESCE(NEW.order_id, OLD.order_id);
     -- 전체 아이템 수
     SELECT COUNT(*) INTO total_items_count FROM public.order_items WHERE order_id = order_id_val;
     -- 취소된 아이템 수
     SELECT COUNT(*) INTO cancelled_items_count FROM public.order_items WHERE order_id = order_id_val AND status = 'CANCELLED';
-    -- 취소되지 않은 아이템 수
-    remaining_items_count := total_items_count - cancelled_items_count;
+    -- 완료된 아이템 수
+    SELECT COUNT(*) INTO completed_items_count FROM public.order_items WHERE order_id = order_id_val AND status = 'COMPLETED';
+    -- 생성(복구)된 아이템 수
+    SELECT COUNT(*) INTO created_items_count FROM public.order_items WHERE order_id = order_id_val AND status = 'CREATED';
 
     IF total_items_count = 0 THEN
       RETURN COALESCE(NEW, OLD);
@@ -96,23 +120,34 @@ BEGIN
       UPDATE public.orders
       SET status = 'PARTIAL_CANCELLED'
       WHERE id = order_id_val AND status NOT IN ('CANCELLED', 'PARTIAL_CANCELLED');
+    -- 모든 아이템이 완료되었으면 주문도 완료로 변경
+    ELSIF completed_items_count = total_items_count THEN
+      UPDATE public.orders
+      SET status = 'COMPLETED'
+      WHERE id = order_id_val AND status != 'COMPLETED';
+    -- 모든 아이템이 CREATED면 주문도 CREATED로 변경
+    ELSIF created_items_count = total_items_count THEN
+      UPDATE public.orders
+      SET status = 'CREATED'
+      WHERE id = order_id_val AND status != 'CREATED';
     END IF;
   END IF;
-  
+
   RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- 트리거 생성
-CREATE TRIGGER trg_sync_order_items_on_order_cancel
+CREATE TRIGGER trg_sync_order_items_on_order_status_change
 AFTER UPDATE ON public.orders
 FOR EACH ROW
-EXECUTE FUNCTION public.sync_order_items_on_order_cancel();
+EXECUTE FUNCTION public.sync_order_items_on_order_status_change();
 
-CREATE TRIGGER trg_sync_order_on_all_items_cancel
+CREATE TRIGGER trg_sync_order_on_all_items_status_change
 AFTER INSERT OR UPDATE ON public.order_items
 FOR EACH ROW
-EXECUTE FUNCTION public.sync_order_on_all_items_cancel();
+EXECUTE FUNCTION public.sync_order_on_all_items_status_change();
 
 
 

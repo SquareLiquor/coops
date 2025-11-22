@@ -86,6 +86,12 @@ export const deleteOrderById = async (orderId: string) => {
   if (error) throw error
 }
 
+export const checkConfirmable = async (orderId: string) => {
+  const { order } = await getOrderById(orderId)
+
+  return order?.status === OrderStatus.CREATED.code
+}
+
 export const confirmOrder = async (orderId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
@@ -103,6 +109,12 @@ export const confirmOrder = async (orderId: string) => {
     .maybeSingle()
 
   return { order: data }
+}
+
+export const checkCancelable = async (orderId: string) => {
+  const { order } = await getOrderById(orderId)
+
+  return order?.status === OrderStatus.CREATED.code
 }
 
 export const cancelOrder = async (orderId: string) => {
@@ -126,14 +138,5 @@ export const cancelOrder = async (orderId: string) => {
   return { order: data }
 }
 
-export const checkConfirmable = async (orderId: string) => {
-  const { order } = await getOrderById(orderId)
-
-  return order?.status === OrderStatus.CREATED.code
-}
-
-export const checkCancelable = async (orderId: string) => {
-  const { order } = await getOrderById(orderId)
-
-  return order?.status === OrderStatus.CREATED.code
-}
+export const checkRestorable = async (orderId: string) => {}
+export const restoreOrder = async (orderId: string) => {}
