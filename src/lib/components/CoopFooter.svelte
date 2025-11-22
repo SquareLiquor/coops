@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getCart } from '$lib/stores'
   import { formatCurrency } from '$lib/utils'
+  import { ShoppingCart } from '@lucide/svelte'
 
   let { isCartOpen = $bindable() } = $props()
 
@@ -14,21 +15,8 @@
   <div class="container mx-auto flex items-center justify-between">
     <div class="flex items-center space-x-3">
       <div class="relative">
-        <svg
-          class="text-surface-600 dark:text-surface-400 h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <circle cx="9" cy="21" r="1" />
-          <circle cx="20" cy="21" r="1" />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M1 1h4l2.68 13.39a2 2 0 002 1.61h7.72a2 2 0 002-1.61L23 6H6"
-          />
-        </svg>
+        <ShoppingCart />
+
         {#if itemsCount > 0}
           <span
             class="bg-primary-500 absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium text-white"

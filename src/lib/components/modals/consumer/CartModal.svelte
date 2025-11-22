@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getCart, removeFromCart, updateCartItem } from '$lib/stores'
   import { formatCurrency } from '$lib/utils'
+  import { Minus, Plus, X } from '@lucide/svelte'
 
   let { isCartOpen = $bindable() } = $props()
 
@@ -53,9 +54,7 @@
                       onclick={() => updateCartItem(item.coopId, -1)}
                       aria-label="수량 감소"
                     >
-                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                      </svg>
+                      <Minus class="h-3 w-3" />
                     </button>
                     <button
                       type="button"
@@ -63,9 +62,7 @@
                       onclick={() => updateCartItem(item.coopId, 1)}
                       aria-label="수량 증가"
                     >
-                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                      </svg>
+                      <Plus class="h-3 w-3" />
                     </button>
                     <button
                       type="button"
@@ -73,14 +70,7 @@
                       onclick={() => removeFromCart(item.coopId)}
                       aria-label="삭제"
                     >
-                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                      <X class="h-3 w-3" />
                     </button>
                   </div>
                 </div>

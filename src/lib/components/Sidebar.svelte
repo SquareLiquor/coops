@@ -2,6 +2,7 @@
   import { page } from '$app/state'
   import { getAuth } from '$lib/stores'
   import { signout } from '$lib/supabase'
+  import { Settings } from '@lucide/svelte'
 
   let { menuItems, settingsPath } = $props()
 
@@ -20,7 +21,7 @@
 >
   <!-- 브랜드/회사명 영역 -->
   <div class="mt-5 flex items-center gap-2 px-6 py-4">
-    <div class="text-2xl">🏪</div>
+    <div class="text-2xl"></div>
     <div>
       <h1 class="text-surface-900 text-lg font-bold">공동구매 관리자</h1>
       <p class="text-surface-500 text-xs">강남점</p>
@@ -40,16 +41,11 @@
               !currentPath.startsWith(item.href) && 'text-surface-700 hover:bg-surface-100',
             ]}
           >
-            <svg
-              class="h-4 w-4 {currentPath === item.href
-                ? 'text-primary-50'
-                : 'text-surface-700 group-hover:text-surface-700'}"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={item.icon} />
-            </svg>
+            {@render item.icon({
+              class: `h-2 w-2 ${
+                currentPath === item.href ? 'text-primary-50' : 'text-surface-700 group-hover:text-surface-700'
+              }`,
+            })}
             {item.label}
           </a>
         </li>
@@ -66,21 +62,11 @@
         ? 'bg-primary-500 text-primary-50 border-primary-200 border'
         : 'text-surface-700 hover:bg-surface-100'}"
     >
-      <svg
+      <Settings
         class="h-4 w-4 {currentPath === settingsPath
           ? 'text-primary-700'
           : 'text-surface-500 group-hover:text-surface-700'}"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-        />
-      </svg>
+      />
       설정
     </a>
   </div>
@@ -102,14 +88,7 @@
         type="button"
         onclick={signout}
       >
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-          />
-        </svg>
+        <Settings class="h-4 w-4" />
       </button>
     </div>
   </div>

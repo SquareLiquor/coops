@@ -1,6 +1,7 @@
 <script lang="ts">
   import { type OrderData } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
+  import { Check, CircleX, RotateCcw, X } from '@lucide/svelte'
   import dayjs from 'dayjs'
 
   let { order, onClose }: { order: OrderData; onClose: () => void } = $props()
@@ -54,9 +55,7 @@
           onclick={onClose}
           aria-label="닫기"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X class="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -110,9 +109,7 @@
                         onclick={(e) => !confirm('주문 상품 완료 처리 하시겠습니까?') && e.preventDefault()}
                         title="완료"
                       >
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check class="h-4 w-4" />
                       </button>
                     {/if}
                     {#if item.cancelable}
@@ -121,9 +118,7 @@
                         onclick={(e) => !confirm('주문 상품 취소 처리 하시겠습니까?') && e.preventDefault()}
                         title="취소"
                       >
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <CircleX class="h-4 w-4" />
                       </button>
                     {/if}
                     {#if item.restorable}
@@ -132,13 +127,7 @@
                         onclick={(e) => !confirm('주문 상품 복구 처리 하시겠습니까?') && e.preventDefault()}
                         title="복구"
                       >
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M4 4v5h.582M20 20v-5h-.581M5 9A7 7 0 0 1 19 15M19 15a7 7 0 0 1-14 0"
-                          />
-                        </svg>
+                        <RotateCcw class="h-4 w-4" />
                       </button>
                     {/if}
                   </div>

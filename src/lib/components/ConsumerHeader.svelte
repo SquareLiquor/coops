@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation'
   import { getAuth, getStore } from '$lib/stores'
   import { signout } from '$lib/supabase'
-  import { Store } from '@lucide/svelte'
+  import { House } from '@lucide/svelte'
 
   const user = $derived(getAuth().user)
   const store = $derived(getStore())
@@ -30,7 +30,7 @@
   >
     <div class="px-4 py-2">
       <div class="relative flex items-center">
-        <Store class="text-xs text-white" size={24} onclick={() => goto('/coops')} />
+        <House class="text-white" size={20} onclick={() => goto('/coops')} />
         <!-- <div class="flex items-center">
         <button
           type="button"
