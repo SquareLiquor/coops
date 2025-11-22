@@ -19,7 +19,7 @@ export const orderDataConverter = () => {
       totalPrice: total_price,
       status: lookupEnum(OrderStatus, status)!,
       items: orderItemDataConverter().convertAll(items),
-      cancelable: status === OrderStatus.ORDERED.code,
+      cancelable: status === OrderStatus.CREATED.code,
       orderedAt: dayjs(ordered_at).format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
@@ -48,7 +48,7 @@ export const orderItemDataConverter = () => {
       quantity,
       price,
       totalPrice: total_price,
-      cancelable: status === OrderStatus.ORDERED.code,
+      cancelable: status === OrderStatus.CREATED.code,
       status: lookupEnum(OrderStatus, status)!,
       images: coopImageDataConverter().convertAll(coop.images), //TODO 이미지 컨버터 공통화
     }

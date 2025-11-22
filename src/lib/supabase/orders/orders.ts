@@ -60,7 +60,7 @@ export const createOrder = async (formData: OrderCreateInput) => {
       user_name: userName,
       store_id: storeId,
       total_price: totalPrice,
-      status: OrderStatus.ORDERED.code,
+      status: OrderStatus.CREATED.code,
     })
     .select()
     .maybeSingle()
@@ -121,11 +121,11 @@ export const cancelOrder = async (orderId: string) => {
 export const checkConfirmable = async (orderId: string) => {
   const { order } = await getOrderById(orderId)
 
-  return order?.status === OrderStatus.ORDERED.code
+  return order?.status === OrderStatus.CREATED.code
 }
 
 export const checkCancelable = async (orderId: string) => {
   const { order } = await getOrderById(orderId)
 
-  return order?.status === OrderStatus.ORDERED.code
+  return order?.status === OrderStatus.CREATED.code
 }

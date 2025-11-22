@@ -138,17 +138,30 @@
                 </div>
 
                 <div class="flex items-center space-x-2">
+                  <!-- 상태 배지 -->
                   <span
-                    class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white bg-${order.status.color}-500`}
+                    class={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium text-${order.status.color}-700 bg-${order.status.color}-100`}
                   >
                     {order.status.label}
                   </span>
+
+                  <!-- 주문 전체 취소 버튼 -->
                   {#if order.cancelable}
                     <button
-                      class="rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                      type="submit"
                       formaction="?/cancel"
+                      class="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
+                      onclick={(e) => !confirm('주문을 취소하시겠습니까?') && e.preventDefault()}
+                      title="주문 취소"
                     >
-                      취소
+                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
                     </button>
                   {/if}
                 </div>
@@ -183,13 +196,35 @@
                         {formatCurrency(item.price)} × {item.quantity}개
                       </p>
                     </div>
-                    <div
-                      class={[
-                        'text-surface-900 dark:text-surface-100 text-sm font-semibold',
-                        equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
-                      ]}
-                    >
-                      {formatCurrency(item.totalPrice)}
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class={[
+                          'text-surface-900 dark:text-surface-100 text-sm font-semibold',
+                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                        ]}
+                      >
+                        {formatCurrency(item.totalPrice)}
+                      </div>
+
+                      <!-- 아이템별 취소 버튼 -->
+                      {#if item.cancelable}
+                        <button
+                          type="submit"
+                          formaction="?/cancelItem"
+                          class="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
+                          onclick={(e) => !confirm('이 상품을 취소하시겠습니까?') && e.preventDefault()}
+                          title="상품 취소"
+                        >
+                          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      {/if}
                     </div>
                   </div>
                 {/each}

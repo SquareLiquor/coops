@@ -6,7 +6,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
     CREATE TYPE order_status AS ENUM (
-      'ORDERED',    -- 주문 생성
+      'CREATED',    -- 주문 생성
       'COMPLETED',  -- 주문 완료(픽업 포함)
       'CANCELLED',  -- 주문 취소
       'PARTIAL_CANCELLED' -- 부분 취소

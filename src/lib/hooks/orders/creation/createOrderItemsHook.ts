@@ -17,7 +17,7 @@ const createOrderItems = async ({ order, orderId }: CreateOrderHookContext, shar
       quantity: item.quantity,
       price: item.price,
       total_price: item.quantity * item.price,
-      status: OrderStatus.ORDERED.code,
+      status: OrderStatus.CREATED.code,
     }))
   )
 

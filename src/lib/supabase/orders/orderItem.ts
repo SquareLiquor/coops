@@ -42,5 +42,5 @@ export const cancelOrderItem = async (orderItemId: string) => {
 const checkCancelable = async (orderItemId: string) => {
   const { orderItem } = await getOrderItemById(orderItemId)
 
-  return orderItem?.status === OrderStatus.ORDERED.code
+  return orderItem?.status === OrderStatus.CREATED.code
 }
