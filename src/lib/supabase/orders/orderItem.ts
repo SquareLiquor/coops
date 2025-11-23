@@ -18,13 +18,36 @@ export const getOrderItemsByOrderId = async (orderId: string) => {
   return { orderItems: data }
 }
 
-export const checkConfirmable = async (orderItemId: string) => {}
-export const confirmOrderItem = async (orderItemId: string) => {}
+export const checkOrderItemConfirmable = async (orderItemId: string) => {
+  const { orderItem } = await getOrderItemById(orderItemId)
+
+  return orderItem?.status === OrderStatus.CREATED.code
+}
+export const confirmOrderItem = async (orderItemId: string) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const confirmable = await checkOrderItemConfirmable(orderItemId)
+
+  if (!confirmable) {
+    throw new Error('Order item is not confirmable')
+  }
+
+  const { data, error } = await supabase
+    .from('order_items')
+    .update({ status: OrderStatus.COMPLETED.code })
+    .eq('id', orderItemId)
+    .select()
+    .maybeSingle()
+
+  if (error) throw error
+
+  return { orderItem: data }
+}
 
 export const checkOrderItemCancelable = async (orderItemId: string) => {
   const { orderItem } = await getOrderItemById(orderItemId)
 
-  return orderItem?.status === OrderStatus.CREATED.code
+  return orderItem?.status === OrderStatus.CREATED.code || orderItem?.status === OrderStatus.COMPLETED.code
 }
 
 export const cancelOrderItem = async (orderItemId: string) => {
@@ -48,5 +71,28 @@ export const cancelOrderItem = async (orderItemId: string) => {
   return { orderItem: data }
 }
 
-export const checkRestorable = async (orderItemId: string) => {}
-export const restoreOrderItem = async (orderItemId: string) => {}
+export const checkOrderItemRestorable = async (orderItemId: string) => {
+  const { orderItem } = await getOrderItemById(orderItemId)
+
+  return orderItem?.status === OrderStatus.CANCELLED.code
+}
+export const restoreOrderItem = async (orderItemId: string) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const restorable = await checkOrderItemRestorable(orderItemId)
+
+  if (!restorable) {
+    throw new Error('Order item is not restorable')
+  }
+
+  const { data, error } = await supabase
+    .from('order_items')
+    .update({ status: OrderStatus.CREATED.code })
+    .eq('id', orderItemId)
+    .select()
+    .maybeSingle()
+
+  if (error) throw error
+
+  return { orderItem: data }
+}

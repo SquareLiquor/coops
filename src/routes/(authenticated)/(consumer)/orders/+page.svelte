@@ -110,26 +110,24 @@
   {:else}
     <div class="space-y-4">
       {#each orders as order (order.id)}
-        <div
-          class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 overflow-hidden rounded-xl border bg-white shadow-sm"
-        >
+        {@const hasCancellableItems = order.items.some((item) => item.cancelable)}
+        <div class="border-surface-200 overflow-hidden rounded-xl border bg-white shadow-sm">
           <div class="border-surface-300 dark:border-surface-600 border-b border-dashed p-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <div class="text-left">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-semibold"
-                    >
+                    <span class="text-primary-600 flex min-w-0 flex-1 cursor-pointer items-center text-sm font-bold">
                       주문번호:
-                      <span class="ml-1 max-w-[100px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
+                      <span class="ml-1 max-w-[170px] truncate sm:max-w-none sm:min-w-0 sm:flex-1">
                         {order.id}
                       </span>
                     </span>
                   </div>
-                  <div class="text-surface-600 dark:text-surface-400 text-xs">
-                    <span class="text-surface-700 text-sm">{dayjs(order.orderedAt).format('YYYY-MM-DD')}</span>
-                    <span class="text-surface-400 text-xs">{dayjs(order.orderedAt).format('HH:mm:ss')}</span>
+                  <div class="text-surface-600 text-xs">
+                    <span class="text-surface-900 font-semibold">[{order.store.name}] </span>
+                    <span class="text-surface-600">{dayjs(order.createdAt).format('YYYY-MM-DD')}</span>
+                    <span class="text-surface-300">{dayjs(order.createdAt).format('HH:mm:ss')}</span>
                   </div>
                 </div>
               </div>
@@ -141,29 +139,6 @@
                 >
                   {order.status.label}
                 </span>
-
-                <!-- 주문 전체 취소 버튼 -->
-                {#if order.cancelable}
-                  <form method="POST" use:enhance>
-                    <input type="hidden" name="orderId" value={order.id} />
-                    <button
-                      type="submit"
-                      formaction="?/cancel"
-                      class="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
-                      onclick={(e) => !confirm('주문을 취소하시겠습니까?') && e.preventDefault()}
-                      title="주문 취소"
-                    >
-                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </form>
-                {/if}
               </div>
             </div>
           </div>
@@ -171,7 +146,12 @@
           <div class="p-4">
             <div class="space-y-3">
               {#each order.items as item}
-                <div class="flex items-center space-x-3">
+                <div
+                  class={[
+                    'flex items-center space-x-3',
+                    equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through opacity-50',
+                  ]}
+                >
                   <img
                     src={item.images.find((image) => image.representative)?.url}
                     alt={item.coop.name}
@@ -196,26 +176,93 @@
                       {formatCurrency(item.price)} × {item.quantity}개
                     </p>
                   </div>
-                  <div class="flex items-center space-x-2">
-                    <div
-                      class={[
-                        'text-surface-900 dark:text-surface-100 text-sm font-semibold',
-                        equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
-                      ]}
-                    >
-                      {formatCurrency(item.totalPrice)}
+                  {#if item.cancelable}
+                    <div class="flex min-w-[90px] items-center justify-end">
+                      <div
+                        class={[
+                          'text-surface-900 dark:text-surface-100 min-w-[60px] text-right text-sm font-semibold',
+                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                        ]}
+                      >
+                        {formatCurrency(item.totalPrice)}
+                      </div>
+                      <div class="border-surface-100 ml-2 flex items-center justify-center border-l pl-2">
+                        <form method="POST" use:enhance>
+                          <input type="hidden" name="orderItemId" value={item.id} />
+                          <button
+                            type="button"
+                            class="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
+                            formaction="?/cancelItem"
+                            onclick={(e) => !confirm('주문 상품을 취소 하시겠습니까?') && e.preventDefault()}
+                            title="상품 취소"
+                          >
+                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </form>
+                      </div>
                     </div>
+                  {:else}
+                    <div class="flex min-w-[90px] items-center justify-end">
+                      <div
+                        class={[
+                          'text-surface-900 dark:text-surface-100 min-w-[60px] text-right text-sm font-semibold',
+                          equalsEnum(item.status, OrderStatus.CANCELLED) && 'line-through',
+                        ]}
+                      >
+                        {formatCurrency(item.totalPrice)}
+                      </div>
+                      {#if hasCancellableItems}
+                        <div class="border-surface-100 ml-2 h-4 min-w-[24px] border-l pl-2"></div>
+                      {/if}
+                    </div>
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          </div>
 
-                    <!-- 아이템별 취소 버튼 -->
-                    {#if item.cancelable}
+          <div class="border-surface-300 dark:border-surface-600 border-t border-dashed bg-white p-4 dark:bg-white">
+            <div
+              class={[
+                'flex items-center justify-between',
+                equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through opacity-50',
+              ]}
+            >
+              <div
+                class={[
+                  'text-surface-600 dark:text-surface-400 text-sm',
+                  equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                ]}
+              >
+                총 {order.items.length}개 상품
+              </div>
+              {#if order.cancelable || order.items.some((item) => item.cancelable)}
+                <div class="flex min-w-[120px] items-center justify-end">
+                  <div
+                    class={[
+                      'text-primary-600 min-w-[90px] text-right text-lg font-bold',
+                      equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                    ]}
+                  >
+                    {formatCurrency(order.totalPrice)}
+                  </div>
+                  {#if order.cancelable}
+                    <div class="border-surface-100 ml-2 flex items-center justify-center border-l pl-2">
                       <form method="POST" use:enhance>
-                        <input type="hidden" name="orderItemId" value={item.id} />
+                        <input type="hidden" name="orderId" value={order.id} />
                         <button
-                          type="submit"
-                          formaction="?/cancelItem"
-                          class="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
-                          onclick={(e) => !confirm('이 상품을 취소하시겠습니까?') && e.preventDefault()}
-                          title="상품 취소"
+                          type="button"
+                          class="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
+                          formaction="?/cancel"
+                          onclick={(e) => !confirm('주문을 취소하시겠습니까?') && e.preventDefault()}
+                          title="주문 취소"
                         >
                           <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -227,31 +274,21 @@
                           </svg>
                         </button>
                       </form>
-                    {/if}
-                  </div>
+                    </div>
+                  {:else if hasCancellableItems}
+                    <div class="border-surface-100 ml-2 h-5 min-w-[24px] border-l pl-2"></div>
+                  {/if}
                 </div>
-              {/each}
-            </div>
-          </div>
-
-          <div class="border-surface-300 dark:border-surface-600 border-t border-dashed bg-white p-4 dark:bg-white">
-            <div class="flex items-center justify-between">
-              <div
-                class={[
-                  'text-surface-600 dark:text-surface-400 text-sm',
-                  equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
-                ]}
-              >
-                총 {order.items.length}개 상품
-              </div>
-              <div
-                class={[
-                  'text-primary-600 text-lg font-bold',
-                  equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
-                ]}
-              >
-                {formatCurrency(order.totalPrice)}
-              </div>
+              {:else}
+                <div
+                  class={[
+                    'text-primary-600 min-w-[90px] text-right text-lg font-bold',
+                    equalsEnum(order.status, OrderStatus.CANCELLED) && 'line-through',
+                  ]}
+                >
+                  {formatCurrency(order.totalPrice)}
+                </div>
+              {/if}
             </div>
           </div>
         </div>

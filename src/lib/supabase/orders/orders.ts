@@ -21,10 +21,10 @@ export const getOrders = async (filter: OrdersFilterInput) => {
   if (name) query.ilike('user_name', `%${name}%`)
   if (categoryId) query.eq('category_id', categoryId)
   if (status) query.eq('status', status)
-  if (dateFrom) query.gte('ordered_at', dayjs(dateFrom).startOf('day').toISOString())
-  if (dateTo) query.lte('ordered_at', dayjs(dateTo).endOf('day').toISOString())
+  if (dateFrom) query.gte('created_at', dayjs(dateFrom).startOf('day').toISOString())
+  if (dateTo) query.lte('created_at', dayjs(dateTo).endOf('day').toISOString())
 
-  const { data, error } = await query.order('ordered_at', { ascending: false })
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   return { orders: data }
 }
@@ -40,10 +40,10 @@ export const getOrdersByUserId = async (filter: ConsumerOrdersFilterInput) => {
     const start = dayjs(dateAt).startOf('day').toISOString()
     const end = dayjs(dateAt).endOf('day').toISOString()
 
-    query.gte('ordered_at', start).lte('ordered_at', end)
+    query.gte('created_at', start).lte('created_at', end)
   }
 
-  const { data, error } = await query.order('ordered_at', { ascending: false })
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   return { orders: data }
 }
@@ -114,7 +114,7 @@ export const confirmOrder = async (orderId: string) => {
 export const checkCancelable = async (orderId: string) => {
   const { order } = await getOrderById(orderId)
 
-  return order?.status === OrderStatus.CREATED.code
+  return order?.status === OrderStatus.CREATED.code || order?.status === OrderStatus.COMPLETED.code
 }
 
 export const cancelOrder = async (orderId: string) => {
@@ -138,5 +138,28 @@ export const cancelOrder = async (orderId: string) => {
   return { order: data }
 }
 
-export const checkRestorable = async (orderId: string) => {}
-export const restoreOrder = async (orderId: string) => {}
+export const checkRestorable = async (orderId: string) => {
+  const { order } = await getOrderById(orderId)
+
+  return order?.status === OrderStatus.CANCELLED.code
+}
+export const restoreOrder = async (orderId: string) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const restorable = await checkRestorable(orderId)
+
+  if (!restorable) {
+    throw new Error('Order is not restorable')
+  }
+
+  const { data, error } = await supabase
+    .from('orders')
+    .update({ status: OrderStatus.CREATED.code })
+    .eq('id', orderId)
+    .select()
+    .maybeSingle()
+
+  if (error) throw error
+
+  return { order: data }
+}

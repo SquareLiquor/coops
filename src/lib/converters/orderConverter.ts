@@ -7,7 +7,7 @@ export const orderDataConverter = () => {
   const convert = (data: any): OrderData | undefined => {
     if (!data) return undefined
 
-    const { id, user_id, user_name, store_id, store, total_price, status, items, ordered_at, updated_at } = data
+    const { id, user_id, user_name, store_id, store, total_price, status, items, created_at, updated_at } = data
 
     return {
       id,
@@ -19,10 +19,11 @@ export const orderDataConverter = () => {
       totalPrice: total_price,
       status: lookupEnum(OrderStatus, status)!,
       items: orderItemDataConverter().convertAll(items),
-      completable: status === OrderStatus.CREATED.code,
       cancelable: status === OrderStatus.CREATED.code,
-      restorable: status === OrderStatus.CANCELLED.code,
-      orderedAt: dayjs(ordered_at).format('YYYY-MM-DD HH:mm:ss'),
+      cancelableForAdmin: status === OrderStatus.CREATED.code || status === OrderStatus.COMPLETED.code,
+      completableForAdmin: status === OrderStatus.CREATED.code,
+      restorableForAdmin: status === OrderStatus.CANCELLED.code,
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
@@ -40,7 +41,7 @@ export const orderItemDataConverter = () => {
   const convert = (data: any): OrderItemData | undefined => {
     if (!data) return undefined
 
-    const { id, order_id, coop_id, coop, quantity, price, total_price, status } = data
+    const { id, order_id, coop_id, coop, quantity, price, total_price, status, created_at, updated_at } = data
 
     return {
       id,
@@ -50,11 +51,14 @@ export const orderItemDataConverter = () => {
       quantity,
       price,
       totalPrice: total_price,
-      completable: status === OrderStatus.CREATED.code,
       cancelable: status === OrderStatus.CREATED.code,
-      restorable: status === OrderStatus.CANCELLED.code,
+      cancelableForAdmin: status === OrderStatus.CREATED.code || status === OrderStatus.COMPLETED.code,
+      completableForAdmin: status === OrderStatus.CREATED.code,
+      restorableForAdmin: status === OrderStatus.CANCELLED.code,
       status: lookupEnum(OrderStatus, status)!,
       images: coopImageDataConverter().convertAll(coop.images), //TODO 이미지 컨버터 공통화
+      createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
+      updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
     }
   }
 

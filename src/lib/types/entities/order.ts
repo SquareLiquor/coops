@@ -13,10 +13,13 @@ export interface OrderData {
   totalPrice: number
   status: OrderStatus
   items: OrderItemData[]
-  completable: boolean
+
   cancelable: boolean
-  restorable: boolean
-  orderedAt: string
+  completableForAdmin: boolean
+  cancelableForAdmin: boolean
+  restorableForAdmin: boolean
+
+  createdAt: string
   updatedAt: string
 }
 
@@ -29,8 +32,13 @@ export interface OrderItemData {
   price: number
   totalPrice: number
   status: OrderStatus
-  completable: boolean
+
   cancelable: boolean
-  restorable: boolean
+  completableForAdmin: boolean
+  cancelableForAdmin: boolean
+  restorableForAdmin: boolean
+
   images: ImageData[]
+  createdAt: string
+  updatedAt: string
 }

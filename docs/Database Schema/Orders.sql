@@ -21,7 +21,7 @@ CREATE TABLE public.orders (
 	store_id uuid NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
 	total_price numeric NOT NULL,
 	status order_status NOT NULL,
-	ordered_at timestamptz NOT NULL DEFAULT now(),
+	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz DEFAULT now()
 );
 COMMENT ON TABLE public.orders IS '공동구매 주문 정보';
@@ -115,11 +115,6 @@ BEGIN
       UPDATE public.orders
       SET status = 'CANCELLED'
       WHERE id = order_id_val AND status != 'CANCELLED';
-    -- 일부만 취소된 경우 PARTIAL_CANCELLED로 변경
-    ELSIF cancelled_items_count > 0 AND cancelled_items_count < total_items_count THEN
-      UPDATE public.orders
-      SET status = 'PARTIAL_CANCELLED'
-      WHERE id = order_id_val AND status NOT IN ('CANCELLED', 'PARTIAL_CANCELLED');
     -- 모든 아이템이 완료되었으면 주문도 완료로 변경
     ELSIF completed_items_count = total_items_count THEN
       UPDATE public.orders
@@ -130,6 +125,21 @@ BEGIN
       UPDATE public.orders
       SET status = 'CREATED'
       WHERE id = order_id_val AND status != 'CREATED';
+    -- 일부만 취소(나머지는 CREATED) → PARTIAL_CANCELLED
+    ELSIF cancelled_items_count > 0 AND cancelled_items_count < total_items_count THEN
+      UPDATE public.orders 
+      SET status = 'PARTIAL_CANCELLED' 
+      WHERE id = order_id_val AND status != 'PARTIAL_CANCELLED';
+
+    -- 일부만 복구(나머지는 CANCELLED) → PARTIAL_CREATED (필요시 새 상태 추가)
+    -- ELSIF created_items_count > 0 AND created_items_count < total_items_count THEN
+    --   UPDATE public.orders 
+    --   SET status = 'PARTIAL_CANCELLED' 
+    --   WHERE id = order_id_val AND status != 'PARTIAL_CANCELLED';
+
+    -- 일부만 완료(나머지는 CREATED/취소 등) → PARTIAL_COMPLETED (필요시 새 상태 추가)
+    -- ELSIF completed_items_count > 0 AND completed_items_count < total_items_count THEN
+    --   UPDATE public.orders SET status = 'PARTIAL_COMPLETED' WHERE id = order_id_val AND status != 'PARTIAL_COMPLETED';
     END IF;
   END IF;
 
@@ -162,7 +172,7 @@ CREATE TABLE public.order_items (
 	price numeric NOT NULL,
   total_price numeric NOT NULL,
 	status order_status NOT NULL -- 주문 상태(ORDERED, COMPLETED, CANCELLED)
-  ordered_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz DEFAULT now()
 );
 COMMENT ON TABLE public.order_items IS '공동구매 주문 상세(공동구매별) 정보';

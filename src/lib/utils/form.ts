@@ -1,4 +1,5 @@
 import type { RemoteFormInput } from '@sveltejs/kit'
+import type { Readable } from 'svelte/store'
 
 // 제네릭 FormData 타입
 export type FormDataObject<K extends string> = {
@@ -56,4 +57,25 @@ export const extractFormData = async <K extends string>(data: FormData, items: K
   }
 
   return result
+}
+
+/**
+ * SuperForm의 submit을 비동기로 처리하고 완료될 때까지 대기합니다.
+ */
+export const asyncSuperFormSubmit = async (submit: () => void, $submitting: Readable<boolean>) => {
+  return new Promise<void>((resolve) => {
+    const prevSubmitting = $submitting
+
+    submit()
+
+    const unsubscribe = $submitting.subscribe((submitting) => {
+      if (prevSubmitting && !submitting) {
+        unsubscribe()
+        resolve()
+      } else if (!prevSubmitting && !submitting) {
+        unsubscribe()
+        resolve()
+      }
+    })
+  })
 }

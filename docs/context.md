@@ -497,7 +497,7 @@ Skeleton 컴포넌트 스타일을 참고해서 버튼, 입력폼, 카드, 테�
 | store_id    | uuid        | FK → stores.id      |
 | total_price | numeric     | 총 주문 금액        |
 | status      | text        | 상태(주문, 취소 등) |
-| ordered_at  | timestamptz | 주문일시            |
+| created_at  | timestamptz | 주문일시            |
 
 ---
 
