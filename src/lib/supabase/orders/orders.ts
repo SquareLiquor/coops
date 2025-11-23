@@ -7,7 +7,7 @@ import { createBrowserClient, createServerClient } from '../clients'
 const ordersSelectQuery = `
   *,
   store:store_id(*),
-  items:order_items(*, coop:coop_id(*, images:coop_images(*)))
+  items:order_items(*, coop:coop_id(*, images:coop_images(*)))!order(created_at.asc)
 `
 
 // TODO: order view를 조회

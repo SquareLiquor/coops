@@ -190,7 +190,6 @@
                         <form method="POST" use:enhance>
                           <input type="hidden" name="orderItemId" value={item.id} />
                           <button
-                            type="button"
                             class="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
                             formaction="?/cancelItem"
                             onclick={(e) => !confirm('주문 상품을 취소 하시겠습니까?') && e.preventDefault()}
@@ -258,7 +257,6 @@
                       <form method="POST" use:enhance>
                         <input type="hidden" name="orderId" value={order.id} />
                         <button
-                          type="button"
                           class="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
                           formaction="?/cancel"
                           onclick={(e) => !confirm('주문을 취소하시겠습니까?') && e.preventDefault()}
