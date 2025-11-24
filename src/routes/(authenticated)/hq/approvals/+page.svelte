@@ -1,13 +1,12 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
+  import { buildFilterForm } from '$lib/builder'
+  import { ApprovalsFilterSchema } from '$lib/schemas'
   import { ApprovalStatus, equalsEnum, type ApprovalRequestData } from '$lib/types'
   import { extractFormData } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { onMount, tick } from 'svelte'
-  import { superForm } from 'sveltekit-superforms'
-  import { valibot } from 'sveltekit-superforms/adapters'
+  import { onDestroy, onMount, tick } from 'svelte'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
@@ -17,36 +16,26 @@
 
   onMount(async () => {
     await tick()
-    filterSubmit()
+    await asyncFilterSubmit()
   })
+
+  onDestroy(() => debouncedSubmit?.cancel?.())
 
   const {
     form: filterForm,
     errors: filterErrors,
     constraints: filterConstraints,
-    validateForm: validateFilterForm,
     enhance: filterEnhance,
-    submit: filterSubmit,
     submitting: filterSubmitting,
-  } = superForm(data.filterForm, {
-    validators: valibot(FilterSchema),
-    resetForm: false,
-    onChange: async (event) => {
-      try {
-        const result = await validateFilterForm({ update: true })
+    asyncSubmit: asyncFilterSubmit,
+    debouncedSubmit,
+  } = buildFilterForm<typeof ApprovalsFilterSchema>({
+    form: data.filterForm,
+    schema: ApprovalsFilterSchema,
+    resultHandler: {
+      handleSuccess: (result) => (requests = result.data?.requests || []),
 
-        if (result.valid) filterSubmit()
-      } catch (e) {
-        console.error('validate form error:', e)
-      }
-    },
-    onResult: ({ result }: { result: ActionResult }) => {
-      if (result?.type === 'success') {
-        requests = result.data?.requests || []
-      }
-      if (result?.type === 'failure') {
-        requests = []
-      }
+      handleFailure: () => (requests = []),
     },
   })
 

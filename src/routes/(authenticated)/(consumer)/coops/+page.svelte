@@ -21,7 +21,7 @@
   import { isBrowser } from '@supabase/ssr'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { onMount, tick } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
@@ -41,14 +41,17 @@
     const { categories: _categories } = await getCategories(store.id)
     categories = _categories
 
-    filterSubmit()
+    await asyncFilterSubmit()
   })
+
+  onDestroy(() => debouncedSubmit?.cancel?.())
 
   const {
     form: filterForm,
     enhance: filterEnhance,
-    submit: filterSubmit,
     submitting: filterSubmitting,
+    asyncSubmit: asyncFilterSubmit,
+    debouncedSubmit,
   } = buildFilterForm<typeof ConsumerCoopsFilterSchema>({
     form: data.filterForm,
     schema: ConsumerCoopsFilterSchema,
@@ -78,7 +81,7 @@
       if (result.type === 'success' || result.type === 'failure') {
         const toast = result.type === 'success' ? toaster.success : toaster.error
 
-        filterSubmit()
+        await asyncFilterSubmit()
         toast({
           description: result.data?.form.message,
           duration: 5000,

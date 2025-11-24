@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { buildFilterForm } from '$lib/builder'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
+  import { ConsumerOrdersFilterSchema } from '$lib/schemas'
   import { equalsEnum, OrderStatus, type OrderData } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
-  import { onMount, tick } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
@@ -17,22 +19,22 @@
 
   onMount(async () => {
     await tick()
-    filterSubmit()
+    await asyncFilterSubmit()
   })
+  onDestroy(() => debouncedSubmit?.cancel?.())
 
   const {
     form: filterForm,
     enhance: filterEnhance,
-    submit: filterSubmit,
     submitting: filterSubmitting,
-  } = superForm(data.filterForm, {
-    resetForm: false,
-    onChange: () => {
-      filterSubmit()
-    },
-    onResult: ({ result }: { result: ActionResult }) => {
-      if (result?.type === 'success') orders = result.data?.orders || []
-      if (result?.type === 'failure') orders = []
+    asyncSubmit: asyncFilterSubmit,
+    debouncedSubmit,
+  } = buildFilterForm<typeof ConsumerOrdersFilterSchema>({
+    form: data.filterForm,
+    schema: ConsumerOrdersFilterSchema,
+    resultHandler: {
+      handleSuccess: (result) => (orders = result.data?.orders || []),
+      handleFailure: () => (orders = []),
     },
   })
 
@@ -41,7 +43,7 @@
       if (result.type === 'success' || result.type === 'failure') {
         const toast = result.type === 'success' ? toaster.success : toaster.error
 
-        filterSubmit()
+        await asyncFilterSubmit()
         toast({
           description: result.data?.form.message,
           duration: 5000,

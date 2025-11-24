@@ -1,38 +1,32 @@
 <script lang="ts">
+  import { buildFilterForm } from '$lib/builder'
   import OrderDetailModal from '$lib/components/modals/admin/OrderDetailModal.svelte'
-  import { OrdersFilterSchema as FilterSchema } from '$lib/schemas'
+  import { OrdersFilterSchema } from '$lib/schemas'
   import { type OrderData } from '$lib/types'
-  import { asyncSuperFormSubmit, debounce, formatCurrency, toaster } from '$lib/utils'
+  import { formatCurrency, toaster } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, setContext, tick } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
-  import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
   let { salesStatuses } = data
   let orders: OrderData[] = $state([])
   let selectedOrder: OrderData | null = $state(null)
-  let debouncedFilterSubmit: ReturnType<typeof debounce>
 
   onMount(async () => {
     await tick()
 
-    debouncedFilterSubmit = debounce(async () => {
-      const result = await validateFilterForm({ update: true })
-      if (result.valid) await asyncSuperFormSubmit(filterSubmit, filterSubmitting)
-    }, 300)
-
-    await asyncSuperFormSubmit(filterSubmit, filterSubmitting)
+    await asyncFilterSubmit()
   })
 
-  onDestroy(() => debouncedFilterSubmit?.cancel?.())
+  onDestroy(() => debouncedSubmit?.cancel?.())
 
   // 모달에서 사용할 수 있도록 context 설정
   setContext('updateOrder', async (orderId: string) => {
     // 주문 목록 재조회 및 완료 대기
-    await asyncSuperFormSubmit(filterSubmit, filterSubmitting)
+    await asyncFilterSubmit()
 
     // 재조회 완료 후 selectedOrder 업데이트
     const updatedOrder = orders.find((order) => order.id === orderId)
@@ -43,28 +37,16 @@
     form: filterForm,
     errors: filterErrors,
     constraints: filterConstraints,
-    validateForm: validateFilterForm,
     enhance: filterEnhance,
-    submit: filterSubmit,
     submitting: filterSubmitting,
-  } = superForm(data.filterForm, {
-    validators: valibot(FilterSchema),
-    resetForm: false,
-    onChange: async ({ target }) => {
-      try {
-        if ((target as HTMLInputElement)?.type === 'text') {
-          debouncedFilterSubmit()
-        } else {
-          const result = await validateFilterForm({ update: true })
-          if (result.valid) await asyncSuperFormSubmit(filterSubmit, filterSubmitting)
-        }
-      } catch (e) {
-        console.error('validate form error:', e)
-      }
-    },
-    onResult: ({ result }: { result: ActionResult }) => {
-      if (result?.type === 'success') orders = result.data?.orders || []
-      if (result?.type === 'failure') orders = []
+    asyncSubmit: asyncFilterSubmit,
+    debouncedSubmit,
+  } = buildFilterForm<typeof OrdersFilterSchema>({
+    form: data.filterForm,
+    schema: OrdersFilterSchema,
+    resultHandler: {
+      handleSuccess: (result) => (orders = result.data?.orders || []),
+      handleFailure: () => (orders = []),
     },
   })
 
@@ -73,7 +55,7 @@
       if (result.type === 'success' || result.type === 'failure') {
         const toast = result.type === 'success' ? toaster.success : toaster.error
 
-        await asyncSuperFormSubmit(filterSubmit, filterSubmitting)
+        await asyncFilterSubmit()
         toast({
           description: result.data?.form.message,
           duration: 5000,

@@ -1,64 +1,39 @@
 <script lang="ts">
+  import { buildFilterForm } from '$lib/builder'
   import ProductDetailModal from '$lib/components/modals/hq/ProductDetailModal.svelte'
-  import { ProductsFilterSchema as FilterSchema } from '$lib/schemas'
+  import { ProductsFilterSchema } from '$lib/schemas'
   import type { ProductData } from '$lib/types'
-  import { debounce, formatCurrency } from '$lib/utils'
-  import type { ActionResult } from '@sveltejs/kit'
+  import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
-  import { superForm } from 'sveltekit-superforms'
-  import { valibot } from 'sveltekit-superforms/adapters'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
   let { categories, statuses } = data
   let products: ProductData[] = $state([])
   let selectedProduct: ProductData | null = $state(null)
-  let debouncedFilterSubmit: ReturnType<typeof debounce>
 
   onMount(async () => {
     await tick()
-
-    debouncedFilterSubmit = debounce(async () => {
-      const result = await validateFilterForm({ update: true })
-      if (result.valid) filterSubmit()
-    }, 300)
-
-    filterSubmit()
+    await asyncFilterSubmit()
   })
 
-  onDestroy(() => debouncedFilterSubmit?.cancel?.())
+  onDestroy(() => debouncedSubmit?.cancel?.())
 
   const {
     form: filterForm,
     errors: filterErrors,
     constraints: filterConstraints,
-    validateForm: validateFilterForm,
     enhance: filterEnhance,
-    submit: filterSubmit,
     submitting: filterSubmitting,
-  } = superForm(data.filterForm, {
-    validators: valibot(FilterSchema),
-    resetForm: false,
-    onChange: async ({ target }) => {
-      try {
-        if ((target as HTMLInputElement)?.type === 'text') {
-          debouncedFilterSubmit()
-        } else {
-          const result = await validateFilterForm({ update: true })
-          if (result.valid) filterSubmit()
-        }
-      } catch (e) {
-        console.error('validate form error:', e)
-      }
-    },
-    onResult: ({ result }: { result: ActionResult }) => {
-      if (result?.type === 'success') {
-        products = result.data?.products || []
-      }
-      if (result?.type === 'failure') {
-        products = []
-      }
+    asyncSubmit: asyncFilterSubmit,
+    debouncedSubmit,
+  } = buildFilterForm<typeof ProductsFilterSchema>({
+    form: data.filterForm,
+    schema: ProductsFilterSchema,
+    resultHandler: {
+      handleSuccess: (result) => (products = result.data?.products || []),
+      handleFailure: () => (products = []),
     },
   })
 </script>

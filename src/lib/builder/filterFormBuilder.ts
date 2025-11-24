@@ -1,56 +1,32 @@
 import { asyncSuperFormSubmit, debounce } from '$lib/utils'
+import { isBrowser } from '@supabase/ssr'
 import type { ActionResult } from '@sveltejs/kit'
-import { superForm, type FormOptions, type SuperValidated } from 'sveltekit-superforms'
+import { superForm, type FormOptions } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { BaseSchema, InferOutput } from 'valibot'
-
-type BuilderSuperFormParamaters<S extends BaseSchema<any, any, any>> = {
-  form: SuperValidated<InferOutput<S>>
-  schema: S
-  changeHandler?: {
-    beforeChange?: () => void
-    afterChange?: () => void
-  }
-  submitHandler?: {
-    beforeSubmit?: () => void
-  }
-  resultHandler?: {
-    handleSuccess?: (result: any) => void // TODO: any to ActionResult
-    handleFailure?: (result: any) => void
-  }
-  options?: Record<string, any>
-}
+import type { BuilderSuperFormParamaters } from '.'
 
 export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: BuilderSuperFormParamaters<S>) => {
   const { form, schema, changeHandler = {}, submitHandler = {}, resultHandler = {}, options = {} } = params
-  const { beforeChange, afterChange } = changeHandler
+  const { beforeChange } = changeHandler
   const { beforeSubmit } = submitHandler
   const { handleSuccess, handleFailure } = resultHandler
-  const { dataType = 'json', resetForm = false } = options
+  const { dataType = 'json', resetForm = false, useClientValidation = false } = options
 
   const formOptions: FormOptions<InferOutput<S>, any, InferOutput<S>> = {
-    dataType,
     validators: valibot(schema),
+    dataType,
     resetForm,
+    invalidateAll: false,
     onChange: async (event: any) => {
+      beforeChange && beforeChange()
+
       const { target } = event
-      try {
-        beforeChange && beforeChange()
-
-        if ((target as HTMLInputElement)?.type === 'text') {
-          debounce(async () => {
-            await asyncSuperFormSubmit(submit, submitting)
-          }, 300)
-        } else {
-          await asyncSuperFormSubmit(submit, submitting)
-        }
-
-        afterChange && afterChange()
-      } catch (error) {
-        console.error('validate form error:', error)
-      }
+      if ((target as HTMLInputElement)?.type === 'text') debouncedSubmit()
+      else await submit()
     },
-    onSubmit: async () => {
+    onSubmit: async ({ cancel }) => {
+      !isBrowser() && cancel()
       beforeSubmit && beforeSubmit()
     },
     onResult: async ({ result }: { result: ActionResult }) => {
@@ -59,28 +35,28 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
     },
   }
 
-  const validateAndSubmit = async () => {
-    const result = await validateForm({ update: true })
-    if (result.valid) await asyncSuperFormSubmit(submit, submitting)
+  let submit = async () => await asyncSuperFormSubmit(_submit, _submitting)
+  if (useClientValidation) {
+    submit = async () => {
+      const result = await _validateForm({ update: true })
+      if (result.valid) await asyncSuperFormSubmit(_submit, _submitting)
+    }
   }
+  const debouncedSubmit = debounce(submit, 300)
 
   const {
-    form: _form,
-    enhance,
-    validateForm,
-    errors,
-    constraints,
-    submit,
-    submitting,
+    submit: _submit,
+    submitting: _submitting,
+    validateForm: _validateForm,
+    ...properties
   } = superForm<InferOutput<S>>(form, formOptions)
 
   return {
-    form: _form,
-    enhance,
-    validateForm,
-    errors,
-    constraints,
-    submit,
-    submitting,
+    submit: _submit,
+    submitting: _submitting,
+    validateForm: _validateForm,
+    asyncSubmit: async () => await asyncSuperFormSubmit(_submit, _submitting),
+    debouncedSubmit,
+    ...properties,
   }
 }
