@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { buildFilterForm } from '$lib/builder'
   import CoopFooter from '$lib/components/CoopFooter.svelte'
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
-  import { convertCartDataToOrderInput, coopDataToCartItemData } from '$lib/schemas'
+  import { ConsumerCoopsFilterSchema, convertCartDataToOrderInput, coopDataToCartItemData } from '$lib/schemas'
   import {
     addToCart,
     clearCart,
@@ -48,15 +49,18 @@
     enhance: filterEnhance,
     submit: filterSubmit,
     submitting: filterSubmitting,
-  } = superForm(data.filterForm, {
-    resetForm: false,
-    onChange: async () => {
-      $filterForm.storeId = store.id
-      filterSubmit()
+  } = buildFilterForm<typeof ConsumerCoopsFilterSchema>({
+    form: data.filterForm,
+    schema: ConsumerCoopsFilterSchema,
+    changeHandler: {
+      beforeChange: () => ($filterForm.storeId = store.id),
     },
-    onResult: ({ result }: { result: ActionResult }) => {
-      if (result?.type === 'success') coops = result.data?.coops || []
-      if (result?.type === 'failure') coops = []
+    submitHandler: {
+      beforeSubmit: () => ($filterForm.storeId = store.id),
+    },
+    resultHandler: {
+      handleSuccess: (result) => (coops = result.data?.coops || []),
+      handleFailure: () => (coops = []),
     },
   })
 
