@@ -1,11 +1,11 @@
 import { toApprovalRequestEntities, toApprovalRequestEntity } from '$lib/converters/signup.converter'
 import { toStoreEntities } from '$lib/converters/store.converter'
-import { ApprovalError, isAppError } from '$lib/errors'
+import { approveRequest, rejectRequest } from '$lib/database'
+import { isAppError } from '$lib/errors'
 import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
 import { approveRequestHook, rejectRequestHook } from '$lib/services/hooks'
 import { ApprovalStatus } from '$lib/types'
 import { extractFormData } from '$lib/utils'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
@@ -63,7 +63,7 @@ export const actions: Actions = {
     }
   },
 
-  approve: async ({ request, locals: { supabase, user } }) => {
+  approve: async ({ request, locals: { user } }) => {
     const { id, storeId, userId } = await extractFormData(await request.formData(), ['id', 'storeId', 'userId'])
 
     if (!id || !user?.id || !storeId || !userId) {
@@ -71,7 +71,7 @@ export const actions: Actions = {
     }
 
     try {
-      const { data } = await approve(supabase, id, user.id)
+      const { data } = await approveRequest(id, user.id)
 
       await approveRequestHook.runAfter({ storeId, userId })
 
@@ -85,7 +85,7 @@ export const actions: Actions = {
     }
   },
 
-  reject: async ({ request, locals: { supabase, user } }) => {
+  reject: async ({ request, locals: { user } }) => {
     const { id, storeId, userId } = await extractFormData(await request.formData(), ['id', 'storeId', 'userId'])
 
     if (!id || !user?.id || !storeId || !userId) {
@@ -93,7 +93,7 @@ export const actions: Actions = {
     }
 
     try {
-      const { data } = await reject(supabase, id, user.id)
+      const { data } = await rejectRequest(id, user.id)
 
       await rejectRequestHook.runAfter({ storeId, userId })
 
@@ -106,50 +106,4 @@ export const actions: Actions = {
       return fail(500, { message: '거부 처리 중 오류가 발생했습니다.' })
     }
   },
-}
-
-const approve = async (supabase: SupabaseClient, id: string, userId: string) => {
-  const { data, error } = await supabase
-    .from('signup_approval_requests')
-    .update({
-      status: ApprovalStatus.APPROVED.code,
-      approver_id: userId,
-      reason: '사용자 확인 완료',
-      approved_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select(requestSelectQuery)
-    .maybeSingle()
-
-  if (error) {
-    throw new ApprovalError('승인 처리 중 오류가 발생했습니다.', {
-      code: 'APPROVAL_PROCESSING_FAILED',
-      details: { error: error.message },
-    })
-  }
-
-  return { data }
-}
-
-const reject = async (supabase: SupabaseClient, id: string, userId: string) => {
-  const { data, error } = await supabase
-    .from('signup_approval_requests')
-    .update({
-      status: ApprovalStatus.REJECTED.code,
-      approver_id: userId,
-      reason: '사용자 확인 불가',
-      cancelled_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select(requestSelectQuery)
-    .maybeSingle()
-
-  if (error) {
-    throw new ApprovalError('거부 처리 중 오류가 발생했습니다.', {
-      code: 'REJECTION_PROCESSING_FAILED',
-      details: { error: error.message },
-    })
-  }
-
-  return { data }
 }

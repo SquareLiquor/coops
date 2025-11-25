@@ -1,27 +1,16 @@
 <script lang="ts">
-  import { toProduictEntities } from '$lib/converters/product.converter'
-  import { createBrowserClient } from '$lib/database'
+  import { toProductEntities } from '$lib/converters/product.converter'
+  import { getProducts } from '$lib/database'
   import type { ProductEntity } from '$lib/types'
   import { onMount } from 'svelte'
-
-  const supabase = createBrowserClient()
 
   let { onClose, onSelect: handleSelect, hqStore } = $props()
   let products: ProductEntity[] = $state([])
 
   onMount(async () => {
-    const { data } = await supabase
-      .from('products')
-      .select(
-        `
-        *,
-        category:category_id ( id, name ),
-        images:product_images ( id, product_id, url, representative, path, sort_order )
-      `
-      )
-      .eq('store_id', hqStore.id)
+    const { products: _products } = await getProducts({ storeId: hqStore.id })
 
-    products = toProduictEntities(data || [])
+    products = toProductEntities(products)
   })
 
   const _handleSelect = async (index: number) => {
@@ -38,8 +27,10 @@
       type="button"
       class="absolute top-2 right-2 text-2xl text-gray-400 hover:text-gray-600"
       onclick={onClose}
-      aria-label="닫기">&times;</button
+      aria-label="닫기"
     >
+      &times;
+    </button>
     <h2 class="mb-4 text-lg font-bold">본사 상품 목록</h2>
     {#if products.length === 0}
       <div class="py-8 text-center text-gray-500">상품이 없습니다.</div>
@@ -61,12 +52,3 @@
     {/if}
   </div>
 </div>
-
-<style>
-  .btn {
-    transition: background 0.2s;
-  }
-  .btn:hover {
-    background: #2563eb;
-  }
-</style>

@@ -43,7 +43,7 @@ export const toProductEntity = (data: any): ProductEntity | undefined => {
   }
 }
 
-export const toProduictEntities = (datas: any[] | null): ProductEntity[] | [] => {
+export const toProductEntities = (datas: any[] | null): ProductEntity[] | [] => {
   if (!datas) return []
 
   return datas.map(toProductEntity).filter((item): item is ProductEntity => item !== null)

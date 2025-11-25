@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 }
 
 export const actions: Actions = {
-  create: async ({ request, locals: { supabase } }) => {
+  create: async ({ request }) => {
     const form = await superValidate(request, valibot(CoopCreateSchema))
 
     if (!form.valid) return fail(400, { form })

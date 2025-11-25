@@ -1,9 +1,8 @@
-import { getCategories } from '$lib/database'
+import { createProduct, getCategories } from '$lib/database'
 import { isAppError } from '$lib/errors'
-import { createInitialProductValues, ProductCreateSchema, type ProductCreateInput } from '$lib/schemas'
+import { createInitialProductValues, ProductCreateSchema } from '$lib/schemas'
 import { createProductHook } from '$lib/services/hooks'
 import { UnitType } from '$lib/types'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
@@ -22,13 +21,13 @@ export const load: PageServerLoad = async ({ parent }) => {
 }
 
 export const actions: Actions = {
-  create: async ({ request, locals: { supabase } }) => {
+  create: async ({ request }) => {
     const form = await superValidate(request, valibot(ProductCreateSchema))
 
     if (!form.valid) return fail(400, { form })
 
     try {
-      const { data } = await createProduct(supabase, form.data)
+      const { data } = await createProduct(form.data)
       await createProductHook.runAfter({ product: form.data, productId: data.id, images: form.data.images })
 
       return { form }
@@ -39,28 +38,4 @@ export const actions: Actions = {
       return setError(form, '상품 등록 중 오류가 발생했습니다.')
     }
   },
-}
-
-const createProduct = async (supabase: SupabaseClient, formData: ProductCreateInput) => {
-  const { storeId, categoryId, name, description, price, initialStock, unit, quantityPerUnit } = formData
-
-  const { data, error } = await supabase
-    .from('products')
-    .insert({
-      store_id: storeId,
-      category_id: categoryId,
-      name,
-      description,
-      price,
-      initial_stock: initialStock,
-      unit,
-      quantity_per_unit: quantityPerUnit,
-      active: true,
-    })
-    .select('*')
-    .maybeSingle()
-
-  if (error) throw error
-
-  return { data }
 }

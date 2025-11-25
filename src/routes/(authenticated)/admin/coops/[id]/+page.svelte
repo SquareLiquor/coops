@@ -16,12 +16,14 @@
       },
     })
   }
+
   const handleError = async () => {
     toaster.error({
       description: '상품 정보 수정 중 오류가 발생했습니다.',
       duration: 5000,
     })
   }
+
   const handleCancel = () => {
     goto('/admin/coops')
   }
@@ -31,11 +33,4 @@
   <title>공동구매 수정 - 가맹점</title>
 </svelte:head>
 
-{#if data.form}
-  <CoopForm {data} mode="edit" onSubmit={handleSubmit} onError={handleError} onCancel={handleCancel} />
-{:else}
-  <!-- 로딩 상태 -->
-  <div class="flex h-full items-center justify-center">
-    <span class="loader-giant"></span>
-  </div>
-{/if}
+<CoopForm {data} mode="edit" onSubmit={handleSubmit} onError={handleError} onCancel={handleCancel} />

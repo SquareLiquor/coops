@@ -1,4 +1,5 @@
 import { toStoreEntity } from '$lib/converters/store.converter'
+import { getHQStore, getStoreMemberByUserId } from '$lib/database/repositories/store.repository'
 import type { LayoutServerLoad } from './$types'
 
 const storeSelectQuery = `
@@ -7,12 +8,12 @@ const storeSelectQuery = `
   profile:user_id(*)
 `
 
-export const load: LayoutServerLoad = async ({ locals: { supabase, user } }) => {
-  const { data } = await supabase.from('store_members').select(storeSelectQuery).eq('user_id', user?.id).maybeSingle()
-  const { data: hqStore } = await supabase.from('stores').select('*').eq('type', 'hq').maybeSingle()
+export const load: LayoutServerLoad = async ({ locals: { user } }) => {
+  const { storeMember } = await getStoreMemberByUserId(user?.id)
+  const { store: hqStore } = await getHQStore()
 
   return {
-    store: toStoreEntity(data.store),
+    store: toStoreEntity(storeMember.store),
     hqStore: toStoreEntity(hqStore),
   }
 }

@@ -1,7 +1,39 @@
-import { toProductEntity, toProduictEntities } from '$lib/converters/product.converter'
+import {
+  type ImageInput,
+  type ProductCreateInput,
+  type ProductsFilterInput,
+  type ProductUpdateInput,
+} from '$lib/schemas'
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient } from '../clients/browser'
 import { createServerClient } from '../clients/server'
+
+const productSelectQuery = `
+  *,
+  category:category_id(*)
+`
+
+export const getProducts = async (filter: ProductsFilterInput) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { storeId, categoryId, productName, status, dateFrom, dateTo } = filter
+
+  const query = supabase
+    .from('products')
+    .select(productSelectQuery)
+    .eq('store_id', storeId)
+    .order('created_at', { ascending: false })
+
+  if (categoryId) query.eq('category_id', categoryId)
+  if (productName) query.ilike('name', `%${productName}%`)
+  if (status) query.eq('status', status)
+  if (dateFrom) query.gte('created_at', dateFrom)
+  if (dateTo) query.lte('created_at', dateTo)
+
+  const { data } = await query
+
+  return { products: data }
+}
 
 export const getProductById = async (productId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
@@ -24,54 +56,74 @@ export const getProductById = async (productId: string) => {
     return { product: null }
   }
 
-  return { product: data ? toProductEntity(data) : null }
+  return { product: data }
 }
 
-export const getProducts = async (
-  storeId: string,
-  options?: {
-    category?: string
-    search?: string
-    limit?: number
-    offset?: number
-  }
-) => {
+export const createProduct = async (formData: ProductCreateInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  let query = supabase
+  const { storeId, categoryId, name, description, price, initialStock, unit, quantityPerUnit } = formData
+
+  const { data, error } = await supabase
     .from('products')
-    .select(
-      `
-      *,
-      category:categories(id, name),
-      images:product_images(id, url, representative, sort_order)
-    `
-    )
-    .eq('store_id', storeId)
-    .eq('active', true)
+    .insert({
+      store_id: storeId,
+      category_id: categoryId,
+      name,
+      description,
+      price,
+      initial_stock: initialStock,
+      unit,
+      quantity_per_unit: quantityPerUnit,
+      active: true,
+    })
+    .select('*')
+    .maybeSingle()
 
-  if (options?.category) {
-    query = query.eq('category_id', options.category)
-  }
+  if (error) throw error
 
-  if (options?.search) {
-    query = query.ilike('name', `%${options.search}%`)
-  }
+  return { data }
+}
 
-  if (options?.limit) {
-    query = query.limit(options.limit)
-  }
+export const updateProduct = async (formData: ProductUpdateInput) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  if (options?.offset) {
-    query = query.range(options.offset, options.offset + (options.limit || 10) - 1)
-  }
+  const { id, storeId, categoryId, name, description, price, unit, quantityPerUnit, images, active } = formData
 
-  const { data, error } = await query.order('created_at', { ascending: false })
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({
+      category_id: categoryId,
+      name,
+      description,
+      price,
+      unit,
+      quantity_per_unit: quantityPerUnit,
+      active,
+    })
+    .eq('id', id)
 
-  if (error) {
-    console.error('상품 목록 조회 오류:', error)
-    return { products: [] }
-  }
+  if (updateError) throw updateError
+}
 
-  return { products: toProduictEntities(data) || [] }
+export const updateProductImages = async (productId: string, images: ImageInput[]) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { error: deleteError } = await supabase.from('product_images').delete().eq('product_id', productId)
+
+  if (deleteError) throw deleteError
+
+  const { error: insertError } = await supabase.from('product_images').insert(
+    images
+      .filter((image) => image.use)
+      .map((image, index) => ({
+        product_id: productId,
+        url: image.url,
+        path: image.path,
+        representative: image.representative,
+        sort_order: index,
+      }))
+  )
+
+  if (insertError) throw insertError
 }
