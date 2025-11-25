@@ -55,9 +55,6 @@
   } = buildFilterForm<typeof ConsumerCoopsFilterSchema>({
     form: data.filterForm,
     schema: ConsumerCoopsFilterSchema,
-    changeHandler: {
-      beforeChange: () => ($filterForm.storeId = store.id),
-    },
     submitHandler: {
       beforeSubmit: () => ($filterForm.storeId = store.id),
     },
