@@ -88,7 +88,7 @@
       <div class="flex items-center space-x-2">
         <button
           type="button"
-          class="btn btn-sm bg-primary-100 text-primary-700 border-primary-200 ml-2 rounded border px-2 py-1"
+          class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           onclick={() => (productMappingModalOpen = true)}
         >
           상품 정보 가져오기

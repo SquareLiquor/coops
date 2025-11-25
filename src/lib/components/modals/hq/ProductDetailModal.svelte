@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'
   import Carousel from '$lib/components/ui/Carousel.svelte'
   import type { ProductEntity } from '$lib/types'
+  import { X } from '@lucide/svelte'
 
   let { product, onClose }: { product: ProductEntity | null; onClose: () => void } = $props()
 
@@ -30,12 +31,9 @@
 >
   <section class="relative max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-lg bg-white shadow-xl" role="document">
     <!-- 헤더 -->
-    <div class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-      <div class="flex items-center space-x-3">
-        <h2 class="text-xl font-semibold text-gray-900">상품 상세정보</h2>
-      </div>
-
-      <div class="flex items-center space-x-2">
+    <div class="flex items-center border-b border-gray-200 bg-gray-50 px-6 py-4">
+      <h2 class="text-xl font-semibold text-gray-900">상품 상세정보</h2>
+      <div class="ml-auto flex items-center gap-2">
         <button
           type="button"
           class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
@@ -45,10 +43,11 @@
         </button>
         <button
           type="button"
-          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
+          class="flex items-center justify-center rounded-full bg-gray-100 p-2 text-gray-700 transition-colors hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
           onclick={onClose}
+          aria-label="닫기"
         >
-          닫기
+          <X class="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -58,9 +57,9 @@
       {#if product}
         <!-- 상품 정보 -->
         <div class="p-6">
-          <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
             <!-- 좌측: 이미지 -->
-            <div class="space-y-4">
+            <div class="lg:col-span-2">
               {#if product.images && product.images.length > 0}
                 <div class="relative aspect-square overflow-hidden rounded-lg">
                   <Carousel images={product.images} />
@@ -75,48 +74,61 @@
             </div>
 
             <!-- 우측: 상품 정보 -->
-            <div class="space-y-6">
-              <div>
-                <h1 class="mb-2 text-2xl font-bold text-gray-900">{product.name}</h1>
-                <div class="space-y-1 text-gray-600">
-                  <div>카테고리: <span class="font-medium">{product.category?.name || '미분류'}</span></div>
-                  <div>
-                    등록일: <span class="font-medium">{new Date(product.createdAt).toLocaleDateString('ko-KR')}</span>
+            <div class="flex h-full flex-col lg:col-span-3">
+              <!-- 기본 정보 -->
+              <div class="mb-6">
+                <h1 class="mb-3 text-2xl font-bold text-gray-900">{product.name}</h1>
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 text-sm">
+                    <span class="text-gray-500">카테고리</span>
+                    <span class="font-medium text-gray-900">{product.category?.name || '미분류'}</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-sm">
+                    <span class="text-gray-500">등록일</span>
+                    <span class="font-medium text-gray-900">
+                      {new Date(product.createdAt).toLocaleDateString('ko-KR')}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div class="space-y-3 rounded-lg bg-gray-50 p-4">
-                <h3 class="font-semibold text-gray-900">가격 정보</h3>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <div class="text-sm text-gray-500">판매 가격</div>
-                    <div class="text-xl font-bold text-gray-900">
+              <!-- 상품 정보 -->
+              <div class="flex-1 space-y-4 rounded-lg border border-gray-200 bg-white p-5">
+                <h3 class="text-base font-semibold text-gray-900">상품 정보</h3>
+
+                <div class="space-y-3">
+                  <div class="flex justify-between border-b border-gray-100 pb-3">
+                    <span class="text-sm text-gray-500">판매 가격</span>
+                    <span class="text-primary-600 text-xl font-bold">
                       {new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(product.price)}
-                    </div>
+                    </span>
                   </div>
-                  <div>
-                    <div class="text-sm text-gray-500">개당 가격</div>
-                    <div class="text-lg font-semibold text-gray-700">
+
+                  <div class="flex justify-between border-b border-gray-100 pb-3">
+                    <span class="text-sm text-gray-500">개당 가격</span>
+                    <span class="text-base font-semibold text-gray-900">
                       {new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
                         product.price / product.quantityPerUnit
                       )}
-                    </div>
+                    </span>
                   </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <div class="text-sm text-gray-500">판매 단위</div>
-                    <div class="font-medium">{product.unit}</div>
+
+                  <div class="flex justify-between border-b border-gray-100 pb-3">
+                    <span class="text-sm text-gray-500">판매 단위</span>
+                    <span class="text-sm font-medium text-gray-900">{product.unit}</span>
                   </div>
-                  <div>
-                    <div class="text-sm text-gray-500">단위별 수량</div>
-                    <div class="font-medium">{product.quantityPerUnit}개</div>
+
+                  <div class="flex justify-between border-b border-gray-100 pb-3">
+                    <span class="text-sm text-gray-500">단위별 수량</span>
+                    <span class="text-sm font-medium text-gray-900">{product.quantityPerUnit}개</span>
                   </div>
-                </div>
-                <div>
-                  <div class="text-sm text-gray-500">초기 재고</div>
-                  <div class="font-medium">{product.initialStock?.toLocaleString()}개</div>
+
+                  <div class="flex justify-between border-b border-gray-100 pb-3">
+                    <span class="text-sm text-gray-500">초기 재고</span>
+                    <span class="text-primary-600 text-sm font-semibold"
+                      >{product.initialStock?.toLocaleString()}개</span
+                    >
+                  </div>
                 </div>
               </div>
             </div>

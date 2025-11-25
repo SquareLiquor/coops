@@ -36,7 +36,7 @@
 >
   <section class="relative max-h-[90vh] w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-xl" role="document">
     <!-- 헤더 -->
-    <div class="flex items-center border-b border-gray-200 bg-white px-6 py-4">
+    <div class="flex items-center border-b border-gray-200 bg-gray-50 px-6 py-4">
       <h2 class="text-xl font-semibold text-gray-900">주문 상세정보</h2>
       <button
         type="button"
