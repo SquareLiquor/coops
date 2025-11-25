@@ -1,6 +1,6 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
-  import CoopFooter from '$lib/components/CoopFooter.svelte'
+  import CoopFooter from '$lib/components/layout/CoopFooter.svelte'
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'

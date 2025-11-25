@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Sidebar from '$lib/components/Sidebar.svelte'
+  import Sidebar from '$lib/components/layout/Sidebar.svelte'
   import Toast from '$lib/components/ui/Toast.svelte'
   import { setStore } from '$lib/stores'
   import { IdCard, PackageSearch, Store, Truck } from '@lucide/svelte'
