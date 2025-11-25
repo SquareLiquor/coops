@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { equalsEnum, OrderStatus, type OrderData } from '$lib/types'
+  import { OrderStatus, type OrderEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
+  import { equalsEnum } from '$lib/utils/enum'
   import { Check, RotateCcw, X } from '@lucide/svelte'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { getContext } from 'svelte'
   import { superForm } from 'sveltekit-superforms'
 
-  let { form, order, onClose }: { form: any; order: OrderData; onClose: () => void } = $props()
+  let { form, order, onClose }: { form: any; order: OrderEntity; onClose: () => void } = $props()
 
   const updateOrder = getContext<(orderId: string) => Promise<void>>('updateOrder')
 

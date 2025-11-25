@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import Carousel from '$lib/components/ui/Carousel.svelte'
-  import type { CoopData } from '$lib/types'
+  import type { CoopEntity } from '$lib/types'
   import dayjs from 'dayjs'
 
-  let { coop, onClose }: { coop: CoopData | null; onClose: () => void } = $props()
+  let { coop, onClose }: { coop: CoopEntity | null; onClose: () => void } = $props()
 
   function handleEdit() {
     goto(`/admin/coops/${coop?.id}`)

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { buildFilterForm } from '$lib/builder'
+  import { buildFilterForm } from '$lib/builders/filter.builder'
   import ProductDetailModal from '$lib/components/modals/hq/ProductDetailModal.svelte'
   import { ProductsFilterSchema } from '$lib/schemas'
-  import type { ProductData } from '$lib/types'
+  import type { ProductEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
@@ -10,8 +10,8 @@
 
   let { data }: PageProps = $props()
   let { categories, statuses } = data
-  let products: ProductData[] = $state([])
-  let selectedProduct: ProductData | null = $state(null)
+  let products: ProductEntity[] = $state([])
+  let selectedProduct: ProductEntity | null = $state(null)
 
   onMount(async () => {
     await tick()

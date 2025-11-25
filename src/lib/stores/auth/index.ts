@@ -1,3 +1,3 @@
-export * from './listener.svelte'
-export * from './state.svelte'
-export * from './sync.svelte'
+export * from './auth.listener.svelte'
+export * from './auth.state.svelte'
+export * from './auth.sync.svelte'

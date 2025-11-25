@@ -1,2 +1,2 @@
-export * from './approval'
-export * from './filter'
+export * from './approval.filter.schema'
+export * from './approval.schema'

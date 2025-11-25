@@ -1,12 +1,10 @@
-import { coopDataConverter } from '$lib/converters'
+import { toCoopEntities } from '$lib/converters/coop.converter'
+import { getCategories, getCoopsByStore } from '$lib/database'
 import { CoopsFilterSchema, getInitialCoopsFilterValues as getInitialFilter } from '$lib/schemas'
-import { getCategories, getCoopsByStore } from '$lib/supabase'
 import { SalesStatus } from '$lib/types'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convertAll } = coopDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
@@ -34,7 +32,7 @@ export const actions: Actions = {
 
     return {
       form,
-      coops: convertAll(coops),
+      coops: toCoopEntities(coops),
     }
   },
 }

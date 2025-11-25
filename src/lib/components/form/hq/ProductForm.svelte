@@ -2,14 +2,14 @@
   import Combobox from '$lib/components/ui/Combobox.svelte'
   import Editor from '$lib/components/ui/Editor.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
-  import { createCategory } from '$lib/supabase'
-  import type { CategoryData, UnitType } from '$lib/types'
+  import { createCategory } from '$lib/database'
+  import type { CategoryEntity, UnitType } from '$lib/types'
   import { superForm } from 'sveltekit-superforms'
 
   interface Props {
     data: {
       form: any
-      categories: CategoryData[]
+      categories: CategoryEntity[]
       unitTypes: UnitType[]
     }
     mode?: 'create' | 'edit'

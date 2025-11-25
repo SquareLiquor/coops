@@ -1,16 +1,13 @@
-import { productDataConverter } from '$lib/converters'
+import { getCategories } from '$lib/database'
 import { isAppError } from '$lib/errors'
-import { createProductHook } from '$lib/hooks'
 import { createInitialProductValues, ProductCreateSchema, type ProductCreateInput } from '$lib/schemas'
-import { getCategories } from '$lib/supabase'
+import { createProductHook } from '$lib/services/hooks'
 import { UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convert } = productDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()

@@ -1,11 +1,9 @@
-import { productDataConverter } from '$lib/converters'
+import { toProduictEntities } from '$lib/converters/product.converter'
+import { getCategories } from '$lib/database'
 import { ProductsFilterSchema as FilterSchema, getInitialProductsFilterValues as getInitialFilter } from '$lib/schemas'
-import { getCategories } from '$lib/supabase'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convertAll } = productDataConverter()
 
 const productSelectQuery = `
   *,
@@ -51,7 +49,7 @@ export const actions: Actions = {
 
     return {
       form,
-      products: data ? convertAll(data) : [],
+      products: toProduictEntities(data),
     }
   },
 }

@@ -1,7 +1,8 @@
-import { approvalRequestDataConverter, storeDataConverter } from '$lib/converters'
+import { toApprovalRequestEntities, toApprovalRequestEntity } from '$lib/converters/signup.converter'
+import { toStoreEntities } from '$lib/converters/store.converter'
 import { ApprovalError, isAppError } from '$lib/errors'
-import { approveRequestHook, rejectRequestHook } from '$lib/hooks'
 import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
+import { approveRequestHook, rejectRequestHook } from '$lib/services/hooks'
 import { ApprovalStatus } from '$lib/types'
 import { extractFormData } from '$lib/utils'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -9,9 +10,6 @@ import { fail } from '@sveltejs/kit'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convertAll: storeConvertAll } = storeDataConverter()
-const { convert, convertAll } = approvalRequestDataConverter()
 
 const requestSelectQuery = `
   *,
@@ -29,7 +27,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     .order('type', { ascending: true })
     .order('name', { ascending: true })
 
-  const stores = error ? [] : storeConvertAll(data)
+  const stores = toStoreEntities(data)
   const statuses = [{ code: undefined, label: '전체' }, ...Object.values(ApprovalStatus)]
 
   return {
@@ -61,7 +59,7 @@ export const actions: Actions = {
 
     return {
       form,
-      requests: data ? convertAll(data) : [],
+      requests: toApprovalRequestEntities(data),
     }
   },
 
@@ -77,7 +75,7 @@ export const actions: Actions = {
 
       await approveRequestHook.runAfter({ storeId, userId })
 
-      return { success: true, request: convert(data) }
+      return { success: true, request: toApprovalRequestEntity(data) }
     } catch (error) {
       console.error('Error in approve action:', error)
       if (isAppError(error)) error.errorHandler()
@@ -99,7 +97,7 @@ export const actions: Actions = {
 
       await rejectRequestHook.runAfter({ storeId, userId })
 
-      return { success: true, request: convert(data) }
+      return { success: true, request: toApprovalRequestEntity(data) }
     } catch (error) {
       console.error('Error in reject action:', error)
       if (isAppError(error)) error.errorHandler()

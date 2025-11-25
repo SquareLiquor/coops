@@ -1,19 +1,17 @@
-import { orderDataConverter } from '$lib/converters'
-import { ConsumerOrdersFilterSchema as FilterSchema, OrderUpdateSchema } from '$lib/schemas'
+import { toOrderEntities } from '$lib/converters/order.converter'
 import {
   cancelOrder,
   cancelOrderItem,
   checkCancelable,
   checkOrderItemCancelable,
   getOrdersByUserId,
-} from '$lib/supabase'
+} from '$lib/database'
+import { ConsumerOrdersFilterSchema as FilterSchema, OrderUpdateSchema } from '$lib/schemas'
 import { OrderStatus } from '$lib/types'
 import { fail } from '@sveltejs/kit'
 import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convertAll } = orderDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { user } = await parent()
@@ -36,7 +34,7 @@ export const actions: Actions = {
 
     const { orders } = await getOrdersByUserId(form.data)
 
-    return { form, orders: convertAll(orders) }
+    return { form, orders: toOrderEntities(orders) }
   },
   /**
    * 주문 취소

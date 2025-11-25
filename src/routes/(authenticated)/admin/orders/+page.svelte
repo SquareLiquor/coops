@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { buildFilterForm } from '$lib/builder'
+  import { buildFilterForm } from '$lib/builders/filter.builder'
   import OrderDetailModal from '$lib/components/modals/admin/OrderDetailModal.svelte'
   import { OrdersFilterSchema } from '$lib/schemas'
-  import { type OrderData } from '$lib/types'
+  import { type OrderEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
@@ -12,8 +12,8 @@
 
   let { data }: PageProps = $props()
   let { salesStatuses } = data
-  let orders: OrderData[] = $state([])
-  let selectedOrder: OrderData | null = $state(null)
+  let orders: OrderEntity[] = $state([])
+  let selectedOrder: OrderEntity | null = $state(null)
 
   onMount(async () => {
     await tick()

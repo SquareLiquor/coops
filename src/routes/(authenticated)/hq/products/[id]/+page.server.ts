@@ -1,6 +1,6 @@
+import { getCategories, getProductById } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { productDataToUpdateInput, ProductUpdateSchema, type ImageInput, type ProductUpdateInput } from '$lib/schemas'
-import { getCategories, getProductById } from '$lib/supabase'
 import { UnitType } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { error, fail } from '@sveltejs/kit'

@@ -1,5 +1,6 @@
-import { lookupEnum, UserType } from '$lib/types'
+import { UserType } from '$lib/types'
 import type { User } from '@supabase/supabase-js'
+import { lookupEnum } from './enum'
 
 interface params {
   user?: User | null

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { buildFilterForm } from '$lib/builder'
+  import { buildFilterForm } from '$lib/builders/filter.builder'
   import { ApprovalsFilterSchema } from '$lib/schemas'
-  import { ApprovalStatus, equalsEnum, type ApprovalRequestData } from '$lib/types'
+  import { ApprovalStatus, type ApprovalRequestEntity } from '$lib/types'
   import { extractFormData } from '$lib/utils'
+  import { equalsEnum } from '$lib/utils/enum'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
@@ -11,7 +12,7 @@
 
   let { data }: PageProps = $props()
   let { statuses, stores } = $derived(data)
-  let requests: ApprovalRequestData[] = $state([])
+  let requests: ApprovalRequestEntity[] = $state([])
   let isRowLoading: string[] = $state([])
 
   onMount(async () => {

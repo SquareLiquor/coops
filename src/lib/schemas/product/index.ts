@@ -1,2 +1,2 @@
-export * from './filter'
-export * from './product'
+export * from './product.filter.schema'
+export * from './product.schema'

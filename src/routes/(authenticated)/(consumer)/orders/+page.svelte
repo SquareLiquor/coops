@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { buildFilterForm } from '$lib/builder'
+  import { buildFilterForm } from '$lib/builders/filter.builder'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { ConsumerOrdersFilterSchema } from '$lib/schemas'
-  import { equalsEnum, OrderStatus, type OrderData } from '$lib/types'
+  import { OrderStatus, type OrderEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
+  import { equalsEnum } from '$lib/utils/enum'
   import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
@@ -14,7 +15,7 @@
   let { statuses } = data
 
   let isRowLoading: string[] = $state([])
-  let orders = $state<OrderData[]>([])
+  let orders = $state<OrderEntity[]>([])
   let selectOrderId = $state<string | null>(null)
 
   onMount(async () => {

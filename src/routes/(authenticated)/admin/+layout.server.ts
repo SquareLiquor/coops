@@ -1,7 +1,5 @@
-import { storeDataConverter } from '$lib/converters'
+import { toStoreEntity } from '$lib/converters/store.converter'
 import type { LayoutServerLoad } from './$types'
-
-const { convert } = storeDataConverter()
 
 const storeSelectQuery = `
   *,
@@ -14,7 +12,7 @@ export const load: LayoutServerLoad = async ({ locals: { supabase, user } }) => 
   const { data: hqStore } = await supabase.from('stores').select('*').eq('type', 'hq').maybeSingle()
 
   return {
-    store: convert(data.store),
-    hqStore: convert(hqStore),
+    store: toStoreEntity(data.store),
+    hqStore: toStoreEntity(hqStore),
   }
 }

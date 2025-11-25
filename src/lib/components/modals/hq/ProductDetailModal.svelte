@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import Carousel from '$lib/components/ui/Carousel.svelte'
-  import type { ProductData } from '$lib/types'
+  import type { ProductEntity } from '$lib/types'
 
-  let { product, onClose }: { product: ProductData | null; onClose: () => void } = $props()
+  let { product, onClose }: { product: ProductEntity | null; onClose: () => void } = $props()
 
   function handleEdit() {
     goto(`/hq/products/${product?.id}`)

@@ -1,15 +1,13 @@
-import { coopDataConverter } from '$lib/converters'
+import { toCoopEntities } from '$lib/converters/coop.converter'
+import { createOrder, getCoopsForUser } from '$lib/database'
 import { isAppError } from '$lib/errors'
-import { createOrderHook } from '$lib/hooks/orders'
 import { ConsumerCoopsFilterSchema as FilterSchema, OrderSchema } from '$lib/schemas'
-import { createOrder, getCoopsForUser } from '$lib/supabase'
+import { createOrderHook } from '$lib/services/hooks'
 import { fail } from '@sveltejs/kit'
 import dayjs from 'dayjs'
 import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convertAll } = coopDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { user } = await parent()
@@ -30,7 +28,7 @@ export const actions: Actions = {
 
     const { coops } = await getCoopsForUser(form.data)
 
-    return { form, coops: convertAll(coops) }
+    return { form, coops: toCoopEntities(coops) }
   },
   /**
    * 주문 생성

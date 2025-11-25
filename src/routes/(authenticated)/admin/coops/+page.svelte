@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { buildFilterForm } from '$lib/builder'
+  import { buildFilterForm } from '$lib/builders/filter.builder'
   import CoopDetailModal from '$lib/components/modals/admin/CoopDetailModal.svelte'
   import { CoopsFilterSchema } from '$lib/schemas'
-  import type { CoopData } from '$lib/types'
+  import type { CoopEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
@@ -10,7 +10,7 @@
 
   let { data }: PageProps = $props()
   let { categories, salesStatuses } = data
-  let coops: CoopData[] = $state([])
+  let coops: CoopEntity[] = $state([])
   let selectedCoopId: string | null = $state(null)
 
   onMount(async () => {

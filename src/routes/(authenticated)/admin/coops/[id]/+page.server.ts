@@ -1,14 +1,12 @@
-import { coopDataConverter } from '$lib/converters'
+import { toCoopEntity } from '$lib/converters/coop.converter'
+import { getCategories, getCoopById, updateCoop, updateCoopImages } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { coopDataToUpdateInput, CoopUpdateSchema } from '$lib/schemas'
-import { getCategories, getCoopById, updateCoop, updateCoopImages } from '$lib/supabase'
 import { SalesStatus, UnitType } from '$lib/types'
 import { error, fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convert } = coopDataConverter()
 
 export const load: PageServerLoad = async ({ params, parent }) => {
   const { store } = await parent()
@@ -25,7 +23,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
   const salesStatuses = [...Object.values(SalesStatus)]
 
   return {
-    coop: convert(coop),
+    coop: toCoopEntity(coop),
     form,
     categories,
     unitTypes,

@@ -1,2 +1,2 @@
-export * from './coop'
-export * from './filter'
+export * from './coop.filter.schema'
+export * from './coop.schema'

@@ -1,5 +1,5 @@
 import { SignUpError } from '$lib/errors/index.js'
-import { signupHook } from '$lib/hooks/index.js'
+import { signupHook } from '$lib/services/hooks'
 import type { SignupFormData } from '$lib/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { signout } from '$lib/database'
   import { getAuth } from '$lib/stores'
-  import { signout } from '$lib/supabase'
   import { Settings } from '@lucide/svelte'
 
   let { menuItems, settingsPath } = $props()

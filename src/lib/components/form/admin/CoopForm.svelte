@@ -3,15 +3,15 @@
   import Combobox from '$lib/components/ui/Combobox.svelte'
   import Editor from '$lib/components/ui/Editor.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
-  import { convertProductToCoop } from '$lib/converters'
-  import { createCategory } from '$lib/supabase'
-  import type { CategoryData, ImageData, ProductData, SalesStatus, UnitType } from '$lib/types'
+  import { convertProductToCoop } from '$lib/converters/coop.converter'
+  import { createCategory } from '$lib/database'
+  import type { CategoryEntity, ImageEntity, ProductEntity, SalesStatus, UnitType } from '$lib/types'
   import { superForm } from 'sveltekit-superforms'
 
   interface Props {
     data: {
       form: any
-      categories: CategoryData[]
+      categories: CategoryEntity[]
       unitTypes: UnitType[]
       salesStatuses: SalesStatus[]
       hqStore?: any
@@ -53,7 +53,7 @@
     }
   }
 
-  const handleSelectProduct = ({ product, images }: { product: ProductData; images: ImageData[] }) => {
+  const handleSelectProduct = ({ product, images }: { product: ProductEntity; images: ImageEntity[] }) => {
     $formData = {
       ...$formData,
       ...convertProductToCoop({ product, images }),

@@ -1,12 +1,10 @@
 export const ssr = false
 
-import { storeDataConverter } from '$lib/converters'
+import { toStoreEntities } from '$lib/converters/store.converter'
 import { getStore, setStore } from '$lib/stores'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 import type { PageLoad } from './$types'
-
-const { convertAll } = storeDataConverter()
 
 /**
  * 메인 페이지 접근 시 상점 Store가 있는 지 체크, 없다면 페이지에서 선택
@@ -20,7 +18,7 @@ export const load: PageLoad = async ({ url, parent }) => {
   }
 
   const { data } = await supabase.from('stores').select('*').neq('type', 'hq')
-  return { stores: convertAll(data || []) }
+  return { stores: toStoreEntities(data) }
 }
 
 const setStoreIfExist = async (url: URL, supabase: SupabaseClient) => {

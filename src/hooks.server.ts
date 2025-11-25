@@ -1,5 +1,5 @@
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import { approvalStatusGuard, authenticatedGuard, userTypeGuard } from '$lib/guards'
+import { approvalStatusGuard, authenticatedGuard, userTypeGuard } from '$lib/server/guards'
 import { createServerClient } from '@supabase/ssr'
 import { type Handle } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'

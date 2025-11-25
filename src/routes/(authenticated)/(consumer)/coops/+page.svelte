@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { buildFilterForm } from '$lib/builder'
+  import { buildFilterForm } from '$lib/builders/filter.builder'
   import CoopFooter from '$lib/components/CoopFooter.svelte'
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
+  import { getCategories } from '$lib/database'
   import { ConsumerCoopsFilterSchema, convertCartDataToOrderInput, coopDataToCartItemData } from '$lib/schemas'
   import {
     addToCart,
@@ -15,8 +16,7 @@
     hasCartItem,
     updateCartItem,
   } from '$lib/stores'
-  import { getCategories } from '$lib/supabase'
-  import type { CategoryData, CoopData } from '$lib/types'
+  import type { CategoryEntity, CoopEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import { isBrowser } from '@supabase/ssr'
   import type { ActionResult } from '@sveltejs/kit'
@@ -27,8 +27,8 @@
 
   let { data }: PageProps = $props()
 
-  let coops = $state<CoopData[]>([])
-  let categories = $state<CategoryData[]>([])
+  let coops = $state<CoopEntity[]>([])
+  let categories = $state<CategoryEntity[]>([])
 
   let isCartOpen = $state(false)
   let selectedCoopId = $state<string | null>(null)
@@ -92,7 +92,7 @@
     },
   })
 
-  const handleChangeQuantity = (coop: CoopData, quantity: number) => {
+  const handleChangeQuantity = (coop: CoopEntity, quantity: number) => {
     if (hasCartItem(coop.id)) {
       updateCartItem(coop.id, quantity)
     } else {

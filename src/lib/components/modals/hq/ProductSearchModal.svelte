@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { productDataConverter } from '$lib/converters/productConverter'
-  import { createBrowserClient } from '$lib/supabase'
-  import type { ProductData } from '$lib/types'
+  import { toProduictEntities } from '$lib/converters/product.converter'
+  import { createBrowserClient } from '$lib/database'
+  import type { ProductEntity } from '$lib/types'
   import { onMount } from 'svelte'
 
-  const { convertAll } = productDataConverter()
   const supabase = createBrowserClient()
 
   let { onClose, onSelect: handleSelect, hqStore } = $props()
-  let products: ProductData[] = $state([])
+  let products: ProductEntity[] = $state([])
 
   onMount(async () => {
     const { data } = await supabase
@@ -22,7 +21,7 @@
       )
       .eq('store_id', hqStore.id)
 
-    products = convertAll(data || [])
+    products = toProduictEntities(data || [])
   })
 
   const _handleSelect = async (index: number) => {

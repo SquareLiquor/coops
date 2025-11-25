@@ -1,6 +1,7 @@
-import { signinFormConverter, signupFormConverter, storeDataConverter } from '$lib/converters'
+import { signinFormConverter, signupFormConverter } from '$lib/converters/signup.converter'
+import { toStoreEntities } from '$lib/converters/store.converter'
 import { SignInError, SignUpError } from '$lib/errors'
-import { signupHook } from '$lib/hooks/'
+import { signupHook } from '$lib/services/hooks'
 import type { SigninFormData, SignupFormData } from '$lib/types'
 import { extractFormData } from '$lib/utils/form'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -24,9 +25,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
   if (error) return { stores: [] }
 
-  const { convertAll } = storeDataConverter()
-
-  return { stores: convertAll(data) }
+  return { stores: toStoreEntities(data) }
 }
 
 export const actions: Actions = {

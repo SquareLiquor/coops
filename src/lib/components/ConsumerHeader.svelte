@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { signout } from '$lib/database'
   import { getAuth, getStore } from '$lib/stores'
-  import { signout } from '$lib/supabase'
   import { House } from '@lucide/svelte'
 
   const user = $derived(getAuth().user)

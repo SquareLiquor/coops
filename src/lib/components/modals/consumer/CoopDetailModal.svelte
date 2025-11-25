@@ -1,15 +1,15 @@
 <script lang="ts">
   import Carousel from '$lib/components/ui/Carousel.svelte'
-  import type { CoopData, ImageData } from '$lib/types'
+  import type { CoopEntity, ImageEntity } from '$lib/types'
   import { onMount } from 'svelte'
 
-  let { selectedCoopId = $bindable(), coops }: { selectedCoopId: string | null; coops: CoopData[] } = $props()
+  let { selectedCoopId = $bindable(), coops }: { selectedCoopId: string | null; coops: CoopEntity[] } = $props()
 
-  let coop: CoopData = $derived.by(() => {
+  let coop: CoopEntity = $derived.by(() => {
     return coops.find((c) => c.id === selectedCoopId)!
   })
 
-  let images: ImageData[] = $derived.by(() => {
+  let images: ImageEntity[] = $derived.by(() => {
     return coop.images.slice().sort((a, b) => {
       if (a.representative && !b.representative) return -1
       if (!a.representative && b.representative) return 1

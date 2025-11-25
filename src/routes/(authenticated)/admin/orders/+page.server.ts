@@ -1,5 +1,4 @@
-import { orderDataConverter } from '$lib/converters'
-import { getInitialOrdersFilterValues as getInitialFilter, OrdersFilterSchema, OrderUpdateSchema } from '$lib/schemas'
+import { toOrderEntities } from '$lib/converters/order.converter'
 import {
   cancelOrder,
   cancelOrderItem,
@@ -15,13 +14,12 @@ import {
   getOrders,
   restoreOrder,
   restoreOrderItem,
-} from '$lib/supabase'
+} from '$lib/database'
+import { getInitialOrdersFilterValues as getInitialFilter, OrdersFilterSchema, OrderUpdateSchema } from '$lib/schemas'
 import { OrderStatus } from '$lib/types'
 import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
-
-const { convertAll } = orderDataConverter()
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
@@ -50,7 +48,7 @@ export const actions: Actions = {
     try {
       const { orders } = await getOrders(form.data)
 
-      return { form, orders: convertAll(orders) }
+      return { form, orders: toOrderEntities(orders) }
     } catch (error) {
       return { form }
     }

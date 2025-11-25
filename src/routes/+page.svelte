@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { setStore } from '$lib/stores'
-  import type { StoreData } from '$lib/types'
+  import type { StoreEntity } from '$lib/types'
 
   let { data } = $props()
-  let stores: StoreData[] = $derived(data.stores)
+  let stores: StoreEntity[] = $derived(data.stores)
   let selectedStoreId: string = $state('')
 
   const handleSelectStore = async () => {
