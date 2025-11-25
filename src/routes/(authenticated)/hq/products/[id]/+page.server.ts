@@ -1,4 +1,3 @@
-import { toProductEntity } from '$lib/converters/product.converter'
 import { getCategories, getProductById, updateProduct, updateProductImages } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { productDataToUpdateInput, ProductUpdateSchema } from '$lib/schemas'
@@ -15,14 +14,13 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, '상품을 찾을 수 없습니다.')
   }
 
-  const productEntity = toProductEntity(product)!
-  const productInput = productDataToUpdateInput(productEntity)
+  const productInput = productDataToUpdateInput(product)
   const form = await superValidate(productInput, valibot(ProductUpdateSchema), { errors: false })
   const { categories } = await getCategories(product.storeId)
   const unitTypes = [...Object.values(UnitType)]
 
   return {
-    product: productEntity,
+    product: product,
     form,
     categories,
     unitTypes,

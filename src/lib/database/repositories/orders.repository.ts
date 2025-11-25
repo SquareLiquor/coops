@@ -1,3 +1,4 @@
+import { toOrderEntities, toOrderEntity } from '$lib/converters/order.converter'
 import type { ConsumerOrdersFilterInput, OrderCreateInput, OrdersFilterInput } from '$lib/schemas'
 import { OrderStatus } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
@@ -45,7 +46,7 @@ export const getOrdersByUserId = async (filter: ConsumerOrdersFilterInput) => {
 
   const { data, error } = await query.order('created_at', { ascending: false })
 
-  return { orders: data }
+  return { orders: toOrderEntities(data) }
 }
 
 export const getOrderById = async (orderId: string) => {
@@ -75,7 +76,7 @@ export const createOrder = async (formData: OrderCreateInput) => {
 
   if (error) throw error
 
-  return { data }
+  return { order: toOrderEntity(data) }
 }
 
 export const deleteOrderById = async (orderId: string) => {

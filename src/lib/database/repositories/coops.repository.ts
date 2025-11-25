@@ -1,3 +1,4 @@
+import { toCoopEntities, toCoopEntity } from '$lib/converters/coop.converter'
 import type {
   ConsumerCoopsFilterSchema,
   CoopCreateInput,
@@ -34,7 +35,7 @@ export const getCoopsByStore = async (filter: CoopsFilterInput) => {
     .order('sales_date', { ascending: false })
     .order('created_at', { ascending: false })
 
-  return { coops: data }
+  return { coops: toCoopEntities(data) }
 }
 
 export const getCoopsForUser = async (filter: ConsumerCoopsFilterSchema) => {
@@ -55,7 +56,7 @@ export const getCoopsForUser = async (filter: ConsumerCoopsFilterSchema) => {
     .order('sales_date', { ascending: false })
     .order('created_at', { ascending: false })
 
-  return { coops: data }
+  return { coops: toCoopEntities(data) }
 }
 
 export const getCoopById = async (coopId: string) => {
@@ -63,7 +64,7 @@ export const getCoopById = async (coopId: string) => {
 
   const { data, error } = await supabase.from('coops').select(coopSelectQuery).eq('id', coopId).maybeSingle()
 
-  return { coop: data }
+  return { coop: toCoopEntity(data) }
 }
 
 export const createCoop = async (formData: CoopCreateInput, productId: string) => {
@@ -89,7 +90,7 @@ export const createCoop = async (formData: CoopCreateInput, productId: string) =
 
   if (error) throw error
 
-  return { data }
+  return { coop: toCoopEntity(data) }
 }
 
 export const updateCoop = async (formData: CoopUpdateInput) => {
@@ -111,8 +112,6 @@ export const updateCoop = async (formData: CoopUpdateInput) => {
     .eq('id', id)
 
   if (updateError) throw updateError
-
-  return { success: true }
 }
 
 export const updateCoopImages = async (coopId: string, images: ImageInput[]) => {

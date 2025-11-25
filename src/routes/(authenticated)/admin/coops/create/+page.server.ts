@@ -30,8 +30,8 @@ export const actions: Actions = {
     try {
       const { shared } = await createCoopHook.runBefore({ coop: form.data })
 
-      const { data } = await createCoop(form.data, shared.get('productId'))
-      shared.set('coopId', data.id)
+      const { coop } = await createCoop(form.data, shared.get('productId'))
+      shared.set('coopId', coop?.id)
 
       await createCoopHook.runAfter({ images: form.data.images })
 

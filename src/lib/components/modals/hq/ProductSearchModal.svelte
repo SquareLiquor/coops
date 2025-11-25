@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { toProductEntities } from '$lib/converters/product.converter'
   import { getProducts } from '$lib/database'
   import type { ProductEntity } from '$lib/types'
   import { onMount } from 'svelte'
@@ -9,8 +8,7 @@
 
   onMount(async () => {
     const { products: _products } = await getProducts({ storeId: hqStore.id })
-
-    products = toProductEntities(products)
+    products = _products
   })
 
   const _handleSelect = async (index: number) => {

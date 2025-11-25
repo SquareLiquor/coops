@@ -1,3 +1,4 @@
+import { toProductEntities, toProductEntity } from '$lib/converters/product.converter'
 import {
   type ImageInput,
   type ProductCreateInput,
@@ -32,7 +33,7 @@ export const getProducts = async (filter: ProductsFilterInput) => {
 
   const { data } = await query
 
-  return { products: data }
+  return { products: toProductEntities(data) }
 }
 
 export const getProductById = async (productId: string) => {
@@ -51,12 +52,9 @@ export const getProductById = async (productId: string) => {
     .eq('active', true)
     .maybeSingle()
 
-  if (error) {
-    console.error('상품 조회 오류:', error)
-    return { product: null }
-  }
+  if (error) throw error
 
-  return { product: data }
+  return { product: toProductEntity(data) }
 }
 
 export const createProduct = async (formData: ProductCreateInput) => {
@@ -82,7 +80,7 @@ export const createProduct = async (formData: ProductCreateInput) => {
 
   if (error) throw error
 
-  return { data }
+  return { order: data }
 }
 
 export const updateProduct = async (formData: ProductUpdateInput) => {

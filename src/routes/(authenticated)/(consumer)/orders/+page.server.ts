@@ -1,4 +1,3 @@
-import { toOrderEntities } from '$lib/converters/order.converter'
 import {
   cancelOrder,
   cancelOrderItem,
@@ -34,7 +33,7 @@ export const actions: Actions = {
 
     const { orders } = await getOrdersByUserId(form.data)
 
-    return { form, orders: toOrderEntities(orders) }
+    return { form, orders }
   },
   /**
    * 주문 취소

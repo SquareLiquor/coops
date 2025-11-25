@@ -27,8 +27,8 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      const { data } = await createProduct(form.data)
-      await createProductHook.runAfter({ product: form.data, productId: data.id, images: form.data.images })
+      const { order } = await createProduct(form.data)
+      await createProductHook.runAfter({ product: form.data, productId: order.id, images: form.data.images })
 
       return { form }
     } catch (error) {

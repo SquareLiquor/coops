@@ -1,4 +1,3 @@
-import { toCoopEntities } from '$lib/converters/coop.converter'
 import { createOrder, getCoopsForUser } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { ConsumerCoopsFilterSchema as FilterSchema, OrderSchema } from '$lib/schemas'
@@ -28,7 +27,7 @@ export const actions: Actions = {
 
     const { coops } = await getCoopsForUser(form.data)
 
-    return { form, coops: toCoopEntities(coops) }
+    return { form, coops }
   },
   /**
    * 주문 생성
@@ -38,8 +37,8 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      const { data } = await createOrder(form.data)
-      createOrderHook.runAfter({ order: form.data, orderId: data.id })
+      const { order } = await createOrder(form.data)
+      createOrderHook.runAfter({ order: form.data, orderId: order?.id })
 
       return message(form, '주문이 성공적으로 생성되었습니다.')
     } catch (error) {

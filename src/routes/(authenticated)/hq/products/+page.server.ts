@@ -1,4 +1,3 @@
-import { toProductEntities } from '$lib/converters/product.converter'
 import { getCategories, getProducts } from '$lib/database'
 import { ProductsFilterSchema as FilterSchema, getInitialProductsFilterValues as getInitialFilter } from '$lib/schemas'
 import { superValidate } from 'sveltekit-superforms'
@@ -31,7 +30,7 @@ export const actions: Actions = {
 
     return {
       form,
-      products: toProductEntities(products),
+      products,
     }
   },
 }

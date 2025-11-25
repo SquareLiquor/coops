@@ -1,3 +1,4 @@
+import { toStoreMemberEntity } from '$lib/converters/store.converter'
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient, createServerClient } from '../clients'
 
@@ -32,5 +33,5 @@ export const getStoreMemberByUserId = async (userId: string | undefined) => {
     .eq('user_id', userId)
     .maybeSingle()
 
-  return { storeMember: data }
+  return { storeMember: toStoreMemberEntity(data) }
 }

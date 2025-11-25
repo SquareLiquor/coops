@@ -1,4 +1,3 @@
-import { toCoopEntities } from '$lib/converters/coop.converter'
 import { getCategories, getCoopsByStore } from '$lib/database'
 import { CoopsFilterSchema, getInitialCoopsFilterValues as getInitialFilter } from '$lib/schemas'
 import { SalesStatus } from '$lib/types'
@@ -32,7 +31,7 @@ export const actions: Actions = {
 
     return {
       form,
-      coops: toCoopEntities(coops),
+      coops,
     }
   },
 }

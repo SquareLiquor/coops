@@ -1,4 +1,3 @@
-import { toCoopEntity } from '$lib/converters/coop.converter'
 import { getCategories, getCoopById, updateCoop, updateCoopImages } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { coopDataToUpdateInput, CoopUpdateSchema } from '$lib/schemas'
@@ -18,12 +17,12 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 
   const coopInput = coopDataToUpdateInput(coop)
   const form = await superValidate(coopInput, valibot(CoopUpdateSchema), { errors: false })
-  const { categories } = await getCategories(coop.store_id)
+  const { categories } = await getCategories(coop.storeId)
   const unitTypes = [...Object.values(UnitType)]
   const salesStatuses = [...Object.values(SalesStatus)]
 
   return {
-    coop: toCoopEntity(coop),
+    coop,
     form,
     categories,
     unitTypes,
