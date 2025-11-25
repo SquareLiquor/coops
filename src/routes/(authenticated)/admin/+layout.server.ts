@@ -1,5 +1,5 @@
 import { toStoreEntity } from '$lib/converters/store.converter'
-import { getHQStore, getStoreMemberByUserId } from '$lib/database/repositories/store.repository'
+import { getHQStore, getStoreMemberByUserId } from '$lib/database/repositories/stores.repository'
 import type { LayoutServerLoad } from './$types'
 
 const storeSelectQuery = `
