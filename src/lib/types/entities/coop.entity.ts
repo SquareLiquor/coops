@@ -25,6 +25,7 @@ export interface CoopEntity {
   orderedQuantity: number
   remainingQuantity: number
   progress: number
+  representativeImageUrl: string
   images: ImageEntity[]
   createdAt: string
   updatedAt: string

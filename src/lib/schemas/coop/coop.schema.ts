@@ -1,4 +1,4 @@
-import { SalesStatus, type CoopEntity } from '$lib/types'
+import { SalesStatus } from '$lib/types'
 import dayjs from 'dayjs'
 import * as v from 'valibot'
 import { ImageSchema } from '../common/image.schema'
@@ -59,70 +59,5 @@ export const getInitialCoopValues = (storeId: string) => {
     storeId,
     status: SalesStatus.PREPARING.code,
     salesDate: dayjs().format('YYYY-MM-DD'),
-  }
-}
-
-export const coopDataToUpdateInput = (coop: any): CoopUpdateInput => {
-  const {
-    id,
-    store_id,
-    product_id,
-    category_id,
-    name,
-    description,
-    status,
-    max_quantity,
-    sales_price,
-    sales_date,
-    product,
-    images,
-  } = coop
-
-  return {
-    id,
-    storeId: store_id,
-    productId: product_id,
-    categoryId: category_id,
-    name,
-    description,
-    status: status?.code || status,
-    maxQuantity: max_quantity,
-    salesPrice: sales_price,
-    salesDate: dayjs(sales_date).format('YYYY-MM-DD'),
-    product: {
-      originId: product.origin_id || product.id,
-      price: product.price,
-      unit: product.unit,
-      quantityPerUnit: product.quantity_per_unit,
-    },
-    images:
-      images?.map((image: any) => ({
-        id: image.id,
-        url: image.url,
-        path: image.path,
-        representative: image.representative,
-        sortOrder: image.sort_order,
-        use: true,
-        new: false,
-      })) || [],
-  }
-}
-
-export const coopDataToCartItemData = (coop: CoopEntity, quantity: number) => {
-  const {
-    name,
-    salesPrice: price,
-    salesDate: sales_date,
-    product: { images },
-  } = coop
-
-  return {
-    coopId: coop.id,
-    productId: coop.product.id,
-    name,
-    quantity,
-    price,
-    sales_date,
-    image: images.find((image) => image.representative)?.url || '',
   }
 }

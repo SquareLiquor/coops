@@ -1,6 +1,7 @@
+import { toCoopUpdateInputFromCoopEntity } from '$lib/converters/coop.converter'
 import { getCategories, getCoopById, updateCoop, updateCoopImages } from '$lib/database'
 import { isAppError } from '$lib/errors'
-import { coopDataToUpdateInput, CoopUpdateSchema } from '$lib/schemas'
+import { CoopUpdateSchema } from '$lib/schemas'
 import { SalesStatus, UnitType } from '$lib/types'
 import { error, fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'
@@ -15,7 +16,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
     throw error(404, '공동구매를 찾을 수 없습니다.')
   }
 
-  const coopInput = coopDataToUpdateInput(coop)
+  const coopInput = toCoopUpdateInputFromCoopEntity(coop)
   const form = await superValidate(coopInput, valibot(CoopUpdateSchema), { errors: false })
   const { categories } = await getCategories(coop.storeId)
   const unitTypes = [...Object.values(UnitType)]

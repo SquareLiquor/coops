@@ -11,7 +11,8 @@ import { createServerClient } from '../clients/server'
 
 const productSelectQuery = `
   *,
-  category:category_id(*)
+  category:category_id(*),
+  images:product_images(id, url, path, representative, sort_order)
 `
 
 export const getProducts = async (filter: ProductsFilterInput) => {
@@ -41,13 +42,7 @@ export const getProductById = async (productId: string) => {
 
   const { data, error } = await supabase
     .from('products')
-    .select(
-      `
-      *,
-      category:categories(id, name),
-      images:product_images(id, url, path, representative, sort_order)
-    `
-    )
+    .select(productSelectQuery)
     .eq('id', productId)
     .eq('active', true)
     .maybeSingle()
