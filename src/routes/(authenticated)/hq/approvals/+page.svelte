@@ -61,220 +61,186 @@
   <title>사용자 관리 - 본사</title>
 </svelte:head>
 
-<!-- Header -->
-<div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
-  <div class="flex items-center space-x-4">
-    <h1 class="text-surface-900 text-2xl font-bold">사용자 관리</h1>
+<div class="min-h-screen bg-gray-100 p-6">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">사용자 관리</h1>
   </div>
-</div>
 
-<div class="relative p-6">
-  <!-- Filter Area -->
-  <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
-    <!-- 좌측 필터 영역 (왼쪽 그룹과 아래 에러 영역을 함께 포함) -->
-    <div class="flex flex-col">
-      <div class="flex items-center gap-4">
-        <!-- 날짜 필터 -->
-        <div class="flex flex-col items-start gap-1">
-          <div class="flex items-center gap-2">
-            <input
-              type="date"
-              name="date_from"
-              bind:value={$filterForm.dateFrom}
-              class={[
-                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
-                $filterForm.dateFrom && 'border-primary-500 text-primary-700',
-                !$filterForm.dateFrom && 'border-surface-100',
-              ]}
-              {...$filterConstraints.dateFrom}
-            />
-            <span class="text-surface-400">~</span>
-            <input
-              type="date"
-              name="date_to"
-              bind:value={$filterForm.dateTo}
-              class={[
-                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
-                $filterForm.dateTo && 'border-primary-500 text-primary-700',
-                !$filterForm.dateTo && 'border-surface-100',
-              ]}
-              {...$filterConstraints.dateTo}
-            />
-          </div>
+  <div class="relative">
+    <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
+      <!-- Filters Row -->
+      <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex items-center gap-2">
+          <!-- 날짜 필터 -->
+          <input
+            type="date"
+            name="date_from"
+            bind:value={$filterForm.dateFrom}
+            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+            {...$filterConstraints.dateFrom}
+          />
+          <span class="text-xs text-gray-400">~</span>
+          <input
+            type="date"
+            name="date_to"
+            bind:value={$filterForm.dateTo}
+            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+            {...$filterConstraints.dateTo}
+          />
+
+          <!-- 매장 선택 필터 -->
+          <select
+            name="store_id"
+            bind:value={$filterForm.storeId}
+            class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          >
+            <option value={undefined} selected>전체</option>
+            {#each stores as store}
+              <option value={store.id}>{store.name}</option>
+            {/each}
+          </select>
         </div>
 
-        <!-- 매장 선택 필터 -->
-        <select
-          name="store_id"
-          bind:value={$filterForm.storeId}
-          class={[
-            'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
-            $filterForm.storeId && 'border-primary-500 text-primary-700',
-            !$filterForm.storeId && 'border-surface-100',
-          ]}
-        >
-          <option value={undefined} selected>전체</option>
-          {#each stores as store}
-            <option value={store.id}>{store.name}</option>
+        <!-- 상태 필터 (우측 또는 아래) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto">
+          <input type="hidden" name="status" bind:value={$filterForm.status} />
+          {#each statuses as option}
+            <button
+              type="button"
+              class={[
+                'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
+                $filterForm.status === option.code && 'bg-primary-600 text-white',
+                $filterForm.status !== option.code && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+              ]}
+              onclick={() => ($filterForm.status = option.code)}
+            >
+              {option.label}
+            </button>
           {/each}
-        </select>
+        </div>
       </div>
 
       {#if $filterErrors.dateFrom || $filterErrors.dateTo}
-        <div class="mt-1 flex flex-col gap-1">
+        <div class="flex flex-col gap-1">
           {#if $filterErrors.dateFrom}
-            <div class="text-error-500 text-sm">{$filterErrors.dateFrom}</div>
+            <div class="text-sm text-red-600">{$filterErrors.dateFrom}</div>
           {/if}
           {#if $filterErrors.dateTo}
-            <div class="text-error-500 text-sm">{$filterErrors.dateTo}</div>
+            <div class="text-sm text-red-600">{$filterErrors.dateTo}</div>
           {/if}
         </div>
       {/if}
-    </div>
+    </form>
 
-    <!-- 우측 상태 필터 영역 -->
-    <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
-      <!-- hidden status input synced with searchForm.status -->
-      <input type="hidden" name="status" bind:value={$filterForm.status} />
-      {#each statuses as option}
-        <button
-          class={[
-            'rounded px-3 py-1.5 text-sm font-medium transition-colors',
-            $filterForm.status === option.code && 'bg-primary-500 text-primary-50 shadow-sm',
-            $filterForm.status !== option.code && 'text-surface-600 hover:text-surface-800',
-          ]}
-          onclick={() => ($filterForm.status = option.code)}
-        >
-          {option.label}
-        </button>
-      {/each}
-    </div>
-  </form>
-
-  <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
-    {#if $filterSubmitting}
-      <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
-        <span class="loader-giant"></span>
-      </div>
-    {/if}
-    <!-- Users Table -->
-    <table class="min-w-full">
-      <thead class="bg-surface-50 border-surface-100 border-b">
-        <tr>
-          <th class="w-8 px-4 py-4 text-center">
-            <span class="text-surface-500 ont-bold">#</span>
-          </th>
-          <th class="text-surface-500 px-4 text-center font-bold">신청자 정보</th>
-          <th class="text-surface-500 px-4 text-center font-bold">매장 정보</th>
-          <th class="text-surface-500 px-4 text-center font-bold">상태</th>
-          <th class="text-surface-500 px-4 text-center font-bold">신청일</th>
-          <th class="text-surface-500 px-4 text-center font-bold">승인일/취소일</th>
-          <!-- <th class="text-surface-500  text-center font-bold">사유</th> -->
-          <th class="text-surface-500 w-32 px-6 text-center font-bold"></th>
-        </tr>
-      </thead>
-      <tbody class="divide-surface-100 divide-y bg-white">
-        {#each requests as request, index}
-          <tr class="hover:bg-surface-50 text-center">
-            <td class="text-surface-500 py-4 text-sm">
-              {index + 1}
-            </td>
-            <td>
-              <div class="flex items-center justify-center">
-                <div class="ml-4">
-                  <div class="text-surface-900 text-sm font-medium">{request.applicant?.name}</div>
-                  <div class="text-surface-400 text-xs">{request.applicant?.email}</div>
-                </div>
-              </div>
-            </td>
-            <td class="items-center px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{request.store?.name}</div>
-            </td>
-            <td class="px-6 py-4 text-sm">
-              <span
-                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-${request.status?.color}-800 bg-${request.status?.color}-100`}
-              >
-                {request.status?.label}
-              </span>
-            </td>
-            <td>
-              <div class="text-surface-700 text-xs">{dayjs(request.requestedAt).format('YYYY-MM-DD')}</div>
-              <div class="text-surface-300 text-xs">{dayjs(request.requestedAt).format('HH:mm:ss')}</div>
-            </td>
-            <td>
-              {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
-                -
-              {:else}
-                <div class={['text-xs', request.status && `text-${request.status.color}-500`]}>
-                  {equalsEnum(ApprovalStatus.APPROVED, request.status)
-                    ? dayjs(request.approvedAt).format('YYYY-MM-DD')
-                    : dayjs(request.cancelledAt).format('YYYY-MM-DD')}
-                </div>
-                <div class="text-surface-300 text-xs">
-                  {equalsEnum(ApprovalStatus.APPROVED, request.status)
-                    ? dayjs(request.approvedAt).format('HH:mm:ss')
-                    : dayjs(request.cancelledAt).format('HH:mm:ss')}
-                </div>
-              {/if}
-            </td>
-            <!-- <td>
-              <div
-                class="text-sm {request.cancelled_at
-                  ? 'text-red-600'
-                  : request.approved_at
-                    ? 'text-green-600'
-                    : 'text-yellow-600'}"
-              >
-                {request.reason}
-              </div>
-            </td> -->
-            <td>
-              <form method="POST" use:enhance={requestFormEnhance}>
-                <input type="hidden" name="id" value={request.id} />
-                <input type="hidden" name="userId" value={request.applicantId} />
-                <input type="hidden" name="storeId" value={request.storeId} />
-                <div class="relative flex items-center justify-center gap-1">
-                  {#if isRowLoading.includes(request.id)}
-                    <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-                      <span class="loader"></span>
-                    </div>
-                  {/if}
-                  {#if !equalsEnum(ApprovalStatus.APPROVED, request.status)}
-                    <button
-                      class="bg-success-500 hover:bg-success-200 rounded px-4 py-2 text-xs font-medium text-white"
-                      formaction="?/approve"
-                      disabled={isRowLoading.includes(request.id)}
-                    >
-                      승인
-                    </button>
-                  {/if}
-                  {#if !equalsEnum(ApprovalStatus.REJECTED, request.status)}
-                    <button
-                      class="bg-error-500 hover:bg-error-200 rounded px-4 py-2 text-xs font-medium text-white"
-                      formaction="?/reject"
-                      disabled={isRowLoading.includes(request.id)}
-                    >
-                      거부
-                    </button>
-                  {/if}
-                </div>
-              </form>
-            </td>
+    <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
+      {#if $filterSubmitting}
+        <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+          <span class="loader-giant"></span>
+        </div>
+      {/if}
+      <!-- Users Table -->
+      <table class="min-w-full border-collapse">
+        <thead>
+          <tr class="border-b border-gray-200 bg-white">
+            <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"
+              >신청자 정보</th
+            >
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">매장 정보</th
+            >
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">상태</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">신청일</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900"
+              >승인일/취소일</th
+            >
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">액션</th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {#each requests as request, index}
+            <tr class="border-b border-gray-100 transition-colors hover:bg-gray-50">
+              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
+                {index + 1}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center">
+                <div class="text-xs font-medium text-gray-900">{request.applicant?.name}</div>
+                <div class="text-xs text-gray-500">{request.applicant?.email}</div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
+                {request.store?.name}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
+                <span
+                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium text-${request.status?.color}-800 bg-${request.status?.color}-100`}
+                >
+                  {request.status?.label}
+                </span>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
+                {dayjs(request.requestedAt).format('YYYY.MM.DD')}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
+                {#if equalsEnum(ApprovalStatus.PENDING, request.status)}
+                  -
+                {:else}
+                  {equalsEnum(ApprovalStatus.APPROVED, request.status)
+                    ? dayjs(request.approvedAt).format('YYYY.MM.DD')
+                    : dayjs(request.cancelledAt).format('YYYY.MM.DD')}
+                {/if}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2">
+                <form method="POST" use:enhance={requestFormEnhance}>
+                  <input type="hidden" name="id" value={request.id} />
+                  <input type="hidden" name="userId" value={request.applicantId} />
+                  <input type="hidden" name="storeId" value={request.storeId} />
+                  <div class="relative flex items-center justify-center gap-1">
+                    {#if isRowLoading.includes(request.id)}
+                      <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+                        <span class="loader"></span>
+                      </div>
+                    {/if}
+                    {#if !equalsEnum(ApprovalStatus.APPROVED, request.status)}
+                      <button
+                        class="bg-success-500 hover:bg-success-600 min-w-[50px] rounded-full px-3 py-1 text-xs font-medium text-white transition-colors"
+                        formaction="?/approve"
+                        disabled={isRowLoading.includes(request.id)}
+                      >
+                        승인
+                      </button>
+                    {/if}
+                    {#if !equalsEnum(ApprovalStatus.REJECTED, request.status)}
+                      <button
+                        class="bg-error-500 hover:bg-error-600 min-w-[50px] rounded-full px-3 py-1 text-xs font-medium text-white transition-colors"
+                        formaction="?/reject"
+                        disabled={isRowLoading.includes(request.id)}
+                      >
+                        거부
+                      </button>
+                    {/if}
+                  </div>
+                </form>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
 
-    {#if requests.length === 0}
-      <div class="py-12 text-center">
-        <h3 class="text-surface-900 mt-2 text-sm font-medium">사용자가 없습니다</h3>
-      </div>
-    {/if}
+      {#if requests.length === 0}
+        <div class="py-12 text-center">
+          <div class="flex flex-col items-center justify-center">
+            <svg class="mb-2 h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">사용자가 없습니다</h3>
+          </div>
+        </div>
+      {/if}
+    </div>
   </div>
-  <!-- TODO: Pagination -->
-  <!-- <Pagination
-    current={currentPage}
-    total={Math.max(1, Math.ceil(snapshotFiltered().length / pageSize))}
-    on:navigate={(e) => (currentPage = e.detail)}
-  /> -->
 </div>

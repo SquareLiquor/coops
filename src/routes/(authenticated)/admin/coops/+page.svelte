@@ -51,193 +51,258 @@
 </script>
 
 <svelte:head>
-  <title>공구 관리 - 관리자</title>
+  <title>판매 상품 관리 - 관리자</title>
 </svelte:head>
 
-<!-- Header -->
-<div class="border-surface-200 flex h-16 items-center justify-between border-b px-6">
-  <div class="flex items-center space-x-4">
-    <h1 class="text-surface-900 text-2xl font-bold">판매 상품 관리</h1>
+<div class="min-h-screen bg-gray-100 p-6">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">판매 상품 관리</h1>
+    <a
+      href="/admin/coops/create"
+      class="bg-primary-600 hover:bg-primary-700 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
+    >
+      <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      새 상품 등록
+    </a>
   </div>
-  <a
-    href="/admin/coops/create"
-    class="btn bg-primary-500 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
-    >새 상품 등록</a
-  >
-</div>
-<div class="relative p-6">
-  <form method="POST" action="?/fetch" use:filterEnhance class="mb-6 flex items-center justify-between">
-    <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
 
-    <div class="flex flex-col">
-      <div class="flex items-center gap-4">
-        <!-- 날짜 필터 -->
-        <div class="flex flex-col items-start gap-1">
-          <div class="flex items-center gap-2">
-            <input
-              type="date"
-              name="dateFrom"
-              bind:value={$filterForm.dateFrom}
-              class={[
-                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
-                $filterForm.dateFrom && 'border-primary-500 text-primary-700',
-                !$filterForm.dateFrom && 'border-surface-100',
-              ]}
-              {...$filterConstraints.dateFrom}
-            />
-            <span class="text-surface-400">~</span>
-            <input
-              type="date"
-              name="dateTo"
-              bind:value={$filterForm.dateTo}
-              class={[
-                'focus:border-primary-500 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
-                $filterForm.dateTo && 'border-primary-500 text-primary-700',
-                !$filterForm.dateTo && 'border-surface-100',
-              ]}
-              {...$filterConstraints.dateTo}
-            />
-          </div>
+  <div class="relative">
+    <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
+      <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
+
+      <!-- Filters Row -->
+      <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex items-center gap-2">
+          <!-- 날짜 필터 -->
+          <input
+            type="date"
+            name="dateFrom"
+            bind:value={$filterForm.dateFrom}
+            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+            {...$filterConstraints.dateFrom}
+          />
+          <span class="text-xs text-gray-400">~</span>
+          <input
+            type="date"
+            name="dateTo"
+            bind:value={$filterForm.dateTo}
+            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+            {...$filterConstraints.dateTo}
+          />
+
+          <!-- 카테고리 필터 -->
+          <select
+            class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+            name="categoryId"
+            bind:value={$filterForm.categoryId}
+          >
+            <option value={undefined} selected>전체</option>
+            {#each categories as category}
+              <option value={category.id}>{category.name}</option>
+            {/each}
+          </select>
+
+          <!-- 상품명 검색 -->
+          <input
+            type="text"
+            name="name"
+            bind:value={$filterForm.name}
+            placeholder="상품명 검색"
+            class="focus:border-primary-500 w-48 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          />
         </div>
 
-        <!-- 카테고리 필터 -->
-        <select
-          class="border-surface-100 focus:border-primary-500 min-w-[100px] border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none"
-          name="categoryId"
-          bind:value={$filterForm.categoryId}
-        >
-          <option value={undefined} selected>전체</option>
-          {#each categories as category}
-            <option value={category.id}>{category.name}</option>
+        <!-- 판매 상태 필터 (우측 또는 아래) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto">
+          <input type="hidden" name="status" bind:value={$filterForm.status} />
+          {#each salesStatuses as option}
+            <button
+              type="button"
+              class={[
+                'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
+                $filterForm.status === option.code && 'bg-primary-600 text-white',
+                $filterForm.status !== option.code && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+              ]}
+              onclick={() => ($filterForm.status = option.code)}
+            >
+              {option.label}
+            </button>
           {/each}
-        </select>
-
-        <!-- 상품명 검색 -->
-        <input
-          type="text"
-          name="name"
-          bind:value={$filterForm.name}
-          placeholder="상품명 검색"
-          class={[
-            'focus:border-primary-500 w-40 border-0 border-b bg-transparent px-3 py-1.5 text-sm focus:outline-none',
-            $filterForm.name && 'border-primary-500 text-primary-700',
-            !$filterForm.name && 'border-surface-100',
-          ]}
-        />
+        </div>
       </div>
 
       {#if $filterErrors.dateFrom || $filterErrors.dateTo}
-        <div class="mt-1 flex flex-col gap-1">
+        <div class="mt-2 flex flex-col gap-1">
           {#if $filterErrors.dateFrom}
-            <div class="text-error-500 text-sm">{$filterErrors.dateFrom}</div>
+            <div class="text-sm text-red-600">{$filterErrors.dateFrom}</div>
           {/if}
           {#if $filterErrors.dateTo}
-            <div class="text-error-500 text-sm">{$filterErrors.dateTo}</div>
+            <div class="text-sm text-red-600">{$filterErrors.dateTo}</div>
           {/if}
         </div>
       {/if}
-    </div>
-    <!-- 우측 상태 필터 영역 -->
-    <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
-      <input type="hidden" name="status" bind:value={$filterForm.status} />
-      {#each salesStatuses as option}
-        <button
-          type="button"
-          class={[
-            'rounded px-3 py-1.5 text-sm font-medium transition-colors',
-            $filterForm.status === option.code && 'bg-primary-500 text-white shadow-sm',
-            $filterForm.status !== option.code && 'text-surface-600 hover:bg-surface-100',
-          ]}
-          onclick={() => ($filterForm.status = option.code)}
-        >
-          {option.label}
-        </button>
-      {/each}
-    </div>
-  </form>
+    </form>
 
-  <div class="border-surface-100 bg-surface-50/50 relative overflow-hidden rounded-lg border">
-    {#if $filterSubmitting}
-      <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
-        <span class="loader-giant"></span>
-      </div>
-    {/if}
+    <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
+      {#if $filterSubmitting}
+        <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
+          <span class="loader-giant"></span>
+        </div>
+      {/if}
 
-    <table class="min-w-full">
-      <thead class="bg-surface-50/50 border-surface-100 border-b">
-        <tr>
-          <th class="w-8 px-4 py-3 text-center">
-            <span class="text-surface-500 text-xs font-medium">#</span>
-          </th>
-          <th class="text-surface-500 w-[10%] px-4 text-center font-bold">판매 상태</th>
-          <th class="text-surface-500 w-[10%] px-4 text-center font-bold">카테고리</th>
-          <th class="text-surface-500 w-[25%] px-4 text-center font-bold">상품명</th>
-          <th class="text-surface-500 w-[15%] px-4 text-center font-bold">가격</th>
-          <th class="text-surface-500 w-[15%] px-4 text-center font-bold">판매일</th>
-          <th class="text-surface-500 w-[15%] px-4 text-center font-bold">진행률</th>
-        </tr>
-      </thead>
-      <tbody class="divide-surface-100 divide-y bg-white">
-        {#each coops as coop, index}
-          <tr class="hover:bg-surface-50 text-center">
-            <td class="text-surface-500 py-4 text-sm">
-              {index + 1}
-            </td>
-            <td class="text-surface-500 px-6 py-4 text-sm">
-              <span
-                class={`inline-flex rounded-full px-2 py-1 text-xs font-medium text-${coop.status.color}-800 bg-${coop.status.color}-100 `}
-              >
-                {coop.status?.label}
-              </span>
-            </td>
-            <td>{coop.category?.name}</td>
-            <td>
-              <div class="flex items-center justify-start">
-                <button
-                  type="button"
-                  class="text-primary-500 m-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium hover:underline"
-                  onclick={() => (selectedCoopId = coop.id)}
-                >
-                  {coop.name}
-                </button>
-              </div>
-            </td>
-            <td class="px-4 py-4 text-center whitespace-nowrap">
-              <span class="text-surface-900 text-sm font-bold">{formatCurrency(coop.salesPrice)}</span>
-            </td>
-            <td>
-              <div class="text-surface-700 text-xs">{dayjs(coop.salesDate).format('YYYY-MM-DD')}</div>
-            </td>
-
-            <td class="px-4 py-4 text-center">
-              <div class="flex flex-col items-center gap-1">
-                <div class="mb-1 flex w-full items-center justify-between text-xs">
-                  <span class="text-surface-700 font-medium">{coop.orderedQuantity}</span>
-                  <span class="text-surface-600 mx-auto text-base font-medium"
-                    >{Math.round((coop.orderedQuantity / coop.maxQuantity) * 100)}%</span
-                  >
-                  <span class="text-surface-400 font-medium">{coop.maxQuantity}</span>
-                </div>
-                <div class="relative w-full">
-                  <div class="bg-surface-50/50 h-2 justify-between overflow-hidden rounded-full">
-                    <div
-                      class="h-full rounded-full transition-all duration-300 {getProgressColor(coop)}"
-                      style="width: {Math.round((coop.orderedQuantity / coop.maxQuantity) * 100)}%"
-                    ></div>
+      <table class="min-w-full border-collapse">
+        <thead>
+          <tr class="border-b border-gray-200 bg-white">
+            <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900"> 상품명 </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">
+              판매 상태
+            </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">
+              판매가격
+            </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> 진행률 </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">
+              목표수량
+            </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">
+              주문수량
+            </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900"> 판매일 </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900"> 등록일 </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {#each coops as coop, index}
+            <tr class="border-b border-gray-100 transition-colors hover:bg-gray-50">
+              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
+                {index + 1}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-left">
+                <div class="flex items-center gap-2.5">
+                  <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
+                    {#if coop.images && coop.images.length > 0}
+                      <img
+                        src={coop.images.find((img) => img.representative)?.url || coop.images[0]?.url}
+                        alt={coop.name}
+                        class="h-full w-full object-cover"
+                      />
+                    {:else}
+                      <div class="flex h-full w-full items-center justify-center text-sm">📦</div>
+                    {/if}
+                  </div>
+                  <div class="flex flex-1 items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
+                      onclick={() => (selectedCoopId = coop.id)}
+                    >
+                      {coop.name}
+                    </button>
+                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500">
+                      {#if coop.category?.name || coop.product?.capacity || coop.product?.sellUnit}
+                        <span class={!coop.product?.capacity && !coop.product?.sellUnit ? 'self-center' : ''}>
+                          {coop.category?.name || ''}
+                        </span>
+                        {#if coop.product?.capacity || coop.product?.sellUnit}
+                          <div class="flex items-center gap-1 whitespace-nowrap">
+                            {#if coop.product?.capacity}
+                              <span>{coop.product.capacity}</span>
+                            {/if}
+                            {#if coop.product?.capacity && coop.product?.sellUnit}
+                              <span>·</span>
+                            {/if}
+                            {#if coop.product?.sellUnit}
+                              <span>{coop.product.sellUnit}</span>
+                            {/if}
+                          </div>
+                        {/if}
+                      {/if}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-
-    {#if coops.length === 0}
-      <div class="py-12 text-center">
-        <h3 class="text-surface-900 mt-2 text-sm font-medium">판매 상품 정보가 없습니다</h3>
-      </div>
-    {/if}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
+                <span
+                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium text-${coop.status.color}-800 bg-${coop.status.color}-100`}
+                >
+                  {coop.status?.label}
+                </span>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
+                {formatCurrency(coop.salesPrice)}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center">
+                <div class="flex items-center justify-center">
+                  <div class="relative h-10 w-10">
+                    <svg class="h-10 w-10 -rotate-90 transform">
+                      <circle
+                        cx="20"
+                        cy="20"
+                        r="16"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        fill="none"
+                        class="text-gray-200"
+                      />
+                      <circle
+                        cx="20"
+                        cy="20"
+                        r="16"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        fill="none"
+                        stroke-dasharray={2 * Math.PI * 16}
+                        stroke-dashoffset={2 * Math.PI * 16 * (1 - coop.orderedQuantity / coop.maxQuantity)}
+                        class="{getProgressColor(coop).replace('bg-', 'text-')} transition-all duration-300"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <span class="text-xs font-semibold text-gray-700">
+                        {Math.round((coop.orderedQuantity / coop.maxQuantity) * 100)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
+                {coop.maxQuantity.toLocaleString()}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
+                {coop.orderedQuantity.toLocaleString()}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
+                {dayjs(coop.salesDate).format('YYYY.MM.DD')}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-500">
+                {dayjs(coop.createdAt).format('YYYY.MM.DD')}
+              </td>
+            </tr>
+          {:else}
+            <tr>
+              <td colspan="9" class="border-0 py-12 text-center">
+                <div class="flex flex-col items-center justify-center">
+                  <svg class="mb-2 h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                    />
+                  </svg>
+                  <h3 class="text-sm font-medium text-gray-900">판매 상품이 없습니다</h3>
+                  <p class="mt-1 text-sm text-gray-500">새 상품을 등록하여 시작하세요</p>
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

@@ -2,7 +2,7 @@
   import Sidebar from '$lib/components/layout/Sidebar.svelte'
   import Toast from '$lib/components/ui/Toast.svelte'
   import { setStore } from '$lib/stores'
-  import { PackageSearch, ShoppingBag, Truck } from '@lucide/svelte'
+  import { Menu, PackageSearch, ShoppingBag, Truck } from '@lucide/svelte'
   import { onMount } from 'svelte'
 
   let { data, children } = $props()
@@ -30,17 +30,42 @@
       icon: Truck,
     },
   ]
+
+  let isCollapsed = $state(false)
+  let isAutoHidden = $state(false)
 </script>
 
-<div class="flex h-screen">
-  <Sidebar menuItems={adminMenuItems} settingsPath="/admin/settings" />
+<div class="flex h-screen bg-white">
+  <!-- 토글 버튼 (모바일/숨겨진 상태에서만 표시) -->
+  {#if isAutoHidden || isCollapsed}
+    <button
+      type="button"
+      onclick={() => (isCollapsed = !isCollapsed)}
+      class="fixed top-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition-colors hover:bg-gray-50"
+      aria-label="메뉴 열기"
+    >
+      <Menu class="h-5 w-5 text-gray-700" />
+    </button>
+  {/if}
 
-  <div class="flex-1 overflow-hidden">
-    <main>
-      <div class="border-surface-400 border-l bg-white md:h-[calc(100vh)] md:overflow-auto">
+  <!-- 오버레이 (모바일에서 사이드바 열렸을 때) -->
+  {#if isAutoHidden && !isCollapsed}
+    <button
+      type="button"
+      onclick={() => (isCollapsed = true)}
+      class="fixed inset-0 z-40 bg-black/20"
+      aria-label="메뉴 닫기"
+    ></button>
+  {/if}
+
+  <div class="flex h-full w-full overflow-hidden">
+    <Sidebar menuItems={adminMenuItems} settingsPath="/admin/settings" bind:isCollapsed bind:isAutoHidden />
+
+    <div class="relative flex-1 overflow-hidden transition-all duration-300">
+      <main class="h-full overflow-auto rounded-tl-3xl bg-white shadow-xl">
         {@render children?.()}
         <Toast />
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 </div>

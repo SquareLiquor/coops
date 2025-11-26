@@ -38,6 +38,7 @@ CREATE TABLE public.purchases (
   quantity integer NOT NULL,
   price number NOT NULL,
   unit text NOT NULL,
+  total_price number NOT NULL,
   requested_date timestamptz NOT NULL DEFAULT now(),
   approved_date timestamptz,
   shipped_date timestamptz,
@@ -202,11 +203,15 @@ SELECT
 
   coop.product_id,
   prd.name AS product_name,
+  prd.price AS product_price,
+  prd.capacity_text as product_capacity,
+  prd.sell_unit_text AS product_sell_unit,
   
   prd.origin_id AS origin_product_id,
   origin_prd.name AS origin_product_name,
-  origin_prd.sell_unit_text AS origin_product_unit,
   origin_prd.price AS origin_product_price,
+  origin_prd.capacity_text as origin_product_capacity,
+  origin_prd.sell_unit_text AS origin_product_sell_unit,
   origin_prd.purchase_unit AS origin_product_purchase_unit,
   origin_prd.purchase_qty AS origin_product_purchase_qty,
 
@@ -226,6 +231,7 @@ SELECT
   p.quantity AS purchase_quantity,
   p.price AS purchase_price,
   p.unit AS purchase_unit,
+  p.total_price AS purchase_total_price,
   p.requested_date,
   p.approved_date,
   p.shipped_date,
@@ -254,9 +260,11 @@ CREATE OR REPLACE VIEW public.hq_purchase_view
 WITH (security_invoker = true) AS
 SELECT
   p.id AS purchase_id,
-  p.status,
-  p.quantity,
-  p.unit,
+  p.status AS purchase_status,
+  p.quantity AS purchase_quantity,
+  p.price AS purchase_price,
+  p.unit AS purchase_unit,
+  p.total_price AS purchase_total_price,
   p.requested_date,
   p.approved_date,
   p.shipped_date,
@@ -275,7 +283,9 @@ SELECT
 
   p.product_id AS origin_product_id,
   origin_prd.name AS origin_product_name,
-  origin_prd.sell_unit_text AS origin_product_unit,
+  origin_prd.price AS origin_product_price,
+  origin_prd.capacity_text as origin_product_capacity,
+  origin_prd.sell_unit_text AS origin_product_sell_unit,
   origin_prd.purchase_unit AS origin_product_purchase_unit,
   origin_prd.purchase_qty AS origin_product_purchase_qty,
 

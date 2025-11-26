@@ -28,30 +28,34 @@
 </script>
 
 <div
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
   role="dialog"
   tabindex="0"
   onkeydown={(e) => e.key === 'Escape' && onClose()}
   onclick={(e) => e.target === e.currentTarget && onClose()}
 >
-  <section class="relative max-h-[90vh] w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-xl" role="document">
+  <section
+    class="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
+    role="document"
+  >
     <!-- 헤더 -->
-    <div class="flex items-center border-b border-gray-200 bg-gray-50 px-6 py-4">
-      <h2 class="text-xl font-semibold text-gray-900">주문 상세정보</h2>
+    <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
+      <h2 class="text-xl font-bold text-gray-900">주문 상세</h2>
       <button
         type="button"
-        class="ml-auto flex items-center justify-center rounded-full bg-gray-100 p-2 text-gray-700 transition-colors hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
+        class="flex items-center justify-center rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none"
         onclick={onClose}
         aria-label="닫기"
       >
-        <X class="h-4 w-4" />
+        <X class="h-5 w-5" />
       </button>
     </div>
 
-    <div class="p-6">
+    <!-- 스크롤 가능한 본문 -->
+    <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
       <div class="space-y-4">
-        <div class="border-surface-200 rounded-lg border bg-white shadow-sm">
-          <div class="border-surface-200 border-b border-dashed px-4 py-3">
+        <div class="rounded-lg border border-gray-200 bg-white">
+          <div class="border-b border-gray-200 px-4 py-3">
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-2">
@@ -71,12 +75,10 @@
               >
             </div>
           </div>
-          <div class="p-4">
+          <div class="px-4 py-3">
             <div class="space-y-3">
               {#each order.items as item}
-                <div
-                  class="border-surface-200 flex items-center gap-3 border-b border-dashed pb-4 last:border-b-0 last:pb-0"
-                >
+                <div class="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
                   <div
                     class={[
                       'flex flex-1 items-center gap-3',
@@ -145,9 +147,7 @@
               {/each}
             </div>
           </div>
-          <div
-            class="border-surface-200 flex items-center justify-between rounded-b-lg border-t border-dashed px-4 py-3"
-          >
+          <div class="flex items-center justify-between rounded-b-lg border-t border-gray-200 px-4 py-3">
             <div
               class={[
                 'text-surface-600 text-sm',

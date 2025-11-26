@@ -30,8 +30,10 @@ export const actions: Actions = {
     try {
       const { purchases } = await getPurchasesForStore(form.data)
 
+      console.log(purchases)
       return { form, purchases }
     } catch (error) {
+      console.log(error)
       return { form }
     }
   },

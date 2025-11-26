@@ -3,6 +3,15 @@ import { isBrowser } from '@supabase/ssr'
 import dayjs from 'dayjs'
 import { createBrowserClient, createServerClient } from '../clients'
 
+const purchasesSelectQuery = `
+  *,
+  coop:coop_id(*),
+  store:store_id(*),
+  product:product_id(*),
+  origin_product:origin_product_id(*),
+  category:category_id(*)
+`
+
 export const getPurchasesForStore = async (filter: PurchasesFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 

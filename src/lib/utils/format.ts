@@ -4,3 +4,7 @@ export const formatCurrency = (amount: number): string => {
     currency: 'KRW',
   }).format(amount)
 }
+
+export const formatNumberWithCommas = (amount: number): string => {
+  return new Intl.NumberFormat('ko-KR').format(amount)
+}

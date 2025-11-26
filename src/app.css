@@ -41,37 +41,43 @@
   }
 }
 
-/* number 필드 화살표 없애기 */
+/* ====== Number Input 화살표(스피너) 완전 제거 ====== */
+/* Chrome, Safari, Edge, Opera */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+/* Firefox */
 input[type='number'] {
-  /* 1. WebKit 기반 브라우저 (Chrome, Safari, 구 Edge, Opera) */
-  -webkit-appearance: none;
-  /* 2. Firefox 브라우저 (화살표 대신 일반 텍스트 필드로 처리) */
-  -moz-appearance: textfield;
-  /* 3. 표준 속성 (최신 브라우저 및 린트 경고 해결) */
-  appearance: none;
-  /* 4. 기타: 일부 브라우저에서 input에 기본 적용되는 margin 제거 */
-  margin: 0;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
 }
 
-/* WebKit 브라우저의 스핀 버튼 제거 */
-input[type='number']::-webkit-inner-spin-button,
-input[type='number']::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+/* 모든 브라우저 공통 */
+input[type='number'] {
+  appearance: textfield;
 }
 
-/* Firefox 브라우저의 스핀 버튼 제거 */
-input[type='number']::-moz-inner-spin-button,
-input[type='number']::-moz-outer-spin-button {
-  -moz-appearance: none;
-  margin: 0;
+/* ====== 글로벌 스크롤바 스타일 ====== */
+html,
+body,
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb transparent;
 }
-
-/* Hide horizontal scrollbar for category filter */
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
 }
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 6px;
+  min-height: 40px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
 }

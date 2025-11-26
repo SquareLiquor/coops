@@ -142,148 +142,147 @@
   <title>가맹점 관리 - 본사</title>
 </svelte:head>
 
-<div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
-  <div class="flex items-center space-x-4">
-    <h1 class="text-surface-900 text-2xl font-bold">가맹점 관리</h1>
-  </div>
-  <button
-    class="bg-primary-500 hover:bg-primary-700 focus:ring-primary-500 rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
-  >
-    새 매장 등록
-  </button>
-</div>
-
-<div class="p-6">
-  <!-- Filter Area -->
+<div class="min-h-screen bg-gray-100 p-6">
+  <!-- Header -->
   <div class="mb-6 flex items-center justify-between">
-    <!-- 좌측 필터 영역 -->
-    <div class="flex items-center gap-4">
-      <!-- 검색 필터 -->
-      <input
-        type="text"
-        bind:value={searchTerm}
-        placeholder="매장명 검색"
-        class="border-0 border-b px-3 py-1.5 text-sm {searchTerm
-          ? 'border-primary-500 text-primary-700'
-          : 'border-surface-100'} focus:border-primary-500 w-40 bg-transparent focus:outline-none"
-      />
-    </div>
-
-    <!-- 우측 상태 필터 영역 -->
-    <div class="bg-surface-50/50 flex items-center gap-1 rounded-lg p-1">
-      {#each statusOptions as option}
-        <button
-          class="rounded px-3 py-1.5 text-sm font-medium transition-colors {selectedStatus === option.value
-            ? 'bg-primary-500 text-primary-50 shadow-sm'
-            : 'text-surface-600 hover:text-surface-800'}"
-          on:click={() => (selectedStatus = option.value)}
-        >
-          {option.label}
-        </button>
-      {/each}
-    </div>
+    <h1 class="text-2xl font-bold text-gray-900">가맹점 관리</h1>
+    <button
+      class="bg-primary-600 hover:bg-primary-700 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
+    >
+      새 매장 등록
+    </button>
   </div>
 
-  <div class="border-surface-100 bg-surface-50/50 overflow-hidden rounded-lg border">
-    <table class="min-w-full">
-      <thead class="bg-surface-50 border-surface-100 border-b">
-        <tr>
-          <th class="w-8 px-4 py-3 text-center">
-            <span class="text-surface-500 text-xs font-medium">#</span>
-          </th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">매장 정보</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">관리자</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">연락처</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">실적</th>
-          <th class="text-surface-500 px-4 py-3 text-left text-xs font-medium">상태</th>
-          <th class="text-surface-500 w-40 px-4 py-3 text-center text-xs font-medium">액션</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white">
-        {#each filteredStores as store, index}
-          <tr class="hover:bg-surface-50 border-surface-100 border-b">
-            <td class="text-surface-500 px-4 py-4 text-center text-sm">
-              {index + 1}
-            </td>
-            <td class="px-4 py-4">
-              <div class="flex items-center">
-                <div class="h-10 w-10 flex-shrink-0">
-                  <div class="bg-primary-100 flex h-10 w-10 items-center justify-center rounded-lg">
-                    <span class="text-primary-700 text-sm font-medium">🏪</span>
+  <div class="relative">
+    <!-- Filter Area -->
+    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center gap-2">
+        <!-- 검색 필터 -->
+        <input
+          type="text"
+          bind:value={searchTerm}
+          placeholder="매장명 검색"
+          class="focus:border-primary-500 w-48 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+        />
+      </div>
+
+      <!-- 상태 필터 (우측 또는 아래) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto">
+        {#each statusOptions as option}
+          <button
+            type="button"
+            class={[
+              'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
+              selectedStatus === option.value && 'bg-primary-600 text-white',
+              selectedStatus !== option.value && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+            ]}
+            on:click={() => (selectedStatus = option.value)}
+          >
+            {option.label}
+          </button>
+        {/each}
+      </div>
+    </div>
+
+    <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
+      <table class="min-w-full border-collapse">
+        <thead>
+          <tr class="border-b border-gray-200 bg-white">
+            <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">매장 정보</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">관리자</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">연락처</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">실적</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">상태</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">액션</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {#each filteredStores as store, index}
+            <tr class="border-b border-gray-100 transition-colors hover:bg-gray-50">
+              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
+                {index + 1}
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-left">
+                <div class="flex items-center gap-2">
+                  <div class="bg-primary-100 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full">
+                    <span class="text-xs">🏪</span>
+                  </div>
+                  <div>
+                    <div class="text-xs font-medium text-gray-900">{store.name}</div>
+                    <div class="text-xs text-gray-500">{store.type}</div>
                   </div>
                 </div>
-                <div class="ml-4">
-                  <div class="text-surface-900 text-sm font-medium">{store.name}</div>
-                  <div class="text-surface-500 text-sm">{store.type}</div>
-                  <div class="text-surface-400 text-xs">등록: {formatDate(store.registeredAt)}</div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-left">
+                <div class="text-xs font-medium text-gray-900">{store.manager}</div>
+                <div class="text-xs text-gray-500">{store.email}</div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-left">
+                <div class="text-xs text-gray-900">{store.phone}</div>
+                <div class="text-xs text-gray-500">{store.address}</div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-right">
+                <div class="text-xs font-medium text-gray-900">
+                  {formatCurrency(store.monthlyRevenue)}
                 </div>
-              </div>
-            </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">{store.manager}</div>
-              <div class="text-surface-500 text-sm">{store.email}</div>
-            </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm">{store.phone}</div>
-              <div class="text-surface-500 text-xs">{store.address}</div>
-              <div class="text-surface-400 text-xs">{store.businessNumber}</div>
-            </td>
-            <td class="px-4 py-4">
-              <div class="text-surface-900 text-sm font-medium">
-                {formatCurrency(store.monthlyRevenue)}
-              </div>
-              <div class="text-surface-500 text-sm">주문 {store.totalOrders}건</div>
-              <div class="text-surface-400 text-xs">최근: {formatDate(store.lastOrderDate)}</div>
-            </td>
-            <td class="px-4 py-4">
-              <span class={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${getStatusBadge(store.status)}`}>
-                {getStatusText(store.status)}
-              </span>
-            </td>
-            <td class="px-4 py-4 text-center">
-              <div class="flex items-center justify-center gap-1">
-                <button
-                  on:click={() => viewStoreDetails(store.id)}
-                  class="text-surface-700 bg-surface-100 hover:bg-surface-200 rounded px-2 py-1 text-xs font-medium"
+                <div class="text-xs text-gray-500">주문 {store.totalOrders}건</div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
+                <span
+                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${getStatusBadge(store.status)}`}
                 >
-                  상세
-                </button>
-                {#if store.status !== 'suspended'}
+                  {getStatusText(store.status)}
+                </span>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2">
+                <div class="flex items-center justify-center gap-1">
                   <button
-                    on:click={() => toggleStoreStatus(store.id)}
-                    class={`rounded px-2 py-1 text-xs font-medium hover:${
-                      store.status === 'active' ? 'bg-yellow-200' : 'bg-green-200'
-                    } ${store.status === 'active' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}
+                    on:click={() => viewStoreDetails(store.id)}
+                    class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
                   >
-                    {store.status === 'active' ? '휴업' : '재개'}
+                    상세
                   </button>
-                  <button
-                    on:click={() => suspendStore(store.id)}
-                    class="rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
-                  >
-                    정지
-                  </button>
-                {/if}
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+                  {#if store.status !== 'suspended'}
+                    <button
+                      on:click={() => toggleStoreStatus(store.id)}
+                      class={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        store.status === 'active'
+                          ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                          : 'bg-green-100 text-green-700 hover:bg-green-200'
+                      }`}
+                    >
+                      {store.status === 'active' ? '휴업' : '재개'}
+                    </button>
+                    <button
+                      on:click={() => suspendStore(store.id)}
+                      class="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 transition-colors hover:bg-red-200"
+                    >
+                      정지
+                    </button>
+                  {/if}
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
 
-    {#if filteredStores.length === 0}
-      <div class="py-12 text-center">
-        <svg class="text-surface-400 mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-          />
-        </svg>
-        <h3 class="text-surface-900 mt-2 text-sm font-medium">등록된 매장이 없습니다</h3>
-        <p class="text-surface-500 mt-1 text-sm">현재 조건에 맞는 매장이 없습니다.</p>
-      </div>
-    {/if}
+      {#if filteredStores.length === 0}
+        <div class="py-12 text-center">
+          <div class="flex flex-col items-center justify-center">
+            <svg class="mb-2 h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">등록된 매장이 없습니다</h3>
+          </div>
+        </div>
+      {/if}
+    </div>
   </div>
 </div>

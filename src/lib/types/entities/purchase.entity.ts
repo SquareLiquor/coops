@@ -19,12 +19,18 @@ export interface PurchaseEntity {
 
   productId: string
   productName: string
+  productPrice: number
+  productCapacity: string
+  productSellUnit: string
   product?: ProductEntity
 
   originProductId: string
   originProductName: string
-  originProductUnit: string
   originProductPrice: number
+  originProductCapacity: string
+  originProductSellUnit: string
+  originProductPurchaseUnit: string
+  originProductPurchaseQty: number
   originProduct?: ProductEntity
 
   categoryId: string
