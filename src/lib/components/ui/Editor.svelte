@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { PUBLIC_TINYMCE_API_KEY } from '$env/static/public'
   import Editor from '@tinymce/tinymce-svelte'
 
@@ -6,9 +6,8 @@
 
   let conf = {
     menubar: false,
-    height: 500,
+    // height: 500,
     resize: true,
-    inline: true,
     // fixed_toolbar_container: '#toolbar-container',
     toolbar:
       'undo redo | blocks | ' +
@@ -65,6 +64,9 @@
 </script>
 
 <div id="toolbar-container" class="sticky top-0 z-20 bg-white shadow-sm"></div>
-<div id="editor-wrapper" class="border-surface-100 min-h-[150px] rounded-md border bg-white px-3 py-2 shadow-sm">
-  <Editor inline apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {conf} cssClass="prose" />
-</div>
+<div
+  id="editor-wrapper"
+  class="border-surface-100 h-full min-h-0 min-h-[150px] flex-1 rounded-md border bg-white px-3 py-2 shadow-sm"
+>
+  <Editor inline apiKey={PUBLIC_TINYMCE_API_KEY} bind:value={description} {conf} {disabled} cssClass="prose" />
+</div> -->

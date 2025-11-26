@@ -1,7 +1,7 @@
 <script lang="ts">
   import ProductSearchModal from '$lib/components/modals/hq/ProductSearchModal.svelte'
   import Combobox from '$lib/components/ui/Combobox.svelte'
-  import Editor from '$lib/components/ui/Editor.svelte'
+  import EditorTipTap from '$lib/components/ui/EditorTipTap.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
   import { convertProductToCoop } from '$lib/converters/coop.converter'
   import { createCategory } from '$lib/database'
@@ -71,7 +71,7 @@
     <span class="loader-giant"></span>
   </div>
 {/if}
-<form method="POST" action={formAction} use:enhance class="flex h-full flex-1 flex-col">
+<form method="POST" action={formAction} use:enhance class="flex h-full min-h-0 flex-1 flex-col">
   <!-- Hidden inputs for edit mode -->
   {#if isEditMode}
     <input type="hidden" name="id" value={$formData.id} />
@@ -79,9 +79,9 @@
   {/if}
   <input type="hidden" name="storeId" value={$formData.storeId} />
 
-  <div class="border-surface-100 flex h-16 items-center justify-between border-b px-6">
+  <div class="border-surface-100 flex h-14 flex-shrink-0 items-center justify-between border-b px-6">
     <div class="flex items-center space-x-4">
-      <h1 class="text-surface-900 text-2xl font-bold">{titleText}</h1>
+      <h1 class="text-surface-900 text-xl font-bold">{titleText}</h1>
     </div>
 
     {#if mode === 'create'}
@@ -113,15 +113,17 @@
     </div>
   </div>
 
-  <div class="flex flex-1 gap-8 p-8">
-    <div class="flex w-1/2 flex-col">
-      <section class="border-surface-100 flex flex-1 flex-col rounded-lg border bg-white p-6">
-        <h2 class="text-lg font-semibold">기본정보</h2>
-        <hr class="hr my-4" />
-        <div class="flex flex-col gap-4">
-          <div class="grid grid-cols-4 gap-2">
-            <label class="label col-span-2 flex flex-col">
-              <span class="label-text text-sm">상품명</span>
+  <div class="flex min-h-0 flex-1 gap-6 overflow-auto p-6">
+    <!-- 좌측 패널 -->
+    <div class="flex w-1/2 flex-col gap-6">
+      <!-- 기본정보 -->
+      <section class="border-surface-100 rounded-lg border bg-white p-3">
+        <h2 class="text-base font-semibold">기본정보</h2>
+        <hr class="hr my-2" />
+        <div class="flex flex-col gap-2">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">상품명</span>
               <input
                 type="text"
                 name="name"
@@ -136,9 +138,23 @@
                   <span class="text-xs text-red-500">{$errors.name}</span>
                 {/if}
               </div>
-            </label>
-            <label class="label col-span-2 flex flex-col">
-              <span class="label-text text-sm">카테고리</span>
+            </div>
+            <div class="col-span-2 flex flex-col">
+              <span class="mb-1 text-sm font-medium">Display Name</span>
+              <input
+                type="text"
+                name="displayName"
+                class="input placeholder-surface-200 w-full"
+                bind:value={$formData.displayName}
+                placeholder="Display Name"
+                disabled={mode === 'create' && !$formData.product?.originId}
+              />
+              <div class="mt-1 min-h-[20px]"></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="col-span-2 flex flex-col">
+              <span class="mb-1 text-sm font-medium">카테고리</span>
               <Combobox
                 bind:selected={$formData.categoryId}
                 data={categories}
@@ -151,35 +167,30 @@
                   <span class="text-xs text-red-500">{$errors.categoryId}</span>
                 {/if}
               </div>
-            </label>
-          </div>
-          <label class="label flex min-h-0 flex-1 flex-col">
-            <span class="label-text text-sm">상세정보</span>
-            <div class="h-full min-h-0 flex-1">
-              <Editor
-                bind:description={$formData.description}
-                disabled={mode === 'create' && !$formData.product?.originId}
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">&nbsp;</span>
+              <input
+                type="text"
+                class="input placeholder-surface-200 w-full"
+                placeholder=""
+                disabled
+                style="visibility: hidden;"
               />
+              <div class="mt-1 min-h-[20px]"></div>
             </div>
-            <input type="hidden" name="description" bind:value={$formData.description} />
-            <div class="mt-1 min-h-[20px]">
-              {#if $errors.description}
-                <span class="text-xs text-red-500">{$errors.description}</span>
-              {/if}
-            </div>
-          </label>
+          </div>
         </div>
       </section>
-    </div>
 
-    <div class="flex w-1/2 flex-col">
-      <section class="border-surface-100 mb-8 rounded-lg border bg-white p-6">
-        <h2 class="text-lg font-semibold">판매 정보</h2>
-        <hr class="hr my-4" />
-        <div class="flex flex-col gap-4">
-          <div class="grid grid-cols-4 items-end gap-2">
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">판매상태</span>
+      <!-- 판매정보 -->
+      <section class="border-surface-100 rounded-lg border bg-white p-3">
+        <h2 class="text-base font-semibold">판매정보</h2>
+        <hr class="hr my-2" />
+        <div class="flex flex-col gap-2">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">판매상태</span>
               <select
                 name="status"
                 class="select h-9 w-full px-3 align-middle"
@@ -192,9 +203,9 @@
                 {/each}
               </select>
               <div class="mt-1 min-h-[20px]"></div>
-            </label>
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">판매일자</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">판매일자</span>
               <input
                 type="date"
                 name="salesDate"
@@ -209,42 +220,12 @@
                   <span class="text-xs text-red-500">{$errors.salesDate}</span>
                 {/if}
               </div>
-            </label>
+            </div>
+            <div class="flex flex-col"></div>
           </div>
-          <div class="grid grid-cols-4 items-end gap-2">
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">판매 가격</span>
-              <input
-                name="salesPrice"
-                class="input placeholder-surface-200 w-full text-right"
-                type="number"
-                bind:value={$formData.salesPrice}
-                min="0"
-                placeholder="가격"
-                disabled={mode === 'create' && !$formData.product?.originId}
-                {...$constraints.salesPrice}
-              />
-              <div class="mt-1 min-h-[20px]">
-                {#if $errors.salesPrice}
-                  <span class="text-xs text-red-500">{$errors.salesPrice}</span>
-                {/if}
-              </div>
-            </label>
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">원가</span>
-              <input
-                name="originalPrice"
-                class="input placeholder-surface-200 w-full text-right"
-                type="text"
-                bind:value={$formData.product.price}
-                min="0"
-                placeholder="가격"
-                disabled
-              />
-              <div class="mt-1 min-h-[20px]"></div>
-            </label>
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">판매 가능 수량</span>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">판매 가능 수량</span>
               <input
                 name="maxQuantity"
                 class="input placeholder-surface-200 w-full text-right"
@@ -260,47 +241,147 @@
                   <span class="text-xs text-red-500">{$errors.maxQuantity}</span>
                 {/if}
               </div>
-            </label>
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">판매 가격</span>
+              <input
+                name="salesPrice"
+                class="input placeholder-surface-200 w-full text-right"
+                type="number"
+                bind:value={$formData.salesPrice}
+                min="0"
+                placeholder="가격"
+                disabled={mode === 'create' && !$formData.product?.originId}
+                {...$constraints.salesPrice}
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.salesPrice}
+                  <span class="text-xs text-red-500">{$errors.salesPrice}</span>
+                {/if}
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">원가</span>
+              <input
+                name="originalPrice"
+                class="input placeholder-surface-200 w-full text-right"
+                type="text"
+                bind:value={$formData.product.price}
+                min="0"
+                placeholder="가격"
+                disabled
+              />
+              <div class="mt-1 min-h-[20px]"></div>
+            </div>
           </div>
-          <div class="grid grid-cols-4 items-end gap-2">
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">단위</span>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">판매 용량</span>
+              <input
+                name="salesVolume"
+                class="input placeholder-surface-200 w-full text-right"
+                type="number"
+                bind:value={$formData.salesVolume}
+                min="0"
+                placeholder="판매 용량"
+                disabled={mode === 'create' && !$formData.product?.originId}
+              />
+              <div class="mt-1 min-h-[20px]"></div>
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">판매단위</span>
               <select
-                name="productUnit"
+                name="salesUnit"
                 class="select h-9 w-full px-3 align-middle"
-                bind:value={$formData.product.unit}
+                bind:value={$formData.salesUnit}
+                disabled={mode === 'create' && !$formData.product?.originId}
               >
                 <option value="" disabled selected>선택</option>
                 {#each unitTypes as unit}
                   <option value={unit.code}>{unit.label}</option>
                 {/each}
               </select>
-            </label>
-            <label class="label flex flex-col">
-              <span class="label-text text-sm">단위 별 수량</span>
+              <div class="mt-1 min-h-[20px]"></div>
+            </div>
+            <div class="flex flex-col"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 발주정보 -->
+      <section class="border-surface-100 rounded-lg border bg-white p-3">
+        <h2 class="text-base font-semibold">발주정보</h2>
+        <hr class="hr my-2" />
+        <div class="flex flex-col gap-2">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">발주단위</span>
+              <select
+                name="productUnit"
+                class="select h-9 w-full px-3 align-middle"
+                bind:value={$formData.product.unit}
+                disabled={mode === 'create' && !$formData.product?.originId}
+              >
+                <option value="" disabled selected>선택</option>
+                {#each unitTypes as unit}
+                  <option value={unit.code}>{unit.label}</option>
+                {/each}
+              </select>
+              <div class="mt-1 min-h-[20px]"></div>
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-1 text-sm font-medium">발주 단위 당 수량</span>
               <input
                 name="quantityPerUnit"
-                class="input placeholder-surface-200 w-full"
+                class="input placeholder-surface-200 w-full text-right"
                 type="number"
                 bind:value={$formData.product.quantityPerUnit}
                 min="0"
                 placeholder="단위 당 수량"
+                disabled={mode === 'create' && !$formData.product?.originId}
               />
-            </label>
+              <div class="mt-1 min-h-[20px]"></div>
+            </div>
+            <div class="flex flex-col"></div>
           </div>
         </div>
       </section>
-      <section class="border-surface-100 rounded-lg border bg-white p-6">
-        <h2 class="text-lg font-semibold">상품 이미지</h2>
-        <hr class="hr my-4" />
-        <label for="coop-images" class="text-surface-700 block font-medium">
-          <FileUploader
-            bind:images={$formData.images}
-            options={{ maxFiles: 5, removeable: false, bucket: 'coops' }}
-            disabled={mode === 'create' && !$formData.product?.originId}
-          />
-          <input type="hidden" name="images" bind:value={$formData.images} />
-        </label>
+    </div>
+
+    <!-- 우측 패널 -->
+    <div class="flex w-1/2 flex-col">
+      <!-- 상세정보 -->
+      <section class="border-surface-100 flex flex-1 flex-col rounded-lg border bg-white p-3">
+        <h2 class="text-base font-semibold">상세정보</h2>
+        <hr class="hr my-2" />
+        <div class="flex min-h-0 flex-1 flex-col">
+          <div class="mb-3 flex min-h-0 flex-1 flex-col">
+            <span class="mb-1 text-sm font-medium">상품 설명</span>
+            <div class="h-full overflow-hidden">
+              <!-- <Editor
+                bind:description={$formData.description}
+                disabled={mode === 'create' && !$formData.product?.originId}
+              /> -->
+              <EditorTipTap
+                bind:description={$formData.description}
+                disabled={mode === 'create' && !$formData.product?.originId}
+              />
+            </div>
+            <input type="hidden" name="description" bind:value={$formData.description} />
+            {#if $errors.description}
+              <span class="mt-1 text-xs text-red-500">{$errors.description}</span>
+            {/if}
+          </div>
+          <div class="flex flex-col">
+            <span class="mb-1 text-sm font-medium">상품 이미지</span>
+            <FileUploader
+              bind:images={$formData.images}
+              options={{ maxFiles: 5, removeable: false, bucket: 'coops' }}
+              disabled={mode === 'create' && !$formData.product?.originId}
+            />
+            <input type="hidden" name="images" bind:value={$formData.images} />
+          </div>
+        </div>
       </section>
     </div>
   </div>
