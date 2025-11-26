@@ -56,8 +56,10 @@ CREATE TABLE public.products (
   description text,
   price numeric NOT NULL,
   initial_stock integer NOT NULL DEFAULT 0,
-  unit unit_type NOT NULL,
-  quantity_per_unit numeric NOT NULL,
+  capacity_text text,
+  sell_unit_text text,
+  purchase_unit text,
+  purchase_qty numeric,
   active boolean NOT NULL DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()

@@ -55,7 +55,8 @@ export const getProductById = async (productId: string) => {
 export const createProduct = async (formData: ProductCreateInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { storeId, categoryId, name, description, price, initialStock, unit, quantityPerUnit } = formData
+  const { storeId, categoryId, name, description, price, initialStock, capacity, sellUnit, purchaseUnit, purchaseQty } =
+    formData
 
   const { data, error } = await supabase
     .from('products')
@@ -66,8 +67,10 @@ export const createProduct = async (formData: ProductCreateInput) => {
       description,
       price,
       initial_stock: initialStock,
-      unit,
-      quantity_per_unit: quantityPerUnit,
+      capacity_text: capacity,
+      sell_unit_text: sellUnit,
+      purchase_unit: purchaseUnit,
+      purchase_qty: purchaseQty,
       active: true,
     })
     .select('*')
@@ -81,7 +84,8 @@ export const createProduct = async (formData: ProductCreateInput) => {
 export const updateProduct = async (formData: ProductUpdateInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { id, storeId, categoryId, name, description, price, unit, quantityPerUnit, images, active } = formData
+  const { id, storeId, categoryId, name, description, price, capacity, sellUnit, purchaseUnit, purchaseQty, active } =
+    formData
 
   const { error: updateError } = await supabase
     .from('products')
@@ -90,8 +94,10 @@ export const updateProduct = async (formData: ProductUpdateInput) => {
       name,
       description,
       price,
-      unit,
-      quantity_per_unit: quantityPerUnit,
+      capacity_text: capacity,
+      sell_unit_text: sellUnit,
+      purchase_unit: purchaseUnit,
+      purchase_qty: purchaseQty,
       active,
     })
     .eq('id', id)

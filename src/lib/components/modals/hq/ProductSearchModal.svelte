@@ -87,7 +87,7 @@
               <!-- 상품 정보 -->
               <div class="flex-1">
                 <div class="mb-1 flex items-center gap-2">
-                  <span class="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  <span class="rounded bg-gray-100 px-2 text-xs font-medium text-gray-600">
                     {product.category?.name || '미분류'}
                   </span>
                   <h3 class="mb-1 font-semibold text-gray-900">{product.name}</h3>
@@ -95,8 +95,12 @@
 
                 <div class="flex items-center gap-3 text-sm text-gray-500">
                   <span class="text-primary-600 font-semibold">{formatCurrency(product.price)}</span>
-                  <span>•</span>
-                  <span>{product.unit} ({product.quantityPerUnit}개)</span>
+                  {#if product.capacity}
+                    <span> / {product.capacity}</span>
+                  {/if}
+                  {#if product.sellUnit}
+                    <span> / {product.sellUnit}</span>
+                  {/if}
                 </div>
               </div>
 

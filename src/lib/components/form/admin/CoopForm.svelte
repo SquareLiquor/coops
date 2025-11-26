@@ -37,6 +37,7 @@
     submitting,
   } = superForm(data.form, {
     dataType: 'json',
+    resetForm: false,
     onResult: async ({ result }) => {
       if (result.type === 'success') onSubmit?.()
       else if (result.type === 'failure') onError?.()
@@ -138,18 +139,6 @@
                   <span class="text-xs text-red-500">{$errors.name}</span>
                 {/if}
               </div>
-            </div>
-            <div class="col-span-2 flex flex-col">
-              <span class="mb-1 text-sm font-medium">Display Name</span>
-              <input
-                type="text"
-                name="displayName"
-                class="input placeholder-surface-200 w-full"
-                bind:value={$formData.displayName}
-                placeholder="Display Name"
-                disabled={mode === 'create' && !$formData.product?.originId}
-              />
-              <div class="mt-1 min-h-[20px]"></div>
             </div>
           </div>
           <div class="grid grid-cols-3 gap-2">
@@ -278,29 +267,37 @@
             <div class="flex flex-col">
               <span class="mb-1 text-sm font-medium">판매 용량</span>
               <input
-                name="salesVolume"
+                type="text"
+                name="capacity"
                 class="input placeholder-surface-200 w-full text-right"
-                type="number"
-                bind:value={$formData.salesVolume}
+                bind:value={$formData.product.capacity}
                 min="0"
-                placeholder="판매 용량"
+                placeholder="용량 (예: 500g, 1L)"
                 disabled={mode === 'create' && !$formData.product?.originId}
               />
               <div class="mt-1 min-h-[20px]"></div>
             </div>
             <div class="flex flex-col">
               <span class="mb-1 text-sm font-medium">판매단위</span>
-              <select
-                name="salesUnit"
+              <input
+                type="text"
+                name="sellUnit"
+                class="input placeholder-surface-200 w-full text-right"
+                bind:value={$formData.product.sellUnit}
+                placeholder="단위 (예: 10개, 1박스 8개입)"
+                disabled={mode === 'create' && !$formData.product?.originId}
+              />
+              <!-- <select
+                name="sellUnit"
                 class="select h-9 w-full px-3 align-middle"
-                bind:value={$formData.salesUnit}
+                bind:value={$formData.product.sellUnit}
                 disabled={mode === 'create' && !$formData.product?.originId}
               >
                 <option value="" disabled selected>선택</option>
                 {#each unitTypes as unit}
                   <option value={unit.code}>{unit.label}</option>
                 {/each}
-              </select>
+              </select> -->
               <div class="mt-1 min-h-[20px]"></div>
             </div>
             <div class="flex flex-col"></div>
@@ -317,10 +314,10 @@
             <div class="flex flex-col">
               <span class="mb-1 text-sm font-medium">발주단위</span>
               <select
-                name="productUnit"
+                name="purchaseUnit"
                 class="select h-9 w-full px-3 align-middle"
-                bind:value={$formData.product.unit}
-                disabled={mode === 'create' && !$formData.product?.originId}
+                bind:value={$formData.product.purchaseUnit}
+                disabled
               >
                 <option value="" disabled selected>선택</option>
                 {#each unitTypes as unit}
@@ -332,13 +329,13 @@
             <div class="flex flex-col">
               <span class="mb-1 text-sm font-medium">발주 단위 당 수량</span>
               <input
-                name="quantityPerUnit"
+                name="purchaseQty"
                 class="input placeholder-surface-200 w-full text-right"
                 type="number"
-                bind:value={$formData.product.quantityPerUnit}
+                bind:value={$formData.product.purchaseQty}
                 min="0"
                 placeholder="단위 당 수량"
-                disabled={mode === 'create' && !$formData.product?.originId}
+                disabled
               />
               <div class="mt-1 min-h-[20px]"></div>
             </div>
@@ -358,13 +355,9 @@
           <div class="mb-3 flex min-h-0 flex-1 flex-col">
             <span class="mb-1 text-sm font-medium">상품 설명</span>
             <div class="h-full overflow-hidden">
-              <!-- <Editor
-                bind:description={$formData.description}
-                disabled={mode === 'create' && !$formData.product?.originId}
-              /> -->
               <EditorTipTap
-                bind:description={$formData.description}
-                disabled={mode === 'create' && !$formData.product?.originId}
+                bind:content={$formData.description}
+                disabled={!$formData.product?.originId || $formData.product?.originId === ''}
               />
             </div>
             <input type="hidden" name="description" bind:value={$formData.description} />
@@ -377,7 +370,7 @@
             <FileUploader
               bind:images={$formData.images}
               options={{ maxFiles: 5, removeable: false, bucket: 'coops' }}
-              disabled={mode === 'create' && !$formData.product?.originId}
+              disabled={!$formData.product?.originId}
             />
             <input type="hidden" name="images" bind:value={$formData.images} />
           </div>

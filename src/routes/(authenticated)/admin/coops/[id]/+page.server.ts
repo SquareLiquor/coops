@@ -1,5 +1,5 @@
 import { toCoopUpdateInputFromCoopEntity } from '$lib/converters/coop.converter'
-import { getCategories, getCoopById, updateCoop, updateCoopImages } from '$lib/database'
+import { getCategories, getCoopById, updateCoop, updateCoopImages, updateProduct } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { CoopUpdateSchema } from '$lib/schemas'
 import { SalesStatus, UnitType } from '$lib/types'
@@ -34,13 +34,23 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 export const actions: Actions = {
   update: async ({ request, params, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(CoopUpdateSchema))
-    const { id, images } = form.data
+    const { id, name, description, salesPrice, storeId, categoryId, product, images } = form.data
 
     if (!form.valid) return fail(400, { form })
 
     try {
       await updateCoop(form.data)
       await updateCoopImages(id, images)
+      await updateProduct({
+        ...product,
+        name,
+        description,
+        price: salesPrice,
+        storeId,
+        categoryId,
+        images: [],
+        active: true,
+      })
 
       return { form }
     } catch (error) {

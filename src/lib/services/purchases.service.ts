@@ -5,7 +5,6 @@ import type { PurchasesFilterInput } from '$lib/schemas'
 export const getPurchasesForStore = async (filter: PurchasesFilterInput) => {
   const { purchases } = await _getPurchasesForStore(filter)
 
-  console.log(purchases)
   return { purchases: toPurchaseEntities(purchases) }
 }
 

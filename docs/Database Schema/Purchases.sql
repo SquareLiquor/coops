@@ -205,8 +205,10 @@ SELECT
   
   prd.origin_id AS origin_product_id,
   origin_prd.name AS origin_product_name,
-  origin_prd.unit AS origin_product_unit,
+  origin_prd.sell_unit_text AS origin_product_unit,
   origin_prd.price AS origin_product_price,
+  origin_prd.purchase_unit AS origin_product_purchase_unit,
+  origin_prd.purchase_qty AS origin_product_purchase_qty,
 
   coop.category_id,
   ct.name AS category_name,
@@ -273,7 +275,9 @@ SELECT
 
   p.product_id AS origin_product_id,
   origin_prd.name AS origin_product_name,
-  origin_prd.unit AS origin_product_unit,
+  origin_prd.sell_unit_text AS origin_product_unit,
+  origin_prd.purchase_unit AS origin_product_purchase_unit,
+  origin_prd.purchase_qty AS origin_product_purchase_qty,
 
   coop.product_id AS product_id,
   prd.name AS product_name,

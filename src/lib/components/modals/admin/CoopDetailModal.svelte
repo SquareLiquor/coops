@@ -120,7 +120,7 @@
                   </div>
 
                   <div class="flex justify-between border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-500">최대 수량</span>
+                    <span class="text-sm text-gray-500">판매 가능 수량</span>
                     <span class="text-sm font-medium text-gray-900">{coop.maxQuantity?.toLocaleString()}개</span>
                   </div>
 

@@ -13,7 +13,7 @@ const createProduct = async (context: CreateCoopHookContext, shared: any) => {
 
   const { coop } = context
   const { storeId, name, categoryId, salesPrice, description } = coop || {}
-  const { originId, unit, quantityPerUnit } = coop!.product || {}
+  const { originId, capacity, sellUnit, purchaseUnit, purchaseQty } = coop!.product || {}
 
   const { data: copiedData, error: copiedError } = await supabase
     .from('products')
@@ -25,14 +25,18 @@ const createProduct = async (context: CreateCoopHookContext, shared: any) => {
         name,
         description,
         price: salesPrice,
-        unit,
+        capacity_text: capacity,
+        sell_unit_text: sellUnit,
+        purchase_unit: purchaseUnit,
+        purchase_qty: purchaseQty,
         initial_stock: 0,
-        quantity_per_unit: quantityPerUnit,
         active: true,
       },
     ])
     .select()
     .maybeSingle()
+
+  if (copiedError) throw new SupabaseError('Failed to copy product')
 
   // shared state에 productId 저장
   shared.set('productId', copiedData?.id)

@@ -105,22 +105,15 @@
                   </div>
 
                   <div class="flex justify-between border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-500">개당 가격</span>
+                    <span class="text-sm text-gray-500">개별 용량</span>
                     <span class="text-base font-semibold text-gray-900">
-                      {new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
-                        product.price / product.quantityPerUnit
-                      )}
+                      {product.capacity}
                     </span>
                   </div>
 
                   <div class="flex justify-between border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-500">판매 단위</span>
-                    <span class="text-sm font-medium text-gray-900">{product.unit}</span>
-                  </div>
-
-                  <div class="flex justify-between border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-500">단위별 수량</span>
-                    <span class="text-sm font-medium text-gray-900">{product.quantityPerUnit}개</span>
+                    <span class="text-sm text-gray-500">개별 단위</span>
+                    <span class="text-sm font-medium text-gray-900">{product.sellUnit}</span>
                   </div>
 
                   <div class="flex justify-between border-b border-gray-100 pb-3">

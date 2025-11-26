@@ -20,8 +20,10 @@ export interface ProductEntity {
   description: string
   price: number
   initialStock: number
-  unit: string
-  quantityPerUnit: number
+  capacity: string
+  sellUnit: string
+  purchaseUnit: string
+  purchaseQty: number
   images: ImageEntity[]
   active: boolean
   createdAt: string

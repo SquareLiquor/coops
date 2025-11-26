@@ -16,10 +16,13 @@ export const CoopSchema = v.pipe(
     images: v.pipe(v.array(ImageSchema), v.minLength(1, '상품 이미지를 최소 1개 이상 등록해주세요.')),
     product: v.pipe(
       v.object({
+        id: v.string(),
         originId: v.string(),
         price: v.pipe(v.number(), v.minValue(1, '가격은 0보다 커야 합니다.')),
-        unit: v.pipe(v.string(), v.nonEmpty('단위를 입력해주세요.')),
-        quantityPerUnit: v.pipe(v.number(), v.minValue(1, '단위 별 수량은 0보다 커야 합니다.')),
+        capacity: v.optional(v.string()),
+        sellUnit: v.optional(v.string()),
+        purchaseUnit: v.string(),
+        purchaseQty: v.number(),
       })
     ),
   }),

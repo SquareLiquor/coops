@@ -98,10 +98,13 @@ export const toCoopUpdateInputFromCoopEntity = (coop: CoopEntity): CoopUpdateInp
     salesPrice: salesPrice,
     salesDate: dayjs(salesDate).format('YYYY-MM-DD'),
     product: {
+      id: productId,
       originId: product.originId || product.id,
       price: product.price,
-      unit: product.unit,
-      quantityPerUnit: product.quantityPerUnit,
+      capacity: product.capacity,
+      sellUnit: product.sellUnit,
+      purchaseUnit: product.purchaseUnit,
+      purchaseQty: product.purchaseQty,
     },
     images:
       images?.map((image: any) => ({
@@ -120,7 +123,7 @@ export const toCoopUpdateInputFromCoopEntity = (coop: CoopEntity): CoopUpdateInp
  * TODO: transform으로 분리
  */
 export const convertProductToCoop = ({ product, images }: { product: ProductEntity; images: ImageEntity[] }) => {
-  const { id, name, description, price, unit, quantityPerUnit } = product
+  const { id, name, description, price, capacity, sellUnit, purchaseUnit, purchaseQty } = product
 
   return {
     name,
@@ -129,8 +132,10 @@ export const convertProductToCoop = ({ product, images }: { product: ProductEnti
     product: {
       originId: id,
       price,
-      unit,
-      quantityPerUnit,
+      capacity,
+      sellUnit,
+      purchaseUnit,
+      purchaseQty,
     },
     images: images.map((image) => ({
       url: image.url,
