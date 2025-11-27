@@ -85,10 +85,3 @@ export const createSignupApprovalRequest = async (userId: string, storeId?: stri
 
   return await authRepository.insertApprovalRequest(payload)
 }
-
-/**
- * 사용자 삭제 (cleanup용)
- */
-export const deleteUser = async (userId: string) => {
-  return await authRepository.deleteUser(userId)
-}

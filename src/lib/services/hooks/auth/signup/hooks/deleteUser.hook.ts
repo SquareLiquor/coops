@@ -1,4 +1,4 @@
-import { deleteUser as deleteUserService } from '$lib/services/auth.service'
+import { deleteUser as deleteUserService } from '$lib/services/admin.service'
 import type { HookContext } from '$lib/services/hooks/hooksManager'
 import type { SignupHookContext } from '../signup.context'
 

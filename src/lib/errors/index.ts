@@ -124,6 +124,12 @@ export class ApprovalError extends BusinessLogicError {
   }
 }
 
+export class InvalidStatusTransitionError extends BusinessLogicError {
+  constructor(message: string = '잘못된 상태 전환입니다', options?: { code?: string; details?: Record<string, any> }) {
+    super(message, options)
+  }
+}
+
 // External service errors
 export class ExternalServiceError extends AppError {
   public status = 502

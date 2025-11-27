@@ -152,9 +152,10 @@
             <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
             <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">상품명</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">가격</th>
-            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">재고</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">발주 단위</th
+            >
             <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">상태</th>
-            <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">등록일</th>
+            <th class="px-3 py-3 text-right text-sm font-semibold text-gray-900">등록일</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -210,15 +211,24 @@
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs text-gray-600">
                 {formatCurrency(product.price)}
               </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs text-gray-600">
-                {product.initialStock}
+              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
+                {#if product.purchaseQty && product.purchaseUnit}
+                  {product.purchaseQty} / {product.purchaseUnit}
+                {:else}
+                  -
+                {/if}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-center">
-                <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium">
-                  <!-- {getStatusText(product.status)} -->
+                <span
+                  class={[
+                    'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
+                    product.active ? 'bg-success-100 text-success-800' : 'bg-gray-100 text-gray-800',
+                  ]}
+                >
+                  {product.active ? '활성' : '비활성'}
                 </span>
               </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-right text-xs text-gray-600">
+              <td class="px-3 py-2 text-right text-xs text-gray-600">
                 {dayjs(product.createdAt).format('YYYY.MM.DD')}
               </td>
             </tr>

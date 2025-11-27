@@ -15,11 +15,14 @@ export type PaginationResult<T> = {
  * Supabase 쿼리에 페이징을 체이닝 방식으로 적용하는 빌더
  */
 export class PaginatedQueryBuilder<T = any> {
-  private query: PostgrestFilterBuilder<any, any, any[], any, any>
+  private query: PostgrestFilterBuilder<any, any, Record<string, unknown>, any, any>
   private page: number
   private pageSize: number
 
-  constructor(query: PostgrestFilterBuilder<any, any, any[], any, any>, pagination?: PaginationInput) {
+  constructor(
+    query: PostgrestFilterBuilder<any, any, Record<string, unknown>, any, any>,
+    pagination?: PaginationInput
+  ) {
     this.query = query
     this.page = pagination?.page ?? 1
     this.pageSize = pagination?.pageSize ?? 10
@@ -60,7 +63,7 @@ export class PaginatedQueryBuilder<T = any> {
  * ).execute()
  */
 export const paginate = <T = any>(
-  query: PostgrestFilterBuilder<any, any, any[], any, any>,
+  query: PostgrestFilterBuilder<any, any, Record<string, unknown>, any, any>,
   pagination?: PaginationInput
 ): PaginatedQueryBuilder<T> => {
   return new PaginatedQueryBuilder<T>(query, pagination)

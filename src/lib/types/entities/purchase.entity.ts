@@ -31,6 +31,7 @@ export interface PurchaseEntity {
   originProductSellUnit: string
   originProductPurchaseUnit: string
   originProductPurchaseQty: number
+  originProductRepresentativeImage: string
   originProduct?: ProductEntity
 
   categoryId: string
@@ -39,11 +40,13 @@ export interface PurchaseEntity {
 
   orderedQuantity: number
 
-  purchaseId: string
-  purchaseStatus: PurchaseStatus
-  purchasePrice: number
-  purchaseQuantity: number
-  purchaseUnit: string
+  id: string
+  status: PurchaseStatus
+  price: number
+  quantity: number
+  unit: string
+  totalPrice: number
+  notes?: string
   requestedDate: string
   approvedDate: string
   shippedDate: string
@@ -52,4 +55,13 @@ export interface PurchaseEntity {
   rejectionReason: string
   createdAt: string
   updatedAt: string
+
+  // Action flags
+  editable: boolean
+  cancelable: boolean
+  approvable: boolean
+  rejectable: boolean
+  shippable: boolean
+  deliverable: boolean
+  reRequestable: boolean
 }

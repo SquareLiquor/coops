@@ -21,7 +21,7 @@
     },
     {
       href: '/hq/purchases',
-      label: '본사 발주',
+      label: '발주 관리',
       icon: Truck,
     },
     {
@@ -31,7 +31,7 @@
     },
     {
       href: '/hq/approvals',
-      label: '사용자 관리',
+      label: '관리자 승인 관리',
       icon: IdCard,
     },
   ]

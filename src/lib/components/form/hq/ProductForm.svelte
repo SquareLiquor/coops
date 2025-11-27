@@ -145,11 +145,22 @@
         {#if !basicInfoCollapsed}
           <div class="flex flex-col gap-4 px-6 pb-6">
             <div class="flex flex-col">
-              <div class="mb-2 flex items-center gap-1.5">
-                <span class="text-sm text-gray-700">상품명</span>
-                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="5"></circle>
-                </svg>
+              <div class="mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm text-gray-700">상품명</span>
+                  <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                  </svg>
+                </div>
+                <label class="relative inline-flex cursor-pointer items-center">
+                  <input type="checkbox" name="active" class="peer sr-only" bind:checked={$formData.active} />
+                  <div
+                    class="peer peer-checked:bg-primary-500 peer-focus:ring-primary-300 h-6 w-11 rounded-full bg-gray-200 peer-focus:ring-2 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+                  ></div>
+                  <span class="ml-3 text-sm font-medium text-gray-900">
+                    {$formData.active ? '활성' : '비활성'}
+                  </span>
+                </label>
               </div>
               <input
                 type="text"
@@ -248,7 +259,7 @@
                   {/if}
                 </div>
               </div>
-              {#if !isEditMode}
+              {#if !isEditMode && 'initialStock' in $formData}
                 <div class="flex flex-col">
                   <span class="mb-2 text-sm text-gray-700">초기 재고</span>
                   <input

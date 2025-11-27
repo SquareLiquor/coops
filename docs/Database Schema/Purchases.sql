@@ -214,6 +214,7 @@ SELECT
   origin_prd.sell_unit_text AS origin_product_sell_unit,
   origin_prd.purchase_unit AS origin_product_purchase_unit,
   origin_prd.purchase_qty AS origin_product_purchase_qty,
+  origin_img.url AS origin_product_representative_image,
 
   coop.category_id,
   ct.name AS category_name,
@@ -226,12 +227,12 @@ SELECT
   ) AS ordered_quantity,
 
   -- 발주 정보 (없을 수도 있음)
-  p.id AS purchase_id,
-  p.status AS purchase_status,
-  p.quantity AS purchase_quantity,
-  p.price AS purchase_price,
-  p.unit AS purchase_unit,
-  p.total_price AS purchase_total_price,
+  p.id,
+  p.status,
+  p.quantity,
+  p.price,
+  p.unit,
+  p.total_price,
   p.requested_date,
   p.approved_date,
   p.shipped_date,
@@ -247,6 +248,7 @@ FROM public.coops coop
 JOIN public.stores store ON coop.store_id = store.id
 JOIN public.products prd ON coop.product_id = prd.id
 LEFT JOIN public.products origin_prd ON prd.origin_id = origin_prd.id
+LEFT JOIN public.product_images origin_img ON origin_prd.id = origin_img.product_id AND origin_img.representative = true
 JOIN public.categories ct ON coop.category_id = ct.id
 LEFT JOIN public.purchases p ON p.coop_id = coop.id
 ;
@@ -259,12 +261,12 @@ COMMENT ON VIEW public.store_purchase_view IS '매장용 발주 정보 포함 �
 CREATE OR REPLACE VIEW public.hq_purchase_view
 WITH (security_invoker = true) AS
 SELECT
-  p.id AS purchase_id,
-  p.status AS purchase_status,
-  p.quantity AS purchase_quantity,
-  p.price AS purchase_price,
-  p.unit AS purchase_unit,
-  p.total_price AS purchase_total_price,
+p.id,
+  p.status,
+  p.quantity,
+  p.price,
+  p.unit,
+  p.total_price,
   p.requested_date,
   p.approved_date,
   p.shipped_date,
@@ -288,6 +290,7 @@ SELECT
   origin_prd.sell_unit_text AS origin_product_sell_unit,
   origin_prd.purchase_unit AS origin_product_purchase_unit,
   origin_prd.purchase_qty AS origin_product_purchase_qty,
+  origin_img.url AS origin_product_representative_image,
 
   coop.product_id AS product_id,
   prd.name AS product_name,
@@ -310,6 +313,7 @@ JOIN public.stores store ON p.store_id = store.id
 JOIN public.coops coop ON p.coop_id = coop.id
 JOIN public.products prd ON coop.product_id = prd.id
 JOIN public.products origin_prd ON p.product_id = origin_prd.id
+LEFT JOIN public.product_images origin_img ON origin_prd.id = origin_img.product_id AND origin_img.representative = true
 JOIN public.categories ct ON coop.category_id = ct.id
 ;
 

@@ -40,12 +40,7 @@ export const getProducts = async (filter: ProductsFilterInput) => {
 export const getProductById = async (productId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { data, error } = await supabase
-    .from('products')
-    .select(productSelectQuery)
-    .eq('id', productId)
-    .eq('active', true)
-    .maybeSingle()
+  const { data, error } = await supabase.from('products').select(productSelectQuery).eq('id', productId).maybeSingle()
 
   if (error) throw error
 
@@ -55,8 +50,19 @@ export const getProductById = async (productId: string) => {
 export const createProduct = async (formData: ProductCreateInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { storeId, categoryId, name, description, price, initialStock, capacity, sellUnit, purchaseUnit, purchaseQty } =
-    formData
+  const {
+    storeId,
+    categoryId,
+    name,
+    description,
+    price,
+    initialStock,
+    capacity,
+    sellUnit,
+    purchaseUnit,
+    purchaseQty,
+    active,
+  } = formData
 
   const { data, error } = await supabase
     .from('products')
@@ -71,7 +77,7 @@ export const createProduct = async (formData: ProductCreateInput) => {
       sell_unit_text: sellUnit,
       purchase_unit: purchaseUnit,
       purchase_qty: purchaseQty,
-      active: true,
+      active,
     })
     .select('*')
     .maybeSingle()

@@ -1,27 +1,32 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import { buildForm } from '$lib/builders/form.builder'
   import PurchaseModal from '$lib/components/modals/admin/PurchaseModal.svelte'
+  import Alert from '$lib/components/ui/Alert.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
-  import { PurchasesFilterSchema } from '$lib/schemas'
+  import { PurchaseStatusChangeSchema, PurchasesFilterSchema } from '$lib/schemas'
   import { PurchaseStatus, type PurchaseEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
   import dayjs from 'dayjs'
-  import { onDestroy, onMount, tick } from 'svelte'
+  import { onDestroy, onMount, setContext, tick } from 'svelte'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
   let { categories, purchaseStatuses } = data
   let purchases: PurchaseEntity[] = $state([])
   let selectedPurchase: PurchaseEntity | null = $state(null)
+  let modalMode: 'create' | 'edit' = $state('create')
+  let alert = $state<{ type: 'success' | 'error'; message: string } | null>(null)
 
   onMount(async () => {
     await tick()
-
     await asyncFilterSubmit()
   })
 
   onDestroy(() => debouncedSubmit?.cancel?.())
+
+  setContext('updatePurchases', async () => await asyncFilterSubmit())
 
   const {
     form: filterForm,
@@ -41,15 +46,52 @@
     },
   })
 
-  const handlePageChange = (page: number) => {
-    $filterForm.page = page
-    asyncFilterSubmit()
+  const { enhance: statusChangeEnhance, submitting: statusChangeSubmitting } = buildForm<
+    typeof PurchaseStatusChangeSchema
+  >({
+    form: data.statusChangeForm,
+    schema: PurchaseStatusChangeSchema,
+    resultHandler: {
+      handleSuccess: async (result) => {
+        await asyncFilterSubmit()
+        alert = {
+          type: 'success',
+          message: result.data?.message || '발주가 취소되었습니다.',
+        }
+      },
+      handleFailure: async (result) => {
+        await asyncFilterSubmit()
+        alert = {
+          type: 'error',
+          message: result.data?.message || '발주 취소 중 오류가 발생했습니다.',
+        }
+      },
+    },
+  })
+
+  const openCreateModal = (purchase: PurchaseEntity) => {
+    modalMode = 'create'
+    selectedPurchase = purchase
+  }
+
+  const openEditModal = (purchase: PurchaseEntity) => {
+    modalMode = 'edit'
+    selectedPurchase = purchase
   }
 </script>
 
 <svelte:head>
   <title>발주관리 - 관리자</title>
 </svelte:head>
+
+{#if alert}
+  <Alert
+    title={alert.type === 'success' ? '성공' : '오류'}
+    type={alert.type}
+    message={alert.message}
+    onClose={() => (alert = null)}
+  />
+{/if}
 
 <div class="min-h-screen bg-gray-100 p-6">
   <!-- Header -->
@@ -138,12 +180,15 @@
           <tr class="border-b border-gray-200 bg-white">
             <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
             <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">상품명</th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">판매 상품명</th
+            >
             <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">발주 상태</th
             >
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">발주 수량</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">단가</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">발주 총액</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">일자</th>
+            <th class="px-3 py-3 text-center text-sm font-semibold text-gray-900">작업</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -155,25 +200,28 @@
               <td class="border-r border-gray-100 px-3 py-2 text-left">
                 <div class="flex items-center gap-2.5">
                   <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
-                    <div class="flex h-full w-full items-center justify-center text-sm">📦</div>
+                    <img
+                      src={purchase.originProductRepresentativeImage}
+                      alt={purchase.originProductName}
+                      class="h-full w-full object-cover"
+                    />
                   </div>
                   <div class="flex flex-1 items-center justify-between gap-3">
-                    <div class="flex flex-col gap-0.5">
-                      <button
-                        type="button"
-                        class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
-                        onclick={() => (selectedPurchase = purchase)}
-                      >
-                        {purchase.originProductName}
-                      </button>
-                      {#if purchase.purchaseId}
-                        <span class="text-xs text-gray-400">{purchase.purchaseId}</span>
-                      {/if}
-                    </div>
-                    <div
-                      class="flex flex-col items-end gap-0.5 text-xs text-gray-500"
-                      class:self-center={!purchase.purchaseId}
+                    <button
+                      type="button"
+                      class="flex flex-col gap-0.5 transition-colors"
+                      onclick={() => (purchase.editable ? openEditModal(purchase) : openCreateModal(purchase))}
                     >
+                      <span
+                        class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium text-gray-900 hover:underline"
+                        >{purchase.originProductName}</span
+                      >
+
+                      {#if purchase.id}
+                        <span class="text-xs text-gray-400">{purchase.id}</span>
+                      {/if}
+                    </button>
+                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500" class:self-center={!purchase.id}>
                       {#if purchase.categoryName}
                         <span class="self-center">{purchase.categoryName}</span>
                       {/if}
@@ -181,55 +229,95 @@
                   </div>
                 </div>
               </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-left">
+                <div class="flex items-center gap-2.5">
+                  <div class="flex flex-1 items-center justify-between gap-3">
+                    <span
+                      class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors"
+                    >
+                      {purchase.coopName}
+                    </span>
+                    <span class="text-xs text-gray-400"
+                      >판매 일자: {dayjs(purchase.salesDate).format('YYYY-MM-DD')}</span
+                    >
+                  </div>
+                </div>
+              </td>
               <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
                 <span
                   class={[
                     'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
-                    purchase.purchaseStatus &&
-                      `text-${purchase.purchaseStatus.code}-800 bg-${purchase.purchaseStatus.code}-100 `,
-                    !purchase.purchaseStatus && 'bg-gray-100 text-gray-800',
+                    purchase.status && `text-${purchase.status.color}-800 bg-${purchase.status.color}-100 `,
+                    !purchase.status && 'bg-gray-100 text-gray-800',
                   ]}
                 >
-                  {purchase.purchaseStatus?.label || '발주 전'}
+                  {purchase.status?.label || '발주 전'}
                 </span>
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
-                {#if !purchase.purchaseStatus}
+                {#if !purchase.status}
                   -
                 {:else}
-                  {purchase.purchaseQuantity}
-                  {purchase.purchaseUnit}
+                  {purchase.quantity}
+                  {purchase.unit}
                 {/if}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
                 {formatCurrency(purchase.originProductPrice)}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
-                {#if !purchase.purchaseStatus}
+                {#if !purchase.status}
                   -
                 {:else}
-                  {formatCurrency(purchase.purchasePrice)}
+                  {formatCurrency(purchase.price)}
                 {/if}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
-                {#if equalsEnum(PurchaseStatus.REQUESTED, purchase.purchaseStatus)}
-                  {purchase.purchaseStatus?.label} 일: {dayjs(purchase.requestedDate).format('YYYY-MM-DD HH:mm')}
-                {:else if equalsEnum(PurchaseStatus.APPROVED, purchase.purchaseStatus)}
-                  {purchase.purchaseStatus?.label} 일: {dayjs(purchase.approvedDate).format('YYYY-MM-DD HH:mm')}
-                {:else if equalsEnum(PurchaseStatus.DELIVERY_STARTED, purchase.purchaseStatus)}
-                  {purchase.purchaseStatus?.label} 일: {dayjs(purchase.shippedDate).format('YYYY-MM-DD HH:mm')}
-                  <!-- {:else if equalsEnum(PurchaseStatus.DELIVERED, purchase.purchaseStatus)}
-                {purchase.purchaseStatus?.label} 일: {dayjs(purchase.deliveredDate).format('YYYY-MM-DD HH:mm')}
-              {/if} -->
-                {:else if equalsEnum(PurchaseStatus.REJECTED, purchase.purchaseStatus)}
-                  {purchase.purchaseStatus?.label} 일: {dayjs(purchase.rejectedDate).format('YYYY-MM-DD HH:mm')}
-                {:else if equalsEnum(PurchaseStatus.CANCELLED, purchase.purchaseStatus)}
-                  {purchase.purchaseStatus?.label} 일: {dayjs(purchase.cancelledDate).format('YYYY-MM-DD HH:mm')}
+                {#if equalsEnum(PurchaseStatus.REQUESTED, purchase.status)}
+                  {purchase.status?.label}: {dayjs(purchase.requestedDate).format('YYYY-MM-DD HH:mm')}
+                {:else if equalsEnum(PurchaseStatus.APPROVED, purchase.status)}
+                  {purchase.status?.label}: {dayjs(purchase.approvedDate).format('YYYY-MM-DD HH:mm')}
+                {:else if equalsEnum(PurchaseStatus.DELIVERY_STARTED, purchase.status)}
+                  {purchase.status?.label}: {dayjs(purchase.shippedDate).format('YYYY-MM-DD HH:mm')}
+                  <!-- {:else if equalsEnum(PurchaseStatus.DELIVERED, purchase.status)}
+                  {purchase.status?.label}: {dayjs(purchase.deliveredDate).format('YYYY-MM-DD HH:mm')} -->
+                {:else if equalsEnum(PurchaseStatus.REJECTED, purchase.status)}
+                  {purchase.status?.label}: {dayjs(purchase.rejectedDate).format('YYYY-MM-DD HH:mm')}
+                {:else if equalsEnum(PurchaseStatus.CANCELLED, purchase.status)}
+                  {purchase.status?.label}: {dayjs(purchase.cancelledDate).format('YYYY-MM-DD HH:mm')}
                 {:else}
                   -
                 {/if}
               </td>
-              <td class="px-4 py-4"></td>
+              <td class="px-3 py-2 text-center">
+                <div class="flex items-center justify-center gap-1">
+                  <!-- 발주 신청/재신청 버튼 -->
+                  {#if !purchase.id || purchase.reRequestable}
+                    <button
+                      type="button"
+                      class="bg-primary-600 hover:bg-primary-700 rounded-full px-3 py-1 text-xs font-medium text-white transition-colors"
+                      onclick={() => openCreateModal(purchase)}
+                    >
+                      {purchase.reRequestable ? '재신청' : '발주 신청'}
+                    </button>
+                  {/if}
+
+                  <!-- 취소 버튼 -->
+                  {#if purchase.cancelable}
+                    <form method="POST" use:statusChangeEnhance>
+                      <input type="hidden" name="id" value={purchase.id} />
+                      <button
+                        class="bg-error-600 hover:bg-error-700 rounded-full px-3 py-1 text-xs font-medium text-white transition-colors"
+                        formaction="?/cancel"
+                        onclick={(e) => !confirm('발주를 취소하시겠습니까?') && e.preventDefault()}
+                        disabled={$statusChangeSubmitting}
+                      >
+                        발주 취소
+                      </button>
+                    </form>
+                  {/if}
+                </div>
+              </td>
             </tr>
           {/each}
         </tbody>
@@ -257,7 +345,7 @@
         <Pagination
           currentPage={pagination.currentPage}
           totalPages={pagination.totalPages}
-          onPageChange={handlePageChange}
+          onPageChange={(page) => ($filterForm.page = page)}
         />
       </div>
     {/if}
@@ -265,5 +353,11 @@
 </div>
 
 {#if selectedPurchase}
-  <PurchaseModal purchase={selectedPurchase} onClose={() => (selectedPurchase = null)} />
+  <PurchaseModal
+    purchase={selectedPurchase}
+    createForm={data.createForm}
+    updateForm={data.updateForm}
+    mode={modalMode}
+    onClose={() => (selectedPurchase = null)}
+  />
 {/if}

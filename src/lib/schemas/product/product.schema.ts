@@ -9,10 +9,9 @@ export const ProductSchema = v.pipe(
     categoryId: v.string(),
     name: v.string(),
     description: v.string(),
-    initialStock: v.number(),
-    price: v.pipe(v.number()),
-    capacity: v.pipe(v.optional(v.string())),
-    sellUnit: v.pipe(v.optional(v.string())),
+    price: v.number(),
+    capacity: v.optional(v.string()),
+    sellUnit: v.optional(v.string()),
     purchaseUnit: v.string(),
     purchaseQty: v.number(),
     images: v.pipe(v.array(ImageSchema), v.minLength(1, '상품 이미지를 최소 1개 이상 등록해주세요.')),
@@ -23,7 +22,7 @@ export const ProductSchema = v.pipe(
 export const ProductCreateSchema = v.pipe(
   v.object({
     ...ProductSchema.entries,
-    initialStock: v.pipe(v.number()),
+    initialStock: v.number(),
   })
 )
 
@@ -44,6 +43,7 @@ export const createInitialProductValues = (storeId: string | undefined) => {
     storeId,
     categoryId: undefined,
     purchaseUnit: undefined,
+    active: true,
     images: [],
   }
 }
@@ -55,7 +55,6 @@ export const productDataToUpdateInput = (product: ProductEntity): ProductUpdateI
     categoryId,
     name,
     description,
-    initialStock,
     price,
     capacity,
     sellUnit,
@@ -71,7 +70,6 @@ export const productDataToUpdateInput = (product: ProductEntity): ProductUpdateI
     categoryId,
     name,
     description,
-    initialStock,
     price,
     capacity,
     sellUnit,
