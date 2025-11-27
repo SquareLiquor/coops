@@ -30,7 +30,7 @@
   >
     <div class="px-4 py-2">
       <div class="relative flex items-center">
-        <House class="text-white" size={20} onclick={() => goto('/coops')} />
+        <House class="text-white" size={24} />
         <!-- <div class="flex items-center">
         <button
           type="button"
@@ -70,6 +70,16 @@
                 style="border-color: #a6adc8;"
               >
                 <div class="py-2">
+                  <button
+                    type="button"
+                    class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
+                    onclick={() => {
+                      showUserMenu = false
+                      goto('/coops')
+                    }}
+                  >
+                    상품 목록
+                  </button>
                   <button
                     type="button"
                     class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
