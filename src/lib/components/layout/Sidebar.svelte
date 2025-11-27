@@ -1,12 +1,13 @@
 <script lang="ts">
   import { page } from '$app/state'
   import { signout } from '$lib/services/auth.service'
-  import { getAuth } from '$lib/stores'
+  import { getAuth, getStore } from '$lib/stores'
 
-  let { menuItems, settingsPath, isCollapsed = $bindable(false), isAutoHidden = $bindable(false) } = $props()
+  let { menuItems, storeType, isCollapsed = $bindable(false), isAutoHidden = $bindable(false) } = $props()
 
   const currentPath = $derived(page.url.pathname)
   const user = $derived(getAuth().user)
+  const store = $derived(getStore())
 
   // 화면 크기 감지하여 자동으로 숨기기/펼치기
   $effect(() => {
@@ -32,10 +33,9 @@
 >
   <!-- 상점명 영역 -->
   <div class="flex h-20 items-center border-b border-gray-200 px-5 py-4">
-    <div>
-      <h1 class="text-lg font-bold text-gray-900">강남점</h1>
-      <p class="text-xs text-gray-500">공동구매 관리</p>
-    </div>
+    <a href="/{storeType}" class="block">
+      <h1 class="text-lg font-bold text-gray-900">{store?.name}</h1>
+    </a>
   </div>
 
   <!-- 메뉴 네비게이션 -->
@@ -60,13 +60,15 @@
   <!-- 하단: 설정 + 사용자 정보 -->
   <div class="border-t border-gray-200 px-3 py-4">
     <!-- 설정 버튼 -->
-    <a
-      href={settingsPath}
+    <!-- <a
+      href="/{storeType}/settings"
       class="mb-3 flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-all
-        {currentPath === settingsPath ? 'bg-gray-200 text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}"
+        {currentPath === `/${storeType}/settings`
+        ? 'bg-gray-200 text-gray-900 shadow-sm'
+        : 'text-gray-500 hover:text-gray-700'}"
     >
       <span>설정</span>
-    </a>
+    </a> -->
 
     <!-- 사용자 정보 -->
     <div class="flex items-center gap-3 rounded-2xl bg-gray-50 p-2.5 transition-all hover:bg-gray-100">

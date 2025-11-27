@@ -131,12 +131,6 @@
 
 <!-- Content -->
 <div class="flex-1 space-y-6 overflow-auto p-6">
-  <!-- Welcome Section -->
-  <div class="from-primary-500 to-primary-600 rounded-xl bg-gradient-to-r p-6 text-white">
-    <h2 class="mb-2 text-2xl font-bold">안녕하세요, 김관리자님!</h2>
-    <p class="text-white">오늘도 좋은 하루 되세요. 강남점의 현황을 확인해보세요.</p>
-  </div>
-
   <!-- Stats Cards -->
   <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
     <div class="border-surface-100 bg-surface-50/10 rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md">

@@ -45,7 +45,7 @@
   <button
     type="button"
     onclick={() => (isCollapsed = !isCollapsed)}
-    class="fixed top-8 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:bg-gray-50
+    class="fixed top-16 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:bg-gray-50
       {isCollapsed ? '-left-4' : 'left-[240px]'}"
     aria-label={isCollapsed ? '메뉴 열기' : '메뉴 닫기'}
   >
@@ -67,7 +67,7 @@
   {/if}
 
   <div class="flex h-full w-full overflow-hidden">
-    <Sidebar menuItems={hqMenuItems} settingsPath="/hq/settings" bind:isCollapsed bind:isAutoHidden />
+    <Sidebar menuItems={hqMenuItems} storeType="hq" bind:isCollapsed bind:isAutoHidden />
 
     <div class="relative flex-1 overflow-hidden transition-all duration-300">
       <main class="h-full overflow-auto rounded-tl-3xl bg-white shadow-xl">
