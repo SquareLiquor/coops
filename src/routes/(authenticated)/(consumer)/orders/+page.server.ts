@@ -1,11 +1,6 @@
-import {
-  cancelOrder,
-  cancelOrderItem,
-  checkCancelable,
-  checkOrderItemCancelable,
-  getOrdersByUserId,
-} from '$lib/database'
+import { cancelOrderItem, checkOrderItemCancelable } from '$lib/database'
 import { ConsumerOrdersFilterSchema as FilterSchema, OrderUpdateSchema } from '$lib/schemas'
+import { cancelOrder, checkCancelable, getOrdersByUserId } from '$lib/services/orders.service'
 import { OrderStatus } from '$lib/types'
 import { fail } from '@sveltejs/kit'
 import { message, superValidate } from 'sveltekit-superforms'

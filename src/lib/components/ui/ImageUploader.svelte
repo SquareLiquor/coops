@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { deleteFile, uploadFile } from '$lib/database'
   import type { ImageInput } from '$lib/schemas'
+  import { deleteFile, uploadFile } from '$lib/services/storages.service'
   import { FileUpload } from '@skeletonlabs/skeleton-svelte'
   import dayjs from 'dayjs'
 

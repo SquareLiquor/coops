@@ -1,5 +1,5 @@
-import { getCategories } from '$lib/database'
 import { getInitialPurchasesFilterValues as getInitialFilter, PurchasesFilterSchema } from '$lib/schemas'
+import { getCategories } from '$lib/services/categories.service'
 import { getPurchasesForStore } from '$lib/services/purchases.service'
 import { PurchaseStatus } from '$lib/types'
 import { superValidate } from 'sveltekit-superforms'

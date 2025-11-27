@@ -2,6 +2,7 @@ import { ApprovalError } from '$lib/errors'
 import { ApprovalStatus } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient, createServerClient } from '../clients'
+import { paginate } from '../utils/pagination.util'
 
 const requestSelectQuery = `
   *,
@@ -15,7 +16,31 @@ export const signout = async () => {
   await supabase.auth.signOut()
 }
 
-export const getApprovalRequests = async () => {}
+export const getApprovalRequests = async (filters: {
+  status?: string
+  storeId?: string
+  dateFrom?: string
+  dateTo?: string
+  page: number
+  pageSize: number
+}) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+  const { status, storeId, dateFrom, dateTo, page, pageSize } = filters
+
+  let query = supabase
+    .from('signup_approval_requests')
+    .select(requestSelectQuery, { count: 'exact' })
+    .not('store_id', 'is', null)
+
+  if (status) query = query.eq('status', status)
+  if (storeId) query = query.eq('store_id', storeId)
+  if (dateFrom) query = query.gte('requested_at', dateFrom)
+  if (dateTo) query = query.lte('requested_at', dateTo)
+
+  const result = await paginate(query.order('created_at', { ascending: false }), { page, pageSize }).execute()
+
+  return result
+}
 
 export const approveRequest = async (id: string, userId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
@@ -65,4 +90,45 @@ export const rejectRequest = async (id: string, userId: string) => {
   }
 
   return { data }
+}
+
+export const createProfile = async (userId: string, payload: any) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  // 프로필이 이미 존재하는지 확인
+  const { data: existing } = await supabase.from('profiles').select('*').eq('id', userId)
+
+  if (!existing || existing.length === 0) {
+    const { error } = await supabase.from('profiles').insert(payload)
+    if (error) throw error
+  }
+}
+
+export const updateUserMetadata = async (userId: string, storeType?: string) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { error } = await supabase.functions.invoke('grant_user_role', {
+    method: 'POST',
+    body: {
+      user_id: userId,
+      user_type: !storeType ? 'consummer' : storeType,
+    },
+  })
+
+  if (error) throw error
+}
+
+export const insertApprovalRequest = async (payload: any) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { data, error } = await supabase.from('signup_approval_requests').insert(payload)
+  if (error) throw error
+
+  return { data }
+}
+
+export const deleteUser = async (userId: string) => {
+  const { supabaseAdmin } = await import('../clients/admin')
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
+  if (error) throw error
 }

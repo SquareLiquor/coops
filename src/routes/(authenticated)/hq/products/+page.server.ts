@@ -1,5 +1,6 @@
-import { getCategories, getProducts } from '$lib/database'
+import { getCategories } from '$lib/database'
 import { ProductsFilterSchema as FilterSchema, getInitialProductsFilterValues as getInitialFilter } from '$lib/schemas'
+import { getProducts } from '$lib/services/products.service'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'

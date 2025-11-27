@@ -168,3 +168,21 @@ export const restoreOrder = async (orderId: string) => {
 
   return { order: data }
 }
+
+export const createOrderItems = async (items: any[]) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { data, error } = await supabase.from('order_items').insert(items)
+
+  if (error) throw error
+
+  return { data }
+}
+
+export const deleteOrder = async (orderId: string) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { error } = await supabase.from('orders').delete().eq('id', orderId)
+
+  if (error) throw error
+}

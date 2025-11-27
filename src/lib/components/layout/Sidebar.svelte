@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
-  import { signout } from '$lib/database'
+  import { signout } from '$lib/services/auth.service'
   import { getAuth } from '$lib/stores'
 
   let { menuItems, settingsPath, isCollapsed = $bindable(false), isAutoHidden = $bindable(false) } = $props()

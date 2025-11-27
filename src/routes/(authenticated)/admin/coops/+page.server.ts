@@ -1,5 +1,6 @@
-import { getCategories, getCoopsByStore } from '$lib/database'
 import { CoopsFilterSchema, getInitialCoopsFilterValues as getInitialFilter } from '$lib/schemas'
+import { getCategories } from '$lib/services/categories.service'
+import { getCoopsByStore } from '$lib/services/coops.service'
 import { SalesStatus } from '$lib/types'
 import { superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'

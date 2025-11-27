@@ -126,3 +126,39 @@ export const updateProductImages = async (productId: string, images: ImageInput[
 
   if (insertError) throw insertError
 }
+
+export const insertProductImages = async (productId: string, images: ImageInput[]) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { data, error } = await supabase.from('product_images').insert(
+    images.map((image, index) => ({
+      product_id: productId,
+      url: image.url,
+      path: image.path,
+      representative: image.representative,
+      sort_order: index,
+    }))
+  )
+
+  if (error) throw error
+
+  return { data }
+}
+
+export const insertProduct = async (productData: any) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { data, error } = await supabase.from('products').insert([productData]).select().maybeSingle()
+
+  if (error) throw error
+
+  return { product: data }
+}
+
+export const deleteProduct = async (productId: string) => {
+  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+
+  const { error } = await supabase.from('products').delete().eq('id', productId)
+
+  if (error) throw error
+}

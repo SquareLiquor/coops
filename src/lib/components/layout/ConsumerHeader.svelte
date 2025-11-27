@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { signout } from '$lib/database'
+  import { signout } from '$lib/services/auth.service'
   import { getAuth, getStore } from '$lib/stores'
   import { House } from '@lucide/svelte'
 

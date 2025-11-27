@@ -1,24 +1,12 @@
-import { createBrowserClient } from '$lib/database/clients/browser'
-import { createServerClient } from '$lib/database/clients/server'
-import { SupabaseError } from '$lib/errors'
 import type { HookContext } from '$lib/services/hooks/hooksManager'
-import { isBrowser } from '@supabase/ssr'
+import { createProductImages as createProductImagesService } from '$lib/services/products.service'
 import type { CreateProductHookContext } from '../createProduct.context'
 
 const createProductImages = async ({ productId, images }: CreateProductHookContext, shared: any) => {
-  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
+  if (!productId || !images || images.length === 0) return
 
-  const { data, error } = await supabase.from('product_images').insert([
-    ...images!.map((image, index) => ({
-      product_id: productId,
-      url: image.url,
-      path: image.path,
-      representative: image.representative,
-      sort_order: index,
-    })),
-  ])
-
-  if (error) throw new SupabaseError('PRODUCT_IMAGE_CREATION_FAILED', { details: { error: error.message } })
+  // service layer에서 모든 비즈니스 로직 처리
+  await createProductImagesService(productId, images)
 
   shared.set('productId', productId)
 }

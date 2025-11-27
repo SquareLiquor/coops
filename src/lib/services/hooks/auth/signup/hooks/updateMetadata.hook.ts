@@ -1,39 +1,13 @@
-import { createServerClient } from '$lib/database'
-import { SignUpError } from '$lib/errors'
+import { updateUserMetadata } from '$lib/services/auth.service'
 import type { HookContext } from '$lib/services/hooks/hooksManager'
 import type { SignupHookContext } from '../signup.context'
 
-/**
- * 사용자 메타데이터 업데이트 (권한 부여)
- *
- * TODO: Edge function에서 직접 업데이트로 변경, 이 부분 변경되면 Edge function 삭제
- */
 const updateAppMetadata = async ({ signupData, userId }: SignupHookContext) => {
-  const { storeId, storeType } = signupData
-  const supabase = createServerClient()
+  if (!userId) return
 
-  if (!userId) {
-    throw new SignUpError('Created user is missing or invalid', {
-      status: 400,
-      code: 'missing_user_error',
-      details: { error: 'createdUser is required for role assignment' },
-    })
-  }
+  const { storeType } = signupData
 
-  const { error } = await supabase.functions.invoke('grant_user_role', {
-    method: 'POST',
-    body: {
-      user_id: userId,
-      user_type: !storeType ? 'consummer' : storeType,
-    },
-  })
-
-  if (error) {
-    throw new SignUpError('Grant Role Error', {
-      status: 400,
-      code: 'grant_role_error',
-    })
-  }
+  await updateUserMetadata(userId, storeType)
 }
 
 export const updateAppMetadataHook: HookContext<SignupHookContext> = {

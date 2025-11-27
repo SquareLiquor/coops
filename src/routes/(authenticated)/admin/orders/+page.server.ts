@@ -1,21 +1,23 @@
 import { toOrderEntities } from '$lib/converters/order.converter'
 import {
-  cancelOrder,
   cancelOrderItem,
-  checkCancelable,
-  checkConfirmable,
   checkOrderItemCancelable,
   checkOrderItemConfirmable,
   checkOrderItemRestorable,
-  checkRestorable,
-  confirmOrder,
   confirmOrderItem,
   getCategories,
-  getOrders,
-  restoreOrder,
   restoreOrderItem,
 } from '$lib/database'
 import { getInitialOrdersFilterValues as getInitialFilter, OrdersFilterSchema, OrderUpdateSchema } from '$lib/schemas'
+import {
+  cancelOrder,
+  checkCancelable,
+  checkConfirmable,
+  checkRestorable,
+  confirmOrder,
+  getOrders,
+  restoreOrder,
+} from '$lib/services/orders.service'
 import { OrderStatus } from '$lib/types'
 import { message, superValidate } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'

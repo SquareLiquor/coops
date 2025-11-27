@@ -1,6 +1,7 @@
-import { getCategories, getProductById, updateProduct, updateProductImages } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { productDataToUpdateInput, ProductUpdateSchema } from '$lib/schemas'
+import { getCategories } from '$lib/services/categories.service'
+import { getProductById, updateProduct, updateProductImages } from '$lib/services/products.service'
 import { UnitType } from '$lib/types'
 import { error, fail } from '@sveltejs/kit'
 import { setError, superValidate } from 'sveltekit-superforms'

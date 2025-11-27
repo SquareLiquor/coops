@@ -5,8 +5,8 @@
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { coopDataToCartItemData } from '$lib/converters/coop.converter'
-  import { getCategories } from '$lib/database'
   import { ConsumerCoopsFilterSchema, convertCartDataToOrderInput } from '$lib/schemas'
+  import { getCategories } from '$lib/services/categories.service'
   import {
     addToCart,
     clearCart,

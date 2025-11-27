@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import Alert from '$lib/components/ui/Alert.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
   import { ApprovalsFilterSchema } from '$lib/schemas'
   import { ApprovalStatus, type ApprovalRequestEntity } from '$lib/types'
@@ -15,6 +16,7 @@
   let { statuses, stores } = $derived(data)
   let requests: ApprovalRequestEntity[] = $state([])
   let isRowLoading: string[] = $state([])
+  let alert: { type: 'info' | 'error' | 'warning' | 'success'; title: string; message: string } | null = $state(null)
 
   onMount(async () => {
     await tick()
@@ -59,6 +61,16 @@
 
         const idx = requests.findIndex((req) => req.id === updatedRequest.id)
         if (idx !== -1) requests[idx] = updatedRequest
+
+        // Alert 메시지 표시
+        if (result?.data?.alert) {
+          alert = result.data.alert
+        }
+      } else if (result?.type === 'failure') {
+        // 에러 Alert 메시지 표시
+        if (result?.data?.alert) {
+          alert = result.data.alert
+        }
       }
     }
   }
@@ -67,6 +79,10 @@
 <svelte:head>
   <title>사용자 관리 - 본사</title>
 </svelte:head>
+
+{#if alert}
+  <Alert type={alert.type} title={alert.title} message={alert.message} onClose={() => (alert = null)} />
+{/if}
 
 <div class="min-h-screen bg-gray-100 p-6">
   <!-- Header -->

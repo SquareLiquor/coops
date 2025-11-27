@@ -1,6 +1,7 @@
-import { createCoop, getCategories } from '$lib/database'
 import { isAppError } from '$lib/errors'
 import { CoopCreateSchema, getInitialCoopValues } from '$lib/schemas'
+import { getCategories } from '$lib/services/categories.service'
+import { createCoop } from '$lib/services/coops.service'
 import { createCoopHook } from '$lib/services/hooks'
 import { SalesStatus, UnitType } from '$lib/types'
 import { fail, type Actions } from '@sveltejs/kit'
