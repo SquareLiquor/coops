@@ -14,7 +14,7 @@ import type { Actions, PageServerLoad } from './$types'
 export const load: PageServerLoad = async () => {
   const filterForm = await superValidate({}, valibot(FilterSchema))
 
-  const { stores } = await getStores()
+  const { stores } = await getStores({})
   const statuses = [{ code: undefined, label: '전체' }, ...Object.values(ApprovalStatus)]
 
   return {

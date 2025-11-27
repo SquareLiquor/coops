@@ -1,6 +1,8 @@
-import { toStoreMemberEntity } from '$lib/converters/store.converter'
+import { toStoreEntities, toStoreMemberEntity } from '$lib/converters/store.converter'
+import type { StoresFilterInput } from '$lib/schemas'
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient, createServerClient } from '../clients'
+import { paginate } from '../utils/pagination.util'
 
 const storeSelectQuery = `
   *,
@@ -8,18 +10,24 @@ const storeSelectQuery = `
   profile:user_id(*)
 `
 
-export const getStores = async () => {
+export const getStores = async (filter: StoresFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { data, error } = await supabase
-    .from('stores_public')
-    .select('*')
-    .order('type', { ascending: true })
-    .order('name', { ascending: true })
+  const { search, type, page, pageSize } = filter
 
-  if (error) throw error
+  let query = supabase.from('stores').select('*', { count: 'exact' })
 
-  return { stores: data || [] }
+  if (search) query = query.or(`name.ilike.%${search}%,address.ilike.%${search}%,phone.ilike.%${search}%`)
+  if (type && type !== 'all') query = query.eq('type', type)
+
+  query = query.order('type', { ascending: true }).order('name', { ascending: true })
+
+  const result = await paginate(query, { page, pageSize }).execute()
+
+  return {
+    stores: toStoreEntities(result.data),
+    pagination: result.pagination,
+  }
 }
 
 export const getStoreById = async (id: string) => {

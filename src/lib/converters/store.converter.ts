@@ -17,6 +17,7 @@ export const toStoreEntity = (data: any): StoreEntity | undefined => {
     phone,
     owner_id,
     owner,
+    active,
     created_at,
     updated_at,
   } = data
@@ -33,6 +34,7 @@ export const toStoreEntity = (data: any): StoreEntity | undefined => {
     phone,
     ownerId: owner_id,
     owner: toProfileEntity(owner),
+    active,
     createdAt: dayjs(created_at).format('YYYY-MM-DD HH:mm:ss'),
     updatedAt: dayjs(updated_at).format('YYYY-MM-DD HH:mm:ss'),
   }

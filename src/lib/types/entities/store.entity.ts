@@ -16,6 +16,7 @@ export interface StoreEntity {
   phone?: string
   ownerId?: string
   owner?: ProfileEntity
+  active: boolean
   createdAt?: string
   updatedAt?: string
 }

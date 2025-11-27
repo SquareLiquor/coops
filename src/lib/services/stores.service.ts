@@ -1,10 +1,11 @@
 import * as storesRepository from '$lib/database/repositories/stores.repository'
+import type { StoresFilterInput } from '$lib/schemas'
 
 /**
  * 매장 목록 조회
  */
-export const getStores = async () => {
-  return await storesRepository.getStores()
+export const getStores = async (filter: StoresFilterInput) => {
+  return await storesRepository.getStores(filter)
 }
 
 /**
