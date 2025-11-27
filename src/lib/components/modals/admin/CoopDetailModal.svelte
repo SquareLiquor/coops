@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import Alert from '$lib/components/ui/Alert.svelte'
   import Carousel from '$lib/components/ui/Carousel.svelte'
   import type { CoopEntity } from '$lib/types'
   import { formatNumberWithCommas } from '$lib/utils'
@@ -11,10 +12,15 @@
   let isBasicInfoOpen = $state(false)
   let isSalesInfoOpen = $state(false)
   let isProductInfoOpen = $state(false)
+  let showAlert = $state(false)
 
   function handleEdit() {
     goto(`/admin/coops/${coop?.id}`)
     onClose()
+  }
+
+  function showDeleteConfirm() {
+    showAlert = true
   }
 </script>
 
@@ -229,18 +235,47 @@
     <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
       <button
         type="button"
-        class="rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none"
+        class="rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none"
         onclick={onClose}
       >
         닫기
       </button>
-      <button
-        type="button"
-        class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-1.5 text-xs font-medium text-white transition-colors focus:outline-none"
-        onclick={handleEdit}
-      >
-        편집
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="rounded-full bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
+          onclick={showDeleteConfirm}
+        >
+          삭제 테스트
+        </button>
+        <button
+          type="button"
+          class="bg-primary-600 hover:bg-primary-700 rounded-full px-5 py-2 text-xs font-medium text-white transition-colors focus:outline-none"
+          onclick={handleEdit}
+        >
+          편집
+        </button>
+      </div>
     </div>
   </section>
 </div>
+
+{#if showAlert}
+  <Alert
+    type="error"
+    mode="confirm"
+    title="상품 삭제"
+    message="정말로 이 상품을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다."
+    confirmText="삭제"
+    cancelText="취소"
+    onConfirm={() => {
+      console.log('상품 삭제 확인')
+      showAlert = false
+    }}
+    onCancel={() => {
+      console.log('삭제 취소')
+      showAlert = false
+    }}
+    onClose={() => (showAlert = false)}
+  />
+{/if}

@@ -45,10 +45,10 @@
   }
 </script>
 
-<div class="flex max-w-md items-start gap-2">
+<div class="grid grid-cols-2 gap-4">
   {#if items.length > 0}
     <Combobox
-      class="flex-1"
+      class="combobox-custom"
       {placeholder}
       {disabled}
       {collection}
@@ -78,9 +78,9 @@
   {/if}
 
   {#if allowNewItem}
-    <div class="input-group flex-1 grid-cols-[1fr_auto] flex-row items-stretch gap-1">
+    <div class="relative">
       <input
-        class="ig-input placeholder-surface-200 w-full"
+        class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 pr-12 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
         type="text"
         placeholder="카테고리 추가"
         bind:value={newItem}
@@ -88,7 +88,7 @@
         onkeydown={(e) => e.key === 'Enter' && _handleAddNewItem(e)}
       />
       <button
-        class="ig-btn preset-filled"
+        class="bg-primary-600 hover:bg-primary-700 absolute top-1/2 right-1 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
         onclick={_handleAddNewItem}
         disabled={!addableNewItem || disabled}
         type="button"
@@ -96,18 +96,110 @@
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
+          width="14"
+          height="14"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="lucide lucide-check"
+          class="lucide lucide-check text-white"
           aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg
         >
       </button>
     </div>
   {/if}
 </div>
+
+<style lang="postcss">
+  :global(.combobox-custom [data-part='control']) {
+    height: 2.5rem !important;
+    width: 100% !important;
+    border-radius: 9999px !important;
+    border: 1px solid rgb(209 213 219) !important;
+    background-color: white !important;
+    padding-left: 1rem !important;
+    padding-right: 2.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+  }
+
+  :global(.combobox-custom [data-part='control'] > *) {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  :global(.combobox-custom [data-part='control']:focus-within) {
+    border-color: rgb(var(--color-primary-500)) !important;
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-200), 0.5) !important;
+    outline: none !important;
+  }
+
+  :global(.combobox-custom [data-part='input']) {
+    width: 100% !important;
+    background-color: transparent !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    outline: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  :global(.combobox-custom [data-part='input']::placeholder) {
+    color: rgb(156 163 175) !important;
+  }
+
+  :global(.combobox-custom [data-part='trigger']) {
+    display: flex !important;
+    height: 100% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-left: 0.5rem !important;
+    flex-shrink: 0 !important;
+    color: rgb(107 114 128) !important;
+    transition: color 0.2s ease !important;
+  }
+
+  :global(.combobox-custom [data-part='trigger']:hover) {
+    color: rgb(31 41 55) !important;
+  }
+
+  :global(.combobox-custom[data-disabled] [data-part='control']) {
+    background-color: rgb(249 250 251) !important;
+    color: rgb(107 114 128) !important;
+  }
+
+  :global(.combobox-custom [data-part='content']) {
+    margin-top: 0.25rem !important;
+    max-height: 15rem !important;
+    overflow: auto !important;
+    border-radius: 1rem !important;
+    border: 1px solid rgb(229 231 235) !important;
+    background-color: white !important;
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  }
+
+  :global(.combobox-custom [data-part='item']) {
+    cursor: pointer !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    transition: background-color 0.15s ease !important;
+  }
+
+  :global(.combobox-custom [data-part='item']:hover) {
+    background-color: rgb(243 244 246) !important;
+  }
+
+  :global(.combobox-custom [data-part='item'][data-highlighted]) {
+    background-color: rgb(var(--color-primary-50)) !important;
+    color: rgb(var(--color-primary-900)) !important;
+  }
+</style>

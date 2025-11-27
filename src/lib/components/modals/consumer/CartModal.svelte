@@ -86,7 +86,7 @@
             </div>
             <button
               type="submit"
-              class="bg-primary-500 hover:bg-primary-600 ml-6 rounded px-6 py-2 text-sm font-semibold text-white transition-colors"
+              class="bg-primary-600 hover:bg-primary-700 ml-6 rounded-full px-6 py-2 text-sm font-semibold text-white transition-colors"
             >
               주문하기
             </button>

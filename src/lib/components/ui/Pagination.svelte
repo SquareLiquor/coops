@@ -1,58 +1,109 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
+  import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from '@lucide/svelte'
 
-  export let current = 1
-  export let total = 1
-  export let maxPages = 5
-  const dispatch = createEventDispatcher()
+  let {
+    currentPage = 1,
+    totalPages = 1,
+    onPageChange,
+  }: {
+    currentPage: number
+    totalPages: number
+    onPageChange: (page: number) => void
+  } = $props()
 
-  function go(page: number) {
-    if (page < 1) page = 1
-    if (page > total) page = total
-    dispatch('navigate', page)
+  function goToPage(page: number) {
+    if (page < 1 || page > totalPages) return
+    onPageChange(page)
   }
 
-  $: pages = (() => {
-    const arr: number[] = []
-    const half = Math.floor(maxPages / 2)
-    let start = Math.max(1, current - half)
-    let end = Math.min(total, start + maxPages - 1)
-    start = Math.max(1, end - maxPages + 1)
-    for (let i = start; i <= end; i++) arr.push(i)
-    return { arr, start, end }
-  })()
+  // 표시할 페이지 번호 계산
+  const pageNumbers = $derived(() => {
+    const delta = 2 // 현재 페이지 양옆으로 보여줄 페이지 수
+    const range: number[] = []
+    const rangeWithDots: (number | string)[] = []
+
+    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+      range.push(i)
+    }
+
+    if (currentPage - delta > 2) {
+      rangeWithDots.push(1, '...')
+    } else {
+      rangeWithDots.push(1)
+    }
+
+    rangeWithDots.push(...range)
+
+    if (currentPage + delta < totalPages - 1) {
+      rangeWithDots.push('...', totalPages)
+    } else if (totalPages > 1) {
+      rangeWithDots.push(totalPages)
+    }
+
+    return rangeWithDots
+  })
 </script>
 
-<nav class="flex items-center justify-center gap-2 py-4">
-  <button class="bg-surface-100 rounded px-2 py-1" on:click={() => go(1)} aria-label="첫 페이지">제일 앞</button>
-  <button class="bg-surface-100 rounded px-2 py-1" on:click={() => go(current - 1)} aria-label="이전">앞</button>
-
-  {#if pages.start > 1}
-    <button class="rounded px-2 py-1" on:click={() => go(1)}>1</button>
-    <span class="px-1">…</span>
-  {/if}
-
-  {#each pages.arr as p}
+{#if totalPages > 1}
+  <div class="flex items-center justify-center gap-1">
+    <!-- 처음으로 -->
     <button
-      class={`rounded px-3 py-1 ${p === current ? 'bg-primary-500 text-white' : 'bg-surface-100'}`}
-      on:click={() => go(p)}
-      aria-current={p === current ? 'page' : undefined}
+      type="button"
+      onclick={() => goToPage(1)}
+      disabled={currentPage === 1}
+      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      aria-label="첫 페이지"
     >
-      {p}
+      <ChevronsLeft class="h-4 w-4" />
     </button>
-  {/each}
 
-  {#if pages.end < total}
-    <span class="px-1">…</span>
-    <button class="rounded px-2 py-1" on:click={() => go(total)}>{total}</button>
-  {/if}
+    <!-- 이전 -->
+    <button
+      type="button"
+      onclick={() => goToPage(currentPage - 1)}
+      disabled={currentPage === 1}
+      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      aria-label="이전 페이지"
+    >
+      <ChevronLeft class="h-4 w-4" />
+    </button>
 
-  <button class="bg-surface-100 rounded px-2 py-1" on:click={() => go(current + 1)} aria-label="다음">뒤</button>
-  <button class="bg-surface-100 rounded px-2 py-1" on:click={() => go(total)} aria-label="마지막">제일 뒤</button>
-</nav>
+    <!-- 페이지 번호들 -->
+    {#each pageNumbers() as pageNum}
+      {#if pageNum === '...'}
+        <span class="flex h-8 w-8 items-center justify-center text-sm text-gray-400">...</span>
+      {:else}
+        <button
+          type="button"
+          onclick={() => goToPage(pageNum as number)}
+          class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors
+            {currentPage === pageNum ? 'bg-white text-black' : 'text-gray-700 hover:bg-gray-100'}"
+        >
+          {pageNum}
+        </button>
+      {/if}
+    {/each}
 
-<style>
-  nav button {
-    border: 1px solid rgba(0, 0, 0, 0.04);
-  }
-</style>
+    <!-- 다음 -->
+    <button
+      type="button"
+      onclick={() => goToPage(currentPage + 1)}
+      disabled={currentPage === totalPages}
+      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      aria-label="다음 페이지"
+    >
+      <ChevronRight class="h-4 w-4" />
+    </button>
+
+    <!-- 마지막으로 -->
+    <button
+      type="button"
+      onclick={() => goToPage(totalPages)}
+      disabled={currentPage === totalPages}
+      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      aria-label="마지막 페이지"
+    >
+      <ChevronsRight class="h-4 w-4" />
+    </button>
+  </div>
+{/if}

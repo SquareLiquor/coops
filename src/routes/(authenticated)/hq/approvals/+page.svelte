@@ -163,9 +163,11 @@
               <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
                 {index + 1}
               </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-center">
-                <div class="text-xs font-medium text-gray-900">{request.applicant?.name}</div>
-                <div class="text-xs text-gray-500">{request.applicant?.email}</div>
+              <td class="border-r border-gray-100 px-3 py-2">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-xs font-medium text-gray-900">{request.applicant?.name}</div>
+                  <div class="text-xs text-gray-500">{request.applicant?.email}</div>
+                </div>
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
                 {request.store?.name}

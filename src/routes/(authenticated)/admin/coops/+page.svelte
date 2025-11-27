@@ -1,6 +1,8 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
   import CoopDetailModal from '$lib/components/modals/admin/CoopDetailModal.svelte'
+  import Alert from '$lib/components/ui/Alert.svelte'
+  import Pagination from '$lib/components/ui/Pagination.svelte'
   import { CoopsFilterSchema } from '$lib/schemas'
   import type { CoopEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
@@ -12,6 +14,66 @@
   let { categories, salesStatuses } = data
   let coops: CoopEntity[] = $state([])
   let selectedCoopId: string | null = $state(null)
+
+  // 페이지네이션 상태
+  let currentPage = $state(1)
+  let totalPages = $state(10) // 테스트용 총 페이지 수
+  const itemsPerPage = 10
+
+  function handlePageChange(page: number) {
+    currentPage = page
+    console.log('페이지 변경:', page)
+    // TODO: 여기서 페이지에 맞는 데이터를 불러오는 로직 추가
+  }
+
+  // Alert 상태 관리
+  let showAlert = $state(false)
+  let alertConfig = $state({
+    type: 'info' as 'info' | 'error' | 'warning' | 'success',
+    mode: 'alert' as 'alert' | 'confirm',
+    title: '',
+    message: '',
+  })
+
+  function showInfoAlert() {
+    alertConfig = {
+      type: 'info',
+      mode: 'alert',
+      title: '정보',
+      message: '이것은 정보 알림입니다.',
+    }
+    showAlert = true
+  }
+
+  function showErrorAlert() {
+    alertConfig = {
+      type: 'error',
+      mode: 'alert',
+      title: '오류',
+      message: '오류가 발생했습니다.',
+    }
+    showAlert = true
+  }
+
+  function showWarningConfirm() {
+    alertConfig = {
+      type: 'warning',
+      mode: 'confirm',
+      title: '경고',
+      message: '이 작업을 계속하시겠습니까?',
+    }
+    showAlert = true
+  }
+
+  function showSuccessAlert() {
+    alertConfig = {
+      type: 'success',
+      mode: 'alert',
+      title: '성공',
+      message: '작업이 성공적으로 완료되었습니다.',
+    }
+    showAlert = true
+  }
 
   onMount(async () => {
     await tick()
@@ -58,15 +120,46 @@
   <!-- Header -->
   <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-bold text-gray-900">판매 상품 관리</h1>
-    <a
-      href="/admin/coops/create"
-      class="bg-primary-600 hover:bg-primary-700 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
-    >
-      <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      새 상품 등록
-    </a>
+    <div class="flex items-center gap-2">
+      <!-- Alert 테스트 버튼들 -->
+      <button
+        type="button"
+        onclick={showInfoAlert}
+        class="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+      >
+        Info
+      </button>
+      <button
+        type="button"
+        onclick={showErrorAlert}
+        class="rounded-full bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
+      >
+        Error
+      </button>
+      <button
+        type="button"
+        onclick={showWarningConfirm}
+        class="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-orange-700"
+      >
+        Warning
+      </button>
+      <button
+        type="button"
+        onclick={showSuccessAlert}
+        class="rounded-full bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-green-700"
+      >
+        Success
+      </button>
+      <a
+        href="/admin/coops/create"
+        class="bg-primary-600 hover:bg-primary-700 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
+      >
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        새 상품 등록
+      </a>
+    </div>
   </div>
 
   <div class="relative">
@@ -195,14 +288,19 @@
                     {/if}
                   </div>
                   <div class="flex flex-1 items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
-                      onclick={() => (selectedCoopId = coop.id)}
-                    >
-                      {coop.name}
-                    </button>
-                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500">
+                    <div class="flex flex-col gap-0.5">
+                      <button
+                        type="button"
+                        class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
+                        onclick={() => (selectedCoopId = coop.id)}
+                      >
+                        {coop.name}
+                      </button>
+                      {#if coop.id}
+                        <span class="text-xs text-gray-400">{coop.id}</span>
+                      {/if}
+                    </div>
+                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500" class:self-center={!coop.id}>
                       {#if coop.category?.name || coop.product?.capacity || coop.product?.sellUnit}
                         <span class={!coop.product?.capacity && !coop.product?.sellUnit ? 'self-center' : ''}>
                           {coop.category?.name || ''}
@@ -303,9 +401,34 @@
         </tbody>
       </table>
     </div>
+
+    <!-- 페이지네이션 -->
+    {#if coops.length > 0}
+      <div class="mt-6">
+        <Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
+      </div>
+    {/if}
   </div>
 </div>
 
 {#if selectedCoopId}
   <CoopDetailModal coop={coops.find((c) => c.id === selectedCoopId) || null} onClose={() => (selectedCoopId = null)} />
+{/if}
+
+{#if showAlert}
+  <Alert
+    type={alertConfig.type}
+    mode={alertConfig.mode}
+    title={alertConfig.title}
+    message={alertConfig.message}
+    onConfirm={() => {
+      console.log('확인 클릭')
+      showAlert = false
+    }}
+    onCancel={() => {
+      console.log('취소 클릭')
+      showAlert = false
+    }}
+    onClose={() => (showAlert = false)}
+  />
 {/if}

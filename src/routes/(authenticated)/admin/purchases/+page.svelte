@@ -129,10 +129,9 @@
         <thead>
           <tr class="border-b border-gray-200 bg-white">
             <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">상품명</th>
             <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">발주 상태</th
             >
-            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">카테고리</th>
-            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">상품명</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">발주 수량</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">단가</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">발주 총액</th>
@@ -145,6 +144,35 @@
               <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
                 {index + 1}
               </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-left">
+                <div class="flex items-center gap-2.5">
+                  <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
+                    <div class="flex h-full w-full items-center justify-center text-sm">📦</div>
+                  </div>
+                  <div class="flex flex-1 items-center justify-between gap-3">
+                    <div class="flex flex-col gap-0.5">
+                      <button
+                        type="button"
+                        class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
+                        onclick={() => (selectedPurchase = purchase)}
+                      >
+                        {purchase.originProductName}
+                      </button>
+                      {#if purchase.purchaseId}
+                        <span class="text-xs text-gray-400">{purchase.purchaseId}</span>
+                      {/if}
+                    </div>
+                    <div
+                      class="flex flex-col items-end gap-0.5 text-xs text-gray-500"
+                      class:self-center={!purchase.purchaseId}
+                    >
+                      {#if purchase.categoryName}
+                        <span class="self-center">{purchase.categoryName}</span>
+                      {/if}
+                    </div>
+                  </div>
+                </div>
+              </td>
               <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
                 <span
                   class={[
@@ -156,30 +184,6 @@
                 >
                   {purchase.purchaseStatus?.label || '발주 전'}
                 </span>
-              </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600"
-                >{purchase.categoryName}</td
-              >
-              <td class="border-r border-gray-100 px-3 py-2 text-left">
-                <div class="flex items-center gap-2.5">
-                  <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
-                    <div class="flex h-full w-full items-center justify-center text-sm">📦</div>
-                  </div>
-                  <div class="flex flex-1 items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
-                      onclick={() => (selectedPurchase = purchase)}
-                    >
-                      {purchase.originProductName}
-                    </button>
-                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500">
-                      {#if purchase.categoryName}
-                        <span class="self-center">{purchase.categoryName}</span>
-                      {/if}
-                    </div>
-                  </div>
-                </div>
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600">
                 {#if !purchase.purchaseStatus}

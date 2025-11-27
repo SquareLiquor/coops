@@ -136,14 +136,15 @@
   {maxFiles}
 >
   <FileUpload.Dropzone>
-    <span>Select file or drag here.</span>
-    <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
+    <FileUpload.Trigger class="bg-primary-600 hover:bg-primary-700 rounded-full text-white"
+      >파일 선택</FileUpload.Trigger
+    >
     <FileUpload.HiddenInput />
   </FileUpload.Dropzone>
 </FileUpload>
 
 {#if images.length > 0}
-  <div class="mt-4 grid grid-cols-5 gap-4">
+  <div class="mt-4 grid grid-cols-5 gap-4 lg:grid-cols-2">
     {#each images as image, index}
       <div class="group relative">
         <div class="aspect-square w-full overflow-hidden rounded-lg border bg-gray-50">

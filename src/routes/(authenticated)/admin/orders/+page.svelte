@@ -151,13 +151,10 @@
         <thead>
           <tr class="border-b border-gray-200 bg-white">
             <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
-            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">
-              주문 번호
-            </th>
+            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900"> 상품명 </th>
             <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">
               주문 상태
             </th>
-            <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900"> 상품명 </th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">
               주문 금액
             </th>
@@ -175,18 +172,6 @@
                 {index + 1}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-left">
-                <span class="block max-w-[120px] truncate text-xs text-gray-600" title={order.id}>
-                  {order.id}
-                </span>
-              </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
-                <span
-                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium text-${order.status?.color}-800 bg-${order.status?.color}-100`}
-                >
-                  {order.status?.label}
-                </span>
-              </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-left">
                 <div class="flex items-center gap-2.5">
                   <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
                     {#if order.items[0]?.coop.images && order.items[0].coop.images.length > 0}
@@ -201,17 +186,22 @@
                     {/if}
                   </div>
                   <div class="flex flex-1 items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
-                      onclick={() => (selectedOrder = order)}
-                    >
-                      {order.items[0]?.coop.name}
-                      {#if order.items.length && order.items.length > 1}
-                        외 {order.items.length - 1}건
+                    <div class="flex flex-col gap-0.5">
+                      <button
+                        type="button"
+                        class="text-primary-600 hover:text-primary-700 text-left text-sm font-medium transition-colors hover:underline"
+                        onclick={() => (selectedOrder = order)}
+                      >
+                        {order.items[0]?.coop.name}
+                        {#if order.items.length && order.items.length > 1}
+                          외 {order.items.length - 1}건
+                        {/if}
+                      </button>
+                      {#if order.id}
+                        <span class="text-xs text-gray-400">{order.id}</span>
                       {/if}
-                    </button>
-                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500">
+                    </div>
+                    <div class="flex flex-col items-end gap-0.5 text-xs text-gray-500" class:self-center={!order.id}>
                       {#if order.items[0]?.coop.category?.name || order.items[0]?.coop.product?.capacity || order.items[0]?.coop.product?.sellUnit}
                         <span
                           class={!order.items[0]?.coop.product?.capacity && !order.items[0]?.coop.product?.sellUnit
@@ -237,6 +227,13 @@
                     </div>
                   </div>
                 </div>
+              </td>
+              <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
+                <span
+                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium text-${order.status?.color}-800 bg-${order.status?.color}-100`}
+                >
+                  {order.status?.label}
+                </span>
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-right text-xs whitespace-nowrap text-gray-600"
                 >{formatCurrency(order.totalPrice)}</td

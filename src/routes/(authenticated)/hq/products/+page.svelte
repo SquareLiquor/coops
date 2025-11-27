@@ -142,7 +142,6 @@
         <thead>
           <tr class="border-b border-gray-200 bg-white">
             <th class="w-10 border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900"> # </th>
-            <th class="border-r border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-900">카테고리</th>
             <th class="border-r border-gray-200 px-3 py-3 text-left text-sm font-semibold text-gray-900">상품명</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">가격</th>
             <th class="border-r border-gray-200 px-3 py-3 text-right text-sm font-semibold text-gray-900">재고</th>
@@ -155,9 +154,6 @@
             <tr class="border-b border-gray-100 transition-colors hover:bg-gray-50">
               <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
                 {index + 1}
-              </td>
-              <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
-                {product.category?.name}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-left">
                 <div class="flex items-center gap-2.5">

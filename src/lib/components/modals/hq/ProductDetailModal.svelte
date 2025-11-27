@@ -161,14 +161,14 @@
     <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
       <button
         type="button"
-        class="rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none"
+        class="rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none"
         onclick={onClose}
       >
         닫기
       </button>
       <button
         type="button"
-        class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-1.5 text-xs font-medium text-white transition-colors focus:outline-none"
+        class="bg-primary-600 hover:bg-primary-700 rounded-full px-5 py-2 text-xs font-medium text-white transition-colors focus:outline-none"
         onclick={handleEdit}
       >
         편집

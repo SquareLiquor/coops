@@ -118,7 +118,7 @@
               <!-- 선택 버튼 -->
               <button
                 type="button"
-                class="bg-primary-600 hover:bg-primary-700 rounded px-3 py-1.5 text-xs font-medium text-white transition-colors focus:outline-none"
+                class="bg-primary-600 hover:bg-primary-700 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors focus:outline-none"
                 onclick={() => _handleSelect(index)}
               >
                 선택
