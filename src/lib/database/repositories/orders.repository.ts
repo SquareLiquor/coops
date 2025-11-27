@@ -4,6 +4,7 @@ import { OrderStatus } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
 import dayjs from 'dayjs'
 import { createBrowserClient, createServerClient } from '../clients'
+import { paginate } from '../utils/pagination.util'
 
 const ordersSelectQuery = `
   *,
@@ -14,20 +15,23 @@ const ordersSelectQuery = `
 // TODO: order view를 조회
 export const getOrders = async (filter: OrdersFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
-  const { storeId, name, categoryId, status, dateFrom, dateTo } = filter
+  const { storeId, name, categoryId, status, dateFrom, dateTo, page, pageSize } = filter
 
-  const query = supabase.from('orders').select(ordersSelectQuery)
+  let query = supabase.from('orders').select(ordersSelectQuery, { count: 'exact' })
 
-  if (storeId) query.eq('store_id', storeId)
-  if (name) query.ilike('user_name', `%${name}%`)
-  if (categoryId) query.eq('category_id', categoryId)
-  if (status) query.eq('status', status)
-  if (dateFrom) query.gte('created_at', dayjs(dateFrom).startOf('day').toISOString())
-  if (dateTo) query.lte('created_at', dayjs(dateTo).endOf('day').toISOString())
+  if (storeId) query = query.eq('store_id', storeId)
+  if (name) query = query.ilike('user_name', `%${name}%`)
+  if (categoryId) query = query.eq('category_id', categoryId)
+  if (status) query = query.eq('status', status)
+  if (dateFrom) query = query.gte('created_at', dayjs(dateFrom).startOf('day').toISOString())
+  if (dateTo) query = query.lte('created_at', dayjs(dateTo).endOf('day').toISOString())
 
-  const { data, error } = await query.order('created_at', { ascending: false })
+  const result = await paginate(query.order('created_at', { ascending: false }), { page, pageSize }).execute()
 
-  return { orders: data }
+  return {
+    orders: result.data,
+    pagination: result.pagination,
+  }
 }
 
 export const getOrdersByUserId = async (filter: ConsumerOrdersFilterInput) => {

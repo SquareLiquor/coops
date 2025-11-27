@@ -2,6 +2,7 @@ import type { PurchasesFilterInput } from '$lib/schemas'
 import { isBrowser } from '@supabase/ssr'
 import dayjs from 'dayjs'
 import { createBrowserClient, createServerClient } from '../clients'
+import { paginate } from '../utils/pagination.util'
 
 const purchasesSelectQuery = `
   *,
@@ -15,19 +16,22 @@ const purchasesSelectQuery = `
 export const getPurchasesForStore = async (filter: PurchasesFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { storeId, categoryId, status, dateFrom, dateTo } = filter
+  const { storeId, categoryId, status, dateFrom, dateTo, page, pageSize } = filter
 
-  const query = supabase.from('store_purchase_view').select('*')
+  let query = supabase.from('store_purchase_view').select('*', { count: 'exact' })
 
-  if (storeId) query.eq('store_id', storeId)
-  if (categoryId) query.eq('category_id', categoryId)
-  if (status) query.eq('status', status)
-  if (dateFrom) query.gte('requested_date', dayjs(dateFrom).startOf('day').toISOString())
-  if (dateTo) query.lte('requested_date', dayjs(dateTo).endOf('day').toISOString())
+  if (storeId) query = query.eq('store_id', storeId)
+  if (categoryId) query = query.eq('category_id', categoryId)
+  if (status) query = query.eq('status', status)
+  if (dateFrom) query = query.gte('requested_date', dayjs(dateFrom).startOf('day').toISOString())
+  if (dateTo) query = query.lte('requested_date', dayjs(dateTo).endOf('day').toISOString())
 
-  const { data, error } = await query.order('requested_date', { ascending: false })
+  const result = await paginate(query.order('requested_date', { ascending: false }), { page, pageSize }).execute()
 
-  return { purchases: data }
+  return {
+    purchases: result.data,
+    pagination: result.pagination,
+  }
 }
 
 export const getPurchasesForHQ = async () => {}

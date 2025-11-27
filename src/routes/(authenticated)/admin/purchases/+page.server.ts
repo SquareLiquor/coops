@@ -28,12 +28,10 @@ export const actions: Actions = {
     if (!form.valid) return { form }
 
     try {
-      const { purchases } = await getPurchasesForStore(form.data)
+      const { purchases, pagination } = await getPurchasesForStore(form.data)
 
-      console.log(purchases)
-      return { form, purchases }
+      return { form, purchases, pagination }
     } catch (error) {
-      console.log(error)
       return { form }
     }
   },

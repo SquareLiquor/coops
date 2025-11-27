@@ -8,6 +8,7 @@ import {
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient } from '../clients/browser'
 import { createServerClient } from '../clients/server'
+import { paginate } from '../utils/pagination.util'
 
 const productSelectQuery = `
   *,
@@ -18,23 +19,22 @@ const productSelectQuery = `
 export const getProducts = async (filter: ProductsFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { storeId, categoryId, productName, status, dateFrom, dateTo } = filter
+  const { storeId, categoryId, productName, status, dateFrom, dateTo, page, pageSize } = filter
 
-  const query = supabase
-    .from('products')
-    .select(productSelectQuery)
-    .eq('store_id', storeId)
-    .order('created_at', { ascending: false })
+  let query = supabase.from('products').select(productSelectQuery, { count: 'exact' }).eq('store_id', storeId)
 
-  if (categoryId) query.eq('category_id', categoryId)
-  if (productName) query.ilike('name', `%${productName}%`)
-  if (status) query.eq('status', status)
-  if (dateFrom) query.gte('created_at', dateFrom)
-  if (dateTo) query.lte('created_at', dateTo)
+  if (categoryId) query = query.eq('category_id', categoryId)
+  if (productName) query = query.ilike('name', `%${productName}%`)
+  if (status) query = query.eq('status', status)
+  if (dateFrom) query = query.gte('created_at', dateFrom)
+  if (dateTo) query = query.lte('created_at', dateTo)
 
-  const { data } = await query
+  const result = await paginate(query.order('created_at', { ascending: false }), { page, pageSize }).execute()
 
-  return { products: toProductEntities(data) }
+  return {
+    products: toProductEntities(result.data),
+    pagination: result.pagination,
+  }
 }
 
 export const getProductById = async (productId: string) => {

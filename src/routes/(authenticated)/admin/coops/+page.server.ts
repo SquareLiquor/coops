@@ -27,11 +27,13 @@ export const actions: Actions = {
     const form = await superValidate(request, valibot(CoopsFilterSchema))
     if (!form.valid) return { form }
 
-    const { coops } = await getCoopsByStore(form.data)
+    console.log(form)
+    const { coops, pagination } = await getCoopsByStore(form.data)
 
     return {
       form,
       coops,
+      pagination,
     }
   },
 }

@@ -10,6 +10,7 @@ import { isBrowser } from '@supabase/ssr'
 import dayjs from 'dayjs'
 import { createBrowserClient } from '../clients/browser'
 import { createServerClient } from '../clients/server'
+import { paginate } from '../utils/pagination.util'
 
 const coopSelectQuery = `
   *,
@@ -22,20 +23,25 @@ const coopSelectQuery = `
 export const getCoopsByStore = async (filter: CoopsFilterInput) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const { storeId, categoryId, name, status, dateFrom, dateTo } = filter
-  const query = supabase.from('coop_list_view').select(coopSelectQuery).eq('store_id', storeId)
+  const { storeId, categoryId, name, status, dateFrom, dateTo, page, pageSize } = filter
 
-  if (categoryId) query.eq('category_id', categoryId)
-  if (name) query.ilike('name', `%${name}%`)
-  if (status) query.eq('status', status)
-  if (dateFrom) query.gte('sales_date', dayjs(dateFrom).startOf('day').toISOString())
-  if (dateTo) query.lte('sales_date', dayjs(dateTo).endOf('day').toISOString())
+  let query = supabase.from('coop_list_view').select(coopSelectQuery, { count: 'exact' }).eq('store_id', storeId)
 
-  const { data, error } = await query
-    .order('sales_date', { ascending: false })
-    .order('created_at', { ascending: false })
+  if (categoryId) query = query.eq('category_id', categoryId)
+  if (name) query = query.ilike('name', `%${name}%`)
+  if (status) query = query.eq('status', status)
+  if (dateFrom) query = query.gte('sales_date', dayjs(dateFrom).startOf('day').toISOString())
+  if (dateTo) query = query.lte('sales_date', dayjs(dateTo).endOf('day').toISOString())
 
-  return { coops: toCoopEntities(data) }
+  const result = await paginate(
+    query.order('sales_date', { ascending: false }).order('created_at', { ascending: false }),
+    { page, pageSize }
+  ).execute()
+
+  return {
+    coops: toCoopEntities(result.data),
+    pagination: result.pagination,
+  }
 }
 
 export const getCoopsForUser = async (filter: ConsumerCoopsFilterSchema) => {

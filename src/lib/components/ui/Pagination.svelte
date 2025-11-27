@@ -44,66 +44,64 @@
   })
 </script>
 
-{#if totalPages > 1}
-  <div class="flex items-center justify-center gap-1">
-    <!-- 처음으로 -->
-    <button
-      type="button"
-      onclick={() => goToPage(1)}
-      disabled={currentPage === 1}
-      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-      aria-label="첫 페이지"
-    >
-      <ChevronsLeft class="h-4 w-4" />
-    </button>
+<div class="flex items-center justify-center gap-1">
+  <!-- 처음으로 -->
+  <button
+    type="button"
+    onclick={() => goToPage(1)}
+    disabled={currentPage === 1}
+    class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+    aria-label="첫 페이지"
+  >
+    <ChevronsLeft class="h-4 w-4" />
+  </button>
 
-    <!-- 이전 -->
-    <button
-      type="button"
-      onclick={() => goToPage(currentPage - 1)}
-      disabled={currentPage === 1}
-      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-      aria-label="이전 페이지"
-    >
-      <ChevronLeft class="h-4 w-4" />
-    </button>
+  <!-- 이전 -->
+  <button
+    type="button"
+    onclick={() => goToPage(currentPage - 1)}
+    disabled={currentPage === 1}
+    class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+    aria-label="이전 페이지"
+  >
+    <ChevronLeft class="h-4 w-4" />
+  </button>
 
-    <!-- 페이지 번호들 -->
-    {#each pageNumbers() as pageNum}
-      {#if pageNum === '...'}
-        <span class="flex h-8 w-8 items-center justify-center text-sm text-gray-400">...</span>
-      {:else}
-        <button
-          type="button"
-          onclick={() => goToPage(pageNum as number)}
-          class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors
+  <!-- 페이지 번호들 -->
+  {#each pageNumbers() as pageNum}
+    {#if pageNum === '...'}
+      <span class="flex h-8 w-8 items-center justify-center text-sm text-gray-400">...</span>
+    {:else}
+      <button
+        type="button"
+        onclick={() => goToPage(pageNum as number)}
+        class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors
             {currentPage === pageNum ? 'bg-white text-black' : 'text-gray-700 hover:bg-gray-100'}"
-        >
-          {pageNum}
-        </button>
-      {/if}
-    {/each}
+      >
+        {pageNum}
+      </button>
+    {/if}
+  {/each}
 
-    <!-- 다음 -->
-    <button
-      type="button"
-      onclick={() => goToPage(currentPage + 1)}
-      disabled={currentPage === totalPages}
-      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-      aria-label="다음 페이지"
-    >
-      <ChevronRight class="h-4 w-4" />
-    </button>
+  <!-- 다음 -->
+  <button
+    type="button"
+    onclick={() => goToPage(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+    aria-label="다음 페이지"
+  >
+    <ChevronRight class="h-4 w-4" />
+  </button>
 
-    <!-- 마지막으로 -->
-    <button
-      type="button"
-      onclick={() => goToPage(totalPages)}
-      disabled={currentPage === totalPages}
-      class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-      aria-label="마지막 페이지"
-    >
-      <ChevronsRight class="h-4 w-4" />
-    </button>
-  </div>
-{/if}
+  <!-- 마지막으로 -->
+  <button
+    type="button"
+    onclick={() => goToPage(totalPages)}
+    disabled={currentPage === totalPages}
+    class="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+    aria-label="마지막 페이지"
+  >
+    <ChevronsRight class="h-4 w-4" />
+  </button>
+</div>

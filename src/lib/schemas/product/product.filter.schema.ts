@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import * as v from 'valibot'
+import { PaginationSchema } from '../common/pagination.schema'
 
 export const ProductsFilterSchema = v.pipe(
   v.object({
@@ -9,10 +10,7 @@ export const ProductsFilterSchema = v.pipe(
     categoryId: v.pipe(v.optional(v.string())),
     productName: v.pipe(v.optional(v.string())),
     status: v.pipe(v.optional(v.string())),
-    // pagination: v.optional(v.object({
-    //   page: v.number().min(1).default(1),
-    //   pageSize: v.number().min(1).default(10),
-    // })),
+    ...PaginationSchema.entries,
   }),
   v.forward(
     v.partialCheck(

@@ -40,26 +40,28 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 export const actions: Actions = {
   fetch: async ({ request, locals: { supabase } }) => {
     const form = await superValidate(request, valibot(FilterSchema))
-    const { status, storeId, dateFrom, dateTo } = form.data
+    const { status, storeId, dateFrom, dateTo, page, pageSize } = form.data
 
     if (!form.valid) fail(400, { form })
 
-    const query = supabase
+    let query = supabase
       .from('signup_approval_requests')
       .select(requestSelectQuery, { count: 'exact' })
       .not('store_id', 'is', null)
-      .order('created_at', { ascending: false })
 
-    if (status) query.eq('status', status)
-    if (storeId) query.eq('store_id', storeId)
-    if (dateFrom) query.gte('requested_at', dateFrom)
-    if (dateTo) query.lte('requested_at', dateTo)
+    if (status) query = query.eq('status', status)
+    if (storeId) query = query.eq('store_id', storeId)
+    if (dateFrom) query = query.gte('requested_at', dateFrom)
+    if (dateTo) query = query.lte('requested_at', dateTo)
 
-    const { data } = await query
+    // paginate 함수를 사용하도록 수정
+    const { paginate } = await import('$lib/database/utils/pagination.util')
+    const result = await paginate(query.order('created_at', { ascending: false }), { page, pageSize }).execute()
 
     return {
       form,
-      requests: toApprovalRequestEntities(data),
+      requests: toApprovalRequestEntities(result.data),
+      pagination: result.pagination,
     }
   },
 

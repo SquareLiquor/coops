@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import Pagination from '$lib/components/ui/Pagination.svelte'
   import { ApprovalsFilterSchema } from '$lib/schemas'
   import { ApprovalStatus, type ApprovalRequestEntity } from '$lib/types'
   import { extractFormData } from '$lib/utils'
@@ -30,6 +31,7 @@
     submitting: filterSubmitting,
     asyncSubmit: asyncFilterSubmit,
     debouncedSubmit,
+    pagination,
   } = buildFilterForm<typeof ApprovalsFilterSchema>({
     form: data.filterForm,
     schema: ApprovalsFilterSchema,
@@ -39,6 +41,11 @@
       handleFailure: () => (requests = []),
     },
   })
+
+  const handlePageChange = (page: number) => {
+    $filterForm.page = page
+    asyncFilterSubmit()
+  }
 
   const requestFormEnhance = async ({ formData }: { formData: FormData }) => {
     const { id } = await extractFormData(formData, ['id'])
@@ -69,6 +76,7 @@
 
   <div class="relative">
     <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
+      <input type="hidden" name="page" bind:value={$filterForm.page} />
       <!-- Filters Row -->
       <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div class="flex items-center gap-2">
@@ -244,5 +252,15 @@
         </div>
       {/if}
     </div>
+
+    {#if requests.length > 0 || pagination.totalPages > 1}
+      <div class="mt-4">
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+    {/if}
   </div>
 </div>

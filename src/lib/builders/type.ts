@@ -11,7 +11,7 @@ export type BuilderSuperFormParamaters<S extends BaseSchema<any, any, any>> = {
     beforeSubmit?: () => void
   }
   resultHandler?: {
-    handleSuccess?: (result: any) => void // TODO: any to ActionResult
+    handleSuccess?: (result: any, pagination?: any) => void // TODO: any to ActionResult
     handleFailure?: (result: any) => void
   }
   options?: Record<string, any>

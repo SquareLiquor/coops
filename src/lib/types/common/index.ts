@@ -1,4 +1,5 @@
 export * from './enums'
 export * from './form'
+export * from './pagination.type'
 export * from './ui/auth.state'
 export * from './ui/cart.state'

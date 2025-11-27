@@ -13,6 +13,13 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
   const { handleSuccess, handleFailure } = resultHandler
   const { dataType = 'json', resetForm = false, useClientValidation = false } = options
 
+  // 페이징 상태 객체 (외부에서 $state로 감싸서 사용)
+  const pagination = {
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+  }
+
   const formOptions: FormOptions<InferOutput<S>, any, InferOutput<S>> = {
     validators: valibot(schema),
     dataType,
@@ -22,6 +29,13 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
       beforeChange && beforeChange()
 
       const { target } = event
+      const inputName = (target as HTMLInputElement)?.name
+
+      // 페이지 필드가 아닌 다른 필드가 변경되면 페이지를 1로 리셋
+      if (inputName && inputName !== 'page' && inputName !== 'pageSize') {
+        _form.update((data) => ({ ...data, page: 1 }))
+      }
+
       if ((target as HTMLInputElement)?.type === 'text') debouncedSubmit()
       else await submit()
     },
@@ -30,8 +44,23 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
       beforeSubmit && beforeSubmit()
     },
     onResult: async ({ result }: { result: ActionResult }) => {
-      if (result?.type === 'success') handleSuccess && handleSuccess(result)
-      if (result?.type === 'failure') handleFailure && handleFailure(result)
+      if (result?.type === 'success') {
+        // pagination 정보가 있으면 상태 업데이트
+        const paginationData = (result as any).data?.pagination
+        if (paginationData) {
+          pagination.currentPage = paginationData.page
+          pagination.totalPages = paginationData.totalPages
+          pagination.totalCount = paginationData.totalCount
+        }
+        handleSuccess && handleSuccess(result, paginationData)
+      }
+      if (result?.type === 'failure') {
+        // 실패 시 페이징 초기화
+        pagination.currentPage = 1
+        pagination.totalPages = 1
+        pagination.totalCount = 0
+        handleFailure && handleFailure(result)
+      }
     },
   }
 
@@ -45,6 +74,7 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
   const debouncedSubmit = debounce(submit, 300)
 
   const {
+    form: _form,
     submit: _submit,
     submitting: _submitting,
     validateForm: _validateForm,
@@ -52,11 +82,13 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
   } = superForm<InferOutput<S>>(form, formOptions)
 
   return {
+    form: _form,
     submit: _submit,
     submitting: _submitting,
     validateForm: _validateForm,
     asyncSubmit: async () => await asyncSuperFormSubmit(_submit, _submitting),
     debouncedSubmit,
+    pagination,
     ...properties,
   }
 }

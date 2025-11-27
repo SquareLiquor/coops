@@ -1,6 +1,7 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
   import PurchaseModal from '$lib/components/modals/admin/PurchaseModal.svelte'
+  import Pagination from '$lib/components/ui/Pagination.svelte'
   import { PurchasesFilterSchema } from '$lib/schemas'
   import { PurchaseStatus, type PurchaseEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
@@ -30,6 +31,7 @@
     submitting: filterSubmitting,
     asyncSubmit: asyncFilterSubmit,
     debouncedSubmit,
+    pagination,
   } = buildFilterForm<typeof PurchasesFilterSchema>({
     form: data.filterForm,
     schema: PurchasesFilterSchema,
@@ -38,6 +40,11 @@
       handleFailure: () => (purchases = []),
     },
   })
+
+  const handlePageChange = (page: number) => {
+    $filterForm.page = page
+    asyncFilterSubmit()
+  }
 </script>
 
 <svelte:head>
@@ -53,6 +60,7 @@
   <div class="relative">
     <form method="POST" action="?/fetch" use:filterEnhance class="mb-4" autocomplete="off">
       <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
+      <input type="hidden" name="page" bind:value={$filterForm.page} />
 
       <!-- Filters Row -->
       <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -243,6 +251,16 @@
         </div>
       {/if}
     </div>
+
+    {#if purchases.length > 0 || pagination.totalPages > 1}
+      <div class="mt-4">
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+    {/if}
   </div>
 </div>
 

@@ -15,15 +15,9 @@
   let coops: CoopEntity[] = $state([])
   let selectedCoopId: string | null = $state(null)
 
-  // 페이지네이션 상태
-  let currentPage = $state(1)
-  let totalPages = $state(10) // 테스트용 총 페이지 수
-  const itemsPerPage = 10
-
   function handlePageChange(page: number) {
-    currentPage = page
-    console.log('페이지 변경:', page)
-    // TODO: 여기서 페이지에 맞는 데이터를 불러오는 로직 추가
+    $filterForm.page = page
+    asyncFilterSubmit()
   }
 
   // Alert 상태 관리
@@ -91,12 +85,17 @@
     submitting: filterSubmitting,
     asyncSubmit: asyncFilterSubmit,
     debouncedSubmit,
+    pagination,
   } = buildFilterForm<typeof CoopsFilterSchema>({
     form: data.filterForm,
     schema: CoopsFilterSchema,
     resultHandler: {
-      handleSuccess: (result) => (coops = result.data?.coops || []),
-      handleFailure: () => (coops = []),
+      handleSuccess: (result) => {
+        coops = result.data?.coops || []
+      },
+      handleFailure: () => {
+        coops = []
+      },
     },
   })
 
@@ -165,6 +164,8 @@
   <div class="relative">
     <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
       <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
+      <input type="hidden" name="page" bind:value={$filterForm.page} />
+      <input type="hidden" name="pageSize" bind:value={$filterForm.pageSize} />
 
       <!-- Filters Row -->
       <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -406,7 +407,11 @@
     <!-- 페이지네이션 -->
     {#if coops.length > 0}
       <div class="mt-6">
-        <Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
     {/if}
   </div>
@@ -422,14 +427,8 @@
     mode={alertConfig.mode}
     title={alertConfig.title}
     message={alertConfig.message}
-    onConfirm={() => {
-      console.log('확인 클릭')
-      showAlert = false
-    }}
-    onCancel={() => {
-      console.log('취소 클릭')
-      showAlert = false
-    }}
+    onConfirm={() => (showAlert = false)}
+    onCancel={() => (showAlert = false)}
     onClose={() => (showAlert = false)}
   />
 {/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
   import OrderDetailModal from '$lib/components/modals/admin/OrderDetailModal.svelte'
+  import Pagination from '$lib/components/ui/Pagination.svelte'
   import { OrdersFilterSchema } from '$lib/schemas'
   import { type OrderEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
@@ -41,6 +42,7 @@
     submitting: filterSubmitting,
     asyncSubmit: asyncFilterSubmit,
     debouncedSubmit,
+    pagination,
   } = buildFilterForm<typeof OrdersFilterSchema>({
     form: data.filterForm,
     schema: OrdersFilterSchema,
@@ -49,6 +51,11 @@
       handleFailure: () => (orders = []),
     },
   })
+
+  const handlePageChange = (page: number) => {
+    $filterForm.page = page
+    asyncFilterSubmit()
+  }
 
   const { form, enhance, submitting } = superForm(data.form, {
     onResult: async ({ result }: { result: ActionResult }) => {
@@ -78,6 +85,7 @@
   <div class="relative">
     <form method="POST" action="?/fetch" use:filterEnhance class="mb-4" autocomplete="off">
       <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
+      <input type="hidden" name="page" bind:value={$filterForm.page} />
 
       <!-- Filters Row -->
       <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -299,6 +307,16 @@
         </div>
       {/if}
     </div>
+
+    {#if orders.length > 0 || pagination.totalPages > 1}
+      <div class="mt-4">
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+    {/if}
   </div>
 
   {#if selectedOrder}

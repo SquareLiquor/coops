@@ -26,11 +26,12 @@ export const actions: Actions = {
 
     if (!form.valid) return { form }
 
-    const { products } = await getProducts(form.data)
+    const { products, pagination } = await getProducts(form.data)
 
     return {
       form,
       products,
+      pagination,
     }
   },
 }

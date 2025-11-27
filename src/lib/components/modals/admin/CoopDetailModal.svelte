@@ -268,14 +268,8 @@
     message="정말로 이 상품을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다."
     confirmText="삭제"
     cancelText="취소"
-    onConfirm={() => {
-      console.log('상품 삭제 확인')
-      showAlert = false
-    }}
-    onCancel={() => {
-      console.log('삭제 취소')
-      showAlert = false
-    }}
+    onConfirm={() => (showAlert = false)}
+    onCancel={() => (showAlert = false)}
     onClose={() => (showAlert = false)}
   />
 {/if}

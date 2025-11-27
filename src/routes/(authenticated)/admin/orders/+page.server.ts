@@ -46,9 +46,9 @@ export const actions: Actions = {
     if (!form.valid) return { form }
 
     try {
-      const { orders } = await getOrders(form.data)
+      const { orders, pagination } = await getOrders(form.data)
 
-      return { form, orders: toOrderEntities(orders) }
+      return { form, orders: toOrderEntities(orders), pagination }
     } catch (error) {
       return { form }
     }
