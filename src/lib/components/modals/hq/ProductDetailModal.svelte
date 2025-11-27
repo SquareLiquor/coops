@@ -9,8 +9,7 @@
 
   let isBasicInfoOpen = $state(false)
   let isProductInfoOpen = $state(false)
-
-  function handleEdit() {
+  const handleEdit = () => {
     goto(`/hq/products/${product?.id}`)
     onClose()
   }

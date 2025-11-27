@@ -45,7 +45,7 @@ const hasSessionChanged = (prevSession: Session | null, newSession: Session | nu
  *
  * @returns cleanup 함수 - 컴포넌트 언마운트 시 호출하여 구독을 해제
  */
-export function setupAuthStateListener() {
+export const setupAuthStateListener = () => {
   const supabase = createBrowserClient()
 
   const {

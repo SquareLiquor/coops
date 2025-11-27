@@ -60,12 +60,12 @@
 
   const config = $derived(typeConfig[type])
 
-  function handleConfirm() {
+  const handleConfirm = () => {
     onConfirm?.()
     onClose?.()
   }
 
-  function handleCancel() {
+  const handleCancel = () => {
     onCancel?.()
     onClose?.()
   }

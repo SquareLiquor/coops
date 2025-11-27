@@ -8,7 +8,7 @@ import { clearAuth, setAuth } from './auth.state.svelte'
  * @param user Supabase User 객체
  * @param session Supabase Session 객체
  */
-export function syncUserToAuthState(user: User | null, session?: Session | null) {
+export const syncUserToAuthState = (user: User | null, session?: Session | null) => {
   if (!user) {
     clearAuth()
     return

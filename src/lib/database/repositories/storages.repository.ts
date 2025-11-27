@@ -1,7 +1,7 @@
 import { isBrowser } from '@supabase/ssr'
 import { createBrowserClient, createServerClient } from '../clients'
 
-export async function uploadFile(bucket: string = 'products', file: File, path: string) {
+export const uploadFile = async (bucket: string = 'products', file: File, path: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { data, error } = await supabase.storage.from(bucket).upload(path, file)
@@ -14,7 +14,7 @@ export async function uploadFile(bucket: string = 'products', file: File, path: 
   return { path: data.path, publicUrl: publicData.publicUrl }
 }
 
-export async function deleteFile(bucket: string = 'products', paths: string[]) {
+export const deleteFile = async (bucket: string = 'products', paths: string[]) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { data, error } = await supabase.storage.from(bucket).remove(paths)
@@ -22,7 +22,7 @@ export async function deleteFile(bucket: string = 'products', paths: string[]) {
   if (error) throw error
 }
 
-export async function copyFile(fromBucket: string, toBucket: string, fromPath: string, toPath: string) {
+export const copyFile = async (fromBucket: string, toBucket: string, fromPath: string, toPath: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { data, error } = await supabase.storage

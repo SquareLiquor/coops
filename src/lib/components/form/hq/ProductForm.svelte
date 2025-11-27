@@ -4,6 +4,7 @@
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
   import { createCategory } from '$lib/database'
   import type { CategoryEntity, UnitType } from '$lib/types'
+  import { ChevronDown } from '@lucide/svelte'
   import { superForm } from 'sveltekit-superforms'
 
   interface Props {
@@ -20,6 +21,18 @@
 
   let { data, mode = 'create', onSubmit, onError, onCancel }: Props = $props()
   let { categories, unitTypes } = $derived(data)
+
+  // Collapse 상태 관리
+  let openSections = $state({
+    basic: true,
+    product: true,
+    purchase: true,
+    detail: true,
+  })
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    openSections[section] = !openSections[section]
+  }
 
   const {
     form: formData,
@@ -90,169 +103,185 @@
     <div class="flex w-full flex-col gap-6 lg:w-1/3">
       <!-- 기본정보 -->
       <section class="rounded-2xl bg-white shadow-sm">
-        <button type="button" class="flex w-full items-center justify-between p-6 text-left">
+        <button
+          type="button"
+          class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50"
+          onclick={() => toggleSection('basic')}
+        >
           <h2 class="text-sm font-semibold text-gray-900">기본 정보</h2>
           <div class="flex items-center gap-2">
-            <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+            <ChevronDown class="h-5 w-5 text-gray-400 transition-transform {openSections.basic ? '' : '-rotate-90'}" />
           </div>
         </button>
-        <div class="flex flex-col gap-4 px-6 pb-6">
-          <div class="flex flex-col">
-            <span class="mb-2 text-sm text-gray-700">상품명</span>
-            <input
-              type="text"
-              name="name"
-              class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-              bind:value={$formData.name}
-              placeholder="상품명을 입력하세요"
-              {...$constraints.name}
-            />
-            <div class="mt-1 min-h-[20px]">
-              {#if $errors.name}
-                <span class="text-xs text-red-500">{$errors.name}</span>
-              {/if}
+        {#if openSections.basic}
+          <div class="flex flex-col gap-4 px-6 pb-6">
+            <div class="flex flex-col">
+              <span class="mb-2 text-sm text-gray-700">상품명</span>
+              <input
+                type="text"
+                name="name"
+                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                bind:value={$formData.name}
+                placeholder="상품명을 입력하세요"
+                {...$constraints.name}
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.name}
+                  <span class="text-xs text-red-500">{$errors.name}</span>
+                {/if}
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-2 text-sm text-gray-700">카테고리</span>
+              <Combobox
+                bind:selected={$formData.categoryId}
+                data={categories}
+                options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleNewCategory }}
+              />
+              <input type="hidden" name="categoryId" bind:value={$formData.categoryId} />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.categoryId}
+                  <span class="text-xs text-red-500">{$errors.categoryId}</span>
+                {/if}
+              </div>
             </div>
           </div>
-          <div class="flex flex-col">
-            <span class="mb-2 text-sm text-gray-700">카테고리</span>
-            <Combobox
-              bind:selected={$formData.categoryId}
-              data={categories}
-              options={{ allowNewItem: true, placeholder: '선택', handleAddNewItem: handleNewCategory }}
-            />
-            <input type="hidden" name="categoryId" bind:value={$formData.categoryId} />
-            <div class="mt-1 min-h-[20px]">
-              {#if $errors.categoryId}
-                <span class="text-xs text-red-500">{$errors.categoryId}</span>
-              {/if}
-            </div>
-          </div>
-        </div>
+        {/if}
       </section>
 
       <!-- 상품정보 -->
       <section class="rounded-2xl bg-white shadow-sm">
-        <button type="button" class="flex w-full items-center justify-between p-6 text-left">
+        <button
+          type="button"
+          class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50"
+          onclick={() => toggleSection('product')}
+        >
           <h2 class="text-sm font-semibold text-gray-900">상품 정보</h2>
           <div class="flex items-center gap-2">
-            <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+            <ChevronDown
+              class="h-5 w-5 text-gray-400 transition-transform {openSections.product ? '' : '-rotate-90'}"
+            />
           </div>
         </button>
-        <div class="flex flex-col gap-4 px-6 pb-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">가격</span>
-              <input
-                name="price"
-                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                type="number"
-                bind:value={$formData.price}
-                min="0"
-                placeholder="0"
-                {...$constraints.price}
-              />
-              <div class="mt-1 min-h-[20px]">
-                {#if $errors.price}
-                  <span class="text-xs text-red-500">{$errors.price}</span>
-                {/if}
-              </div>
-            </div>
-            {#if !isEditMode}
+        {#if openSections.product}
+          <div class="flex flex-col gap-4 px-6 pb-6">
+            <div class="grid grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <span class="mb-2 text-sm text-gray-700">초기 재고</span>
+                <span class="mb-2 text-sm text-gray-700">가격</span>
                 <input
-                  name="initialStock"
+                  name="price"
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
                   type="number"
-                  bind:value={$formData.initialStock}
+                  bind:value={$formData.price}
                   min="0"
                   placeholder="0"
-                  {...$constraints.initialStock}
+                  {...$constraints.price}
                 />
                 <div class="mt-1 min-h-[20px]">
-                  {#if $errors.initialStock}
-                    <span class="text-xs text-red-500">{$errors.initialStock}</span>
+                  {#if $errors.price}
+                    <span class="text-xs text-red-500">{$errors.price}</span>
                   {/if}
                 </div>
               </div>
-            {/if}
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">개별 용량</span>
-              <input
-                name="capacity"
-                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                type="text"
-                bind:value={$formData.capacity}
-                placeholder="예: 500g, 1L"
-                {...$constraints.capacity}
-              />
-              <div class="mt-1 min-h-[20px]">
-                {#if $errors.capacity}
-                  <span class="text-xs text-red-500">{$errors.capacity}</span>
-                {/if}
+              {#if !isEditMode}
+                <div class="flex flex-col">
+                  <span class="mb-2 text-sm text-gray-700">초기 재고</span>
+                  <input
+                    name="initialStock"
+                    class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                    type="number"
+                    bind:value={$formData.initialStock}
+                    min="0"
+                    placeholder="0"
+                    {...$constraints.initialStock}
+                  />
+                  <div class="mt-1 min-h-[20px]">
+                    {#if $errors.initialStock}
+                      <span class="text-xs text-red-500">{$errors.initialStock}</span>
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="mb-2 text-sm text-gray-700">개별 용량</span>
+                <input
+                  name="capacity"
+                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                  type="text"
+                  bind:value={$formData.capacity}
+                  placeholder="예: 500g, 1L"
+                  {...$constraints.capacity}
+                />
+                <div class="mt-1 min-h-[20px]">
+                  {#if $errors.capacity}
+                    <span class="text-xs text-red-500">{$errors.capacity}</span>
+                  {/if}
+                </div>
+              </div>
+              <div class="flex flex-col">
+                <span class="mb-2 text-sm text-gray-700">개별 단위</span>
+                <input
+                  type="text"
+                  name="unit"
+                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                  bind:value={$formData.sellUnit}
+                  placeholder="예: 10개, 1박스"
+                />
+                <div class="mt-1 min-h-[20px]"></div>
               </div>
             </div>
-            <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">개별 단위</span>
-              <input
-                type="text"
-                name="unit"
-                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                bind:value={$formData.sellUnit}
-                placeholder="예: 10개, 1박스"
-              />
-              <div class="mt-1 min-h-[20px]"></div>
-            </div>
           </div>
-        </div>
+        {/if}
       </section>
 
       <!-- 발주정보 -->
       <section class="rounded-2xl bg-white shadow-sm">
-        <button type="button" class="flex w-full items-center justify-between p-6 text-left">
+        <button
+          type="button"
+          class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50"
+          onclick={() => toggleSection('purchase')}
+        >
           <h2 class="text-sm font-semibold text-gray-900">발주 정보</h2>
           <div class="flex items-center gap-2">
-            <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+            <ChevronDown
+              class="h-5 w-5 text-gray-400 transition-transform {openSections.purchase ? '' : '-rotate-90'}"
+            />
           </div>
         </button>
-        <div class="flex flex-col gap-4 px-6 pb-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">발주 단위</span>
-              <select
-                name="purchaseUnit"
-                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none"
-                bind:value={$formData.purchaseUnit}
-              >
-                <option value="" disabled selected>선택</option>
-                {#each unitTypes as unit}
-                  <option value={unit.code}>{unit.label}</option>
-                {/each}
-              </select>
-              <div class="mt-1 min-h-[20px]"></div>
-            </div>
-            <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">단위 당 수량</span>
-              <input
-                name="purchaseQty"
-                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                type="number"
-                bind:value={$formData.purchaseQty}
-                min="0"
-                placeholder="0"
-              />
-              <div class="mt-1 min-h-[20px]"></div>
+        {#if openSections.purchase}
+          <div class="flex flex-col gap-4 px-6 pb-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="mb-2 text-sm text-gray-700">발주 단위</span>
+                <select
+                  name="purchaseUnit"
+                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none"
+                  bind:value={$formData.purchaseUnit}
+                >
+                  <option value="" disabled selected>선택</option>
+                  {#each unitTypes as unit}
+                    <option value={unit.code}>{unit.label}</option>
+                  {/each}
+                </select>
+                <div class="mt-1 min-h-[20px]"></div>
+              </div>
+              <div class="flex flex-col">
+                <span class="mb-2 text-sm text-gray-700">단위 당 수량</span>
+                <input
+                  name="purchaseQty"
+                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                  type="number"
+                  bind:value={$formData.purchaseQty}
+                  min="0"
+                  placeholder="0"
+                />
+                <div class="mt-1 min-h-[20px]"></div>
+              </div>
             </div>
           </div>
-        </div>
+        {/if}
       </section>
     </div>
 
@@ -260,34 +289,38 @@
     <div class="flex w-full flex-col lg:w-2/3">
       <!-- 상세정보 -->
       <section class="rounded-2xl bg-white shadow-sm" class:flex={true} class:flex-1={true} class:flex-col={true}>
-        <button type="button" class="flex w-full items-center justify-between p-6 text-left">
+        <button
+          type="button"
+          class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50"
+          onclick={() => toggleSection('detail')}
+        >
           <h2 class="text-sm font-semibold text-gray-900">상세 정보</h2>
           <div class="flex items-center gap-2">
-            <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+            <ChevronDown class="h-5 w-5 text-gray-400 transition-transform {openSections.detail ? '' : '-rotate-90'}" />
           </div>
         </button>
-        <div class="flex min-h-0 flex-1 flex-col gap-6 px-6 pb-6 lg:flex-row">
-          <div class="flex min-h-0 flex-1 flex-col">
-            <span class="mb-2 text-sm text-gray-700">상품 설명</span>
-            <div class="h-full overflow-hidden rounded-2xl border border-gray-200">
-              <EditorTipTap bind:content={$formData.description} />
+        {#if openSections.detail}
+          <div class="flex min-h-0 flex-1 flex-col gap-6 px-6 pb-6 lg:flex-row">
+            <div class="flex min-h-0 flex-1 flex-col">
+              <span class="mb-2 text-sm text-gray-700">상품 설명</span>
+              <div class="h-full overflow-hidden rounded-2xl border border-gray-200">
+                <EditorTipTap bind:content={$formData.description} />
+              </div>
+              <input type="hidden" name="description" bind:value={$formData.description} />
+              {#if $errors.description}
+                <span class="mt-1 text-xs text-red-500">{$errors.description}</span>
+              {/if}
             </div>
-            <input type="hidden" name="description" bind:value={$formData.description} />
-            {#if $errors.description}
-              <span class="mt-1 text-xs text-red-500">{$errors.description}</span>
-            {/if}
+            <div class="flex w-full flex-col lg:w-80">
+              <span class="mb-2 text-sm text-gray-700">상품 이미지</span>
+              <FileUploader
+                bind:images={$formData.images}
+                options={{ maxFiles: 5, removeable: mode === 'create', bucket: 'products' }}
+              />
+              <input type="hidden" name="images" bind:value={$formData.images} />
+            </div>
           </div>
-          <div class="flex w-full flex-col lg:w-80">
-            <span class="mb-2 text-sm text-gray-700">상품 이미지</span>
-            <FileUploader
-              bind:images={$formData.images}
-              options={{ maxFiles: 5, removeable: mode === 'create', bucket: 'products' }}
-            />
-            <input type="hidden" name="images" bind:value={$formData.images} />
-          </div>
-        </div>
+        {/if}
       </section>
     </div>
   </div>

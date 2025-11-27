@@ -18,6 +18,14 @@
     })
   )
 
+  // selected 변경 감지
+  $effect(() => {
+    // selected 값이 변경될 때마다 실행
+    if (selected !== undefined) {
+      items = data
+    }
+  })
+
   const onOpenChange = () => {
     items = data
   }
@@ -59,7 +67,7 @@
       inputBehavior="autohighlight"
     >
       <Combobox.Control>
-        <Combobox.Input />
+        <Combobox.Input class="border-none outline-none focus:outline-none" />
         <Combobox.Trigger />
       </Combobox.Control>
       <Portal>

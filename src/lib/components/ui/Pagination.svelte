@@ -11,7 +11,7 @@
     onPageChange: (page: number) => void
   } = $props()
 
-  function goToPage(page: number) {
+  const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return
     onPageChange(page)
   }

@@ -14,12 +14,12 @@
   let isProductInfoOpen = $state(false)
   let showAlert = $state(false)
 
-  function handleEdit() {
+  const handleEdit = () => {
     goto(`/admin/coops/${coop?.id}`)
     onClose()
   }
 
-  function showDeleteConfirm() {
+  const showDeleteConfirm = () => {
     showAlert = true
   }
 </script>
