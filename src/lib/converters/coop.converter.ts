@@ -130,6 +130,7 @@ export const convertProductToCoop = ({ product, images }: { product: ProductEnti
     description,
     salesPrice: price,
     product: {
+      id,
       originId: id,
       price,
       capacity,

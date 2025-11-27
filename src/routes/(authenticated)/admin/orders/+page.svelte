@@ -1,20 +1,21 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import { buildForm } from '$lib/builders/form.builder'
   import OrderDetailModal from '$lib/components/modals/admin/OrderDetailModal.svelte'
+  import Alert from '$lib/components/ui/Alert.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
-  import { OrdersFilterSchema } from '$lib/schemas'
+  import { OrdersFilterSchema, OrderUpdateSchema } from '$lib/schemas'
   import { type OrderEntity } from '$lib/types'
-  import { formatCurrency, toaster } from '$lib/utils'
-  import type { ActionResult } from '@sveltejs/kit'
+  import { formatCurrency } from '$lib/utils'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, setContext, tick } from 'svelte'
-  import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
   let { salesStatuses } = data
   let orders: OrderEntity[] = $state([])
   let selectedOrder: OrderEntity | null = $state(null)
+  let alert: { type: 'success' | 'error'; message: string } | null = $state(null)
 
   onMount(async () => {
     await tick()
@@ -52,24 +53,25 @@
     },
   })
 
+  const { form, enhance, submitting } = buildForm<typeof OrderUpdateSchema>({
+    form: data.form,
+    schema: OrderUpdateSchema,
+    resultHandler: {
+      handleSuccess: async (result) => {
+        await asyncFilterSubmit()
+        alert = { type: 'success', message: result.data?.form.message || '성공했습니다.' }
+      },
+      handleFailure: async (result) => {
+        await asyncFilterSubmit()
+        alert = { type: 'error', message: result.data?.form.message || '오류가 발생했습니다.' }
+      },
+    },
+  })
+
   const handlePageChange = (page: number) => {
     $filterForm.page = page
     asyncFilterSubmit()
   }
-
-  const { form, enhance, submitting } = superForm(data.form, {
-    onResult: async ({ result }: { result: ActionResult }) => {
-      if (result.type === 'success' || result.type === 'failure') {
-        const toast = result.type === 'success' ? toaster.success : toaster.error
-
-        await asyncFilterSubmit()
-        toast({
-          description: result.data?.form.message,
-          duration: 5000,
-        })
-      }
-    },
-  })
 </script>
 
 <svelte:head>
@@ -323,3 +325,13 @@
     <OrderDetailModal form={data.form} order={selectedOrder} onClose={() => (selectedOrder = null)} />
   {/if}
 </div>
+
+{#if alert}
+  <Alert
+    type={alert.type}
+    mode="alert"
+    title={alert.type === 'success' ? '성공' : '오류'}
+    message={alert.message}
+    onClose={() => (alert = null)}
+  />
+{/if}

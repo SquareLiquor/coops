@@ -1,28 +1,31 @@
 <script lang="ts">
+  import { buildForm } from '$lib/builders/form.builder'
+  import Alert from '$lib/components/ui/Alert.svelte'
+  import { OrderUpdateSchema } from '$lib/schemas'
   import { OrderStatus, type OrderEntity } from '$lib/types'
-  import { formatCurrency, toaster } from '$lib/utils'
+  import { formatCurrency } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
   import { Check, RotateCcw, X } from '@lucide/svelte'
-  import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { getContext } from 'svelte'
-  import { superForm } from 'sveltekit-superforms'
 
   let { form, order, onClose }: { form: any; order: OrderEntity; onClose: () => void } = $props()
 
   const updateOrder = getContext<(orderId: string) => Promise<void>>('updateOrder')
+  let alert: { type: 'success' | 'error'; message: string } | null = $state(null)
 
-  const { enhance, submitting } = superForm(form, {
-    onResult: async ({ result }: { result: ActionResult }) => {
-      if (result.type === 'success' || result.type === 'failure') {
-        const toast = result.type === 'success' ? toaster.success : toaster.error
-
+  const { enhance, submitting } = buildForm({
+    form,
+    schema: OrderUpdateSchema,
+    resultHandler: {
+      handleSuccess: async (result) => {
         await updateOrder(order.id)
-        toast({
-          description: result.data?.form.message,
-          duration: 5000,
-        })
-      }
+        alert = { type: 'success', message: result.data?.form.message || '성공했습니다.' }
+      },
+      handleFailure: async (result) => {
+        await updateOrder(order.id)
+        alert = { type: 'error', message: result.data?.form.message || '오류가 발생했습니다.' }
+      },
     },
   })
 </script>
@@ -208,3 +211,13 @@
     </div>
   </section>
 </div>
+
+{#if alert}
+  <Alert
+    type={alert.type}
+    mode="alert"
+    title={alert.type === 'success' ? '성공' : '오류'}
+    message={alert.message}
+    onClose={() => (alert = null)}
+  />
+{/if}

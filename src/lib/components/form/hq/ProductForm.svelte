@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { buildForm } from '$lib/builders/form.builder'
   import Combobox from '$lib/components/ui/Combobox.svelte'
   import EditorTipTap from '$lib/components/ui/EditorTipTap.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
   import { createCategory } from '$lib/database'
+  import { ProductCreateSchema, ProductUpdateSchema } from '$lib/schemas'
   import type { CategoryEntity, UnitType } from '$lib/types'
-  import { superForm } from 'sveltekit-superforms'
 
   interface Props {
     data: {
@@ -26,6 +27,7 @@
   let productInfoCollapsed = $state(false)
   let purchaseInfoCollapsed = $state(false)
   let detailsInfoCollapsed = $state(false)
+  const schema = mode === 'create' ? ProductCreateSchema : ProductUpdateSchema
 
   const {
     form: formData,
@@ -34,14 +36,18 @@
     constraints,
     enhance,
     submitting,
-  } = superForm(data.form, {
-    dataType: 'json',
-    resetForm: false,
-    onResult: async ({ result }) => {
-      if (result.type === 'success') onSubmit?.()
-      else if (result.type === 'failure') onError?.()
+  } = buildForm<typeof schema>({
+    form: data.form,
+    schema,
+    resultHandler: {
+      handleSuccess: async () => onSubmit?.(),
+      handleFailure: async () => onError?.(),
     },
-    invalidateAll: false,
+    options: {
+      dataType: 'json',
+      resetForm: false,
+      invalidateAll: false,
+    },
   })
 
   // 필수 항목 완료 상태
@@ -55,7 +61,7 @@
 
     if (!!category) {
       categories = [...categories, category].sort((a, b) => a.name.localeCompare(b.name))
-      $formData.category_id = category.id
+      $formData.categoryId = category.id
     }
   }
 
@@ -73,7 +79,7 @@
 <form method="POST" action={formAction} use:enhance class="flex h-full min-h-0 flex-1 flex-col bg-gray-100 p-6">
   <!-- Hidden inputs for edit mode -->
   {#if isEditMode}
-    <input type="hidden" name="id" value={$formData.id} />
+    <input type="hidden" name="id" value={($formData as any).id} />
   {/if}
   <input type="hidden" name="storeId" value={$formData.storeId} />
 

@@ -1,14 +1,13 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import { buildForm } from '$lib/builders/form.builder'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
-  import { ConsumerOrdersFilterSchema } from '$lib/schemas'
+  import { ConsumerOrdersFilterSchema, OrderUpdateSchema } from '$lib/schemas'
   import { OrderStatus, type OrderEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
-  import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
-  import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
@@ -39,17 +38,28 @@
     },
   })
 
-  const { form, enhance, submitting } = superForm(data.form, {
-    onResult: async ({ result }: { result: ActionResult }) => {
-      if (result.type === 'success' || result.type === 'failure') {
-        const toast = result.type === 'success' ? toaster.success : toaster.error
-
+  const { form, enhance, submitting } = buildForm<typeof OrderUpdateSchema>({
+    form: data.form,
+    schema: OrderUpdateSchema,
+    options: {
+      resetForm: true,
+      invalidateAll: true,
+    },
+    resultHandler: {
+      handleSuccess: async (result) => {
         await asyncFilterSubmit()
-        toast({
-          description: result.data?.form.message,
+        toaster.success({
+          description: result.data?.form.message || '성공했습니다.',
           duration: 5000,
         })
-      }
+      },
+      handleFailure: async (result) => {
+        await asyncFilterSubmit()
+        toaster.error({
+          description: result.data?.form.message || '오류가 발생했습니다.',
+          duration: 5000,
+        })
+      },
     },
   })
 </script>

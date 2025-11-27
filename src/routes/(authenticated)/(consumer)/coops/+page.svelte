@@ -1,11 +1,12 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import { buildForm } from '$lib/builders/form.builder'
   import CoopFooter from '$lib/components/layout/CoopFooter.svelte'
   import CartModal from '$lib/components/modals/consumer/CartModal.svelte'
   import CoopDetailModal from '$lib/components/modals/consumer/CoopDetailModal.svelte'
   import DatePicker from '$lib/components/ui/DatePicker.svelte'
   import { coopDataToCartItemData } from '$lib/converters/coop.converter'
-  import { ConsumerCoopsFilterSchema, convertCartDataToOrderInput } from '$lib/schemas'
+  import { ConsumerCoopsFilterSchema, convertCartDataToOrderInput, OrderSchema } from '$lib/schemas'
   import { getCategories } from '$lib/services/categories.service'
   import {
     addToCart,
@@ -20,10 +21,8 @@
   import type { CategoryEntity, CoopEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
   import { isBrowser } from '@supabase/ssr'
-  import type { ActionResult } from '@sveltejs/kit'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
-  import { superForm } from 'sveltekit-superforms'
   import type { PageProps } from './$types'
 
   let { data }: PageProps = $props()
@@ -69,25 +68,33 @@
     form: cartForm,
     enhance,
     submitting,
-  } = superForm(data.form, {
-    dataType: 'json',
-    onSubmit: async () => {
-      $cartForm = convertCartDataToOrderInput(getAuth(), getStore(), getCart())
-      isCartOpen = false
+  } = buildForm<typeof OrderSchema>({
+    form: data.form,
+    schema: OrderSchema,
+    submitHandler: {
+      beforeSubmit: () => {
+        $cartForm = convertCartDataToOrderInput(getAuth(), getStore(), getCart())
+        isCartOpen = false
+      },
     },
-    onResult: async ({ result }: { result: ActionResult }) => {
-      if (result.type === 'success' || result.type === 'failure') {
-        const toast = result.type === 'success' ? toaster.success : toaster.error
-
+    resultHandler: {
+      handleSuccess: async (result) => {
         await asyncFilterSubmit()
-        toast({
-          description: result.data?.form.message,
+        clearCart()
+        toaster.success({
+          description: result.data?.form.message || '주문이 완료되었습니다.',
           duration: 5000,
         })
-      }
-
-      if (result.type === 'success') clearCart()
+      },
+      handleFailure: async (result) => {
+        await asyncFilterSubmit()
+        toaster.error({
+          description: result.data?.form.message || '주문 중 오류가 발생했습니다.',
+          duration: 5000,
+        })
+      },
     },
+    options: { dataType: 'json' },
   })
 
   const handleChangeQuantity = (coop: CoopEntity, quantity: number) => {

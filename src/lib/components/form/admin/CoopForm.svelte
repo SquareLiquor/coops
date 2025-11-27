@@ -1,12 +1,13 @@
 <script lang="ts">
+  import { buildForm } from '$lib/builders/form.builder'
   import ProductSearchModal from '$lib/components/modals/hq/ProductSearchModal.svelte'
   import Combobox from '$lib/components/ui/Combobox.svelte'
   import EditorTipTap from '$lib/components/ui/EditorTipTap.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
   import { convertProductToCoop } from '$lib/converters/coop.converter'
   import { createCategory } from '$lib/database'
+  import { CoopCreateSchema, CoopUpdateSchema } from '$lib/schemas'
   import type { CategoryEntity, ImageEntity, ProductEntity, SalesStatus, UnitType } from '$lib/types'
-  import { superForm } from 'sveltekit-superforms'
 
   interface Props {
     data: {
@@ -27,6 +28,7 @@
 
   // 상품 매핑 모달
   let productMappingModalOpen = $state(false)
+  const schema = mode === 'create' ? CoopCreateSchema : CoopUpdateSchema
 
   const {
     form: formData,
@@ -35,14 +37,18 @@
     constraints,
     enhance,
     submitting,
-  } = superForm(data.form, {
-    dataType: 'json',
-    resetForm: false,
-    onResult: async ({ result }) => {
-      if (result.type === 'success') onSubmit?.()
-      else if (result.type === 'failure') onError?.()
+  } = buildForm<typeof schema>({
+    form: data.form,
+    schema,
+    resultHandler: {
+      handleSuccess: async () => onSubmit?.(),
+      handleFailure: async () => onError?.(),
     },
-    invalidateAll: false,
+    options: {
+      dataType: 'json',
+      resetForm: false,
+      invalidateAll: false,
+    },
   })
 
   const handleNewCategory = async (categoryName: string) => {
@@ -89,8 +95,8 @@
 <form method="POST" action={formAction} use:enhance class="flex h-full min-h-0 flex-1 flex-col bg-gray-100 p-6">
   <!-- Hidden inputs for edit mode -->
   {#if isEditMode}
-    <input type="hidden" name="id" value={$formData.id} />
-    <input type="hidden" name="product_id" value={$formData.product_id} />
+    <input type="hidden" name="id" value={($formData as any).id} />
+    <input type="hidden" name="productId" value={($formData as any).productId} />
   {/if}
   <input type="hidden" name="storeId" value={$formData.storeId} />
 
