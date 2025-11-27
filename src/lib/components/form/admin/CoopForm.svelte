@@ -167,10 +167,12 @@
         {#if !basicInfoCollapsed}
           <div class="flex flex-col gap-4 px-6 pb-6">
             <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">
-                상품명
-                <span class="text-xs text-red-500">*</span>
-              </span>
+              <div class="mb-2 flex items-center gap-1.5">
+                <span class="text-sm text-gray-700">상품명</span>
+                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </div>
               <input
                 type="text"
                 name="name"
@@ -187,10 +189,12 @@
               </div>
             </div>
             <div class="flex flex-col">
-              <span class="mb-2 text-sm text-gray-700">
-                카테고리
-                <span class="text-xs text-red-500">*</span>
-              </span>
+              <div class="mb-2 flex items-center gap-1.5">
+                <span class="text-sm text-gray-700">카테고리</span>
+                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </div>
               <Combobox
                 bind:selected={$formData.categoryId}
                 data={categories}
@@ -241,10 +245,12 @@
           <div class="flex flex-col gap-4 px-6 pb-6">
             <div class="grid grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <span class="mb-2 text-sm text-gray-700">
-                  판매 상태
-                  <span class="text-xs text-red-500">*</span>
-                </span>
+                <div class="mb-2 flex items-center gap-1.5">
+                  <span class="text-sm text-gray-700">판매 상태</span>
+                  <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                  </svg>
+                </div>
                 <select
                   name="status"
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
@@ -259,10 +265,12 @@
                 <div class="mt-1 min-h-[20px]"></div>
               </div>
               <div class="flex flex-col">
-                <span class="mb-2 text-sm text-gray-700">
-                  판매 일자
-                  <span class="text-xs text-red-500">*</span>
-                </span>
+                <div class="mb-2 flex items-center gap-1.5">
+                  <span class="text-sm text-gray-700">판매 일자</span>
+                  <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                  </svg>
+                </div>
                 <input
                   type="date"
                   name="salesDate"
@@ -281,10 +289,12 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <span class="mb-2 text-sm text-gray-700">
-                  판매 가능 수량
-                  <span class="text-xs text-red-500">*</span>
-                </span>
+                <div class="mb-2 flex items-center gap-1.5">
+                  <span class="text-sm text-gray-700">판매 가능 수량</span>
+                  <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                  </svg>
+                </div>
                 <input
                   name="maxQuantity"
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
@@ -303,10 +313,12 @@
               </div>
               <div class="flex flex-col">
                 <div class="mb-2 flex items-center justify-between">
-                  <span class="text-sm text-gray-700">
-                    판매 가격
-                    <span class="text-xs text-red-500">*</span>
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-sm text-gray-700">판매 가격</span>
+                    <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="5"></circle>
+                    </svg>
+                  </div>
                   <span class="text-xs text-gray-500">
                     원가: {$formData.product.price?.toLocaleString() || '0'}원
                   </span>
@@ -476,10 +488,12 @@
         {#if !detailsInfoCollapsed}
           <div class="flex min-h-0 flex-1 flex-col gap-6 px-6 pb-6 lg:flex-row">
             <div class="flex min-h-0 flex-1 flex-col">
-              <span class="mb-2 text-sm text-gray-700">
-                상품 설명
-                <span class="text-xs text-red-500">*</span>
-              </span>
+              <div class="mb-2 flex items-center gap-1.5">
+                <span class="text-sm text-gray-700">상품 설명</span>
+                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </div>
               <div class="h-full overflow-hidden rounded-2xl border border-gray-200">
                 <EditorTipTap
                   bind:content={$formData.description}
@@ -492,10 +506,12 @@
               {/if}
             </div>
             <div class="flex w-full flex-col lg:w-80">
-              <span class="mb-2 text-sm text-gray-700">
-                상품 이미지
-                <span class="text-xs text-red-500">*</span>
-              </span>
+              <div class="mb-2 flex items-center gap-1.5">
+                <span class="text-sm text-gray-700">상품 이미지</span>
+                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </div>
               <FileUploader
                 bind:images={$formData.images}
                 options={{ maxFiles: 5, removeable: false, bucket: 'coops' }}
