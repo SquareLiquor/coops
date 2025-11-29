@@ -2,8 +2,8 @@
   import { buildForm } from '$lib/builders/form.builder'
   import ProductSearchModal from '$lib/components/modals/hq/ProductSearchModal.svelte'
   import Combobox from '$lib/components/ui/Combobox.svelte'
-  import EditorTipTap from '$lib/components/ui/EditorTipTap.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
+  import TipTapEditor from '$lib/components/ui/TipTapEditor.svelte'
   import { convertProductToCoop } from '$lib/converters/coop.converter'
   import { createCategory } from '$lib/database'
   import { CoopCreateSchema, CoopUpdateSchema } from '$lib/schemas'
@@ -501,7 +501,7 @@
                 </svg>
               </div>
               <div class="h-full overflow-hidden rounded-2xl border border-gray-200">
-                <EditorTipTap
+                <TipTapEditor
                   bind:content={$formData.description}
                   disabled={!$formData.product?.originId || $formData.product?.originId === ''}
                 />

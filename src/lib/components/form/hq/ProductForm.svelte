@@ -1,8 +1,8 @@
 <script lang="ts">
   import { buildForm } from '$lib/builders/form.builder'
   import Combobox from '$lib/components/ui/Combobox.svelte'
-  import EditorTipTap from '$lib/components/ui/EditorTipTap.svelte'
   import FileUploader from '$lib/components/ui/ImageUploader.svelte'
+  import TipTapEditor from '$lib/components/ui/TipTapEditor.svelte'
   import { createCategory } from '$lib/database'
   import { ProductCreateSchema, ProductUpdateSchema } from '$lib/schemas'
   import type { CategoryEntity, UnitType } from '$lib/types'
@@ -424,7 +424,7 @@
             <div class="flex min-h-0 flex-1 flex-col">
               <span class="mb-2 text-sm text-gray-700">상품 설명</span>
               <div class="h-full overflow-hidden rounded-2xl border border-gray-200">
-                <EditorTipTap bind:content={$formData.description} />
+                <TipTapEditor bind:content={$formData.description} />
               </div>
               <input type="hidden" name="description" bind:value={$formData.description} />
               {#if $errors.description}
