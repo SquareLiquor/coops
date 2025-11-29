@@ -49,7 +49,8 @@ export const actions: Actions = {
 
       return message(form, '주문 취소가 완료되었습니다.')
     } catch (error) {
-      return message(form, '주문 취소 중 오류가 발생했습니다.', { status: 400 })
+      const errorMessage = error instanceof Error ? error.message : '주문 취소 중 오류가 발생했습니다.'
+      return message(form, errorMessage, { status: 400 })
     }
   },
   /**
@@ -71,7 +72,8 @@ export const actions: Actions = {
 
       return message(form, '취소가 완료되었습니다.')
     } catch (error) {
-      return message(form, '취소 중 오류가 발생했습니다.', { status: 400 })
+      const errorMessage = error instanceof Error ? error.message : '취소 중 오류가 발생했습니다.'
+      return message(form, errorMessage, { status: 400 })
     }
   },
 }

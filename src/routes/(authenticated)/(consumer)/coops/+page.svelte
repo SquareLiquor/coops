@@ -252,6 +252,7 @@
                 </span>
                 <button
                   class="bg-primary-500 hover:bg-primary-600 flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors"
+                  disabled={(getCartItem(coop.id)?.quantity || 0) >= coop.remainingQuantity}
                   onclick={() => handleChangeQuantity(coop, 1)}
                   aria-label="수량 증가"
                 >

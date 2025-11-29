@@ -5,7 +5,7 @@ import { createCoop } from '$lib/services/coops.service'
 import { createCoopHook } from '$lib/services/hooks'
 import { SalesStatus, UnitType } from '$lib/types'
 import { fail, type Actions } from '@sveltejs/kit'
-import { setError, superValidate } from 'sveltekit-superforms'
+import { message, superValidate, type ErrorStatus } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { PageServerLoad } from './$types'
 
@@ -38,10 +38,13 @@ export const actions: Actions = {
 
       return { form }
     } catch (error) {
-      if (isAppError(error)) error.errorHandler()
-
       await createCoopHook.runCleanup({})
-      return setError(form, '판매 상품 등록 중 오류가 발생했습니다.')
+
+      if (isAppError(error)) {
+        return message(form, error.message, { status: error.status as ErrorStatus })
+      }
+
+      return message(form, '판매 상품 등록 중 오류가 발생했습니다.', { status: 500 })
     }
   },
 }

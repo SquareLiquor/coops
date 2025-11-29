@@ -5,7 +5,7 @@ import { createOrderHook } from '$lib/services/hooks'
 import { createOrder } from '$lib/services/orders.service'
 import { fail } from '@sveltejs/kit'
 import dayjs from 'dayjs'
-import { message, superValidate } from 'sveltekit-superforms'
+import { message, superValidate, type ErrorStatus } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
 
@@ -39,14 +39,19 @@ export const actions: Actions = {
 
     try {
       const { order } = await createOrder(form.data)
-      createOrderHook.runAfter({ order: form.data, orderId: order?.id })
+
+      createOrderHook.getShared().set('orderId', order?.id)
+      await createOrderHook.runAfter({ order: form.data, orderId: order?.id })
 
       return message(form, '주문이 성공적으로 생성되었습니다.')
     } catch (error) {
-      if (isAppError(error)) error.errorHandler()
-
       await createOrderHook.runCleanup({})
-      return message(form, '주문 생성 중 오류가 발생했습니다.', { status: 400 })
+
+      if (isAppError(error)) {
+        return message(form, error.message, { status: error.status as ErrorStatus })
+      }
+
+      return message(form, '주문 생성 중 오류가 발생했습니다.', { status: 500 })
     }
   },
 }

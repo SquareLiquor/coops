@@ -68,7 +68,8 @@ export const actions: Actions = {
       await confirmOrder(orderId)
       return message(form, '주문이 완료되었습니다.')
     } catch (error) {
-      return message(form, '주문 완료 처리 중 오류가 발생했습니다.', { status: 400 })
+      const errorMessage = error instanceof Error ? error.message : '주문 완료 처리 중 오류가 발생했습니다.'
+      return message(form, errorMessage, { status: 400 })
     }
   },
   cancel: async ({ request }) => {
@@ -87,7 +88,8 @@ export const actions: Actions = {
 
       return message(form, '주문 취소가 완료되었습니다.')
     } catch (error) {
-      return message(form, '주문 취소 처리 중 오류가 발생했습니다.', { status: 400 })
+      const errorMessage = error instanceof Error ? error.message : '주문 취소 처리 중 오류가 발생했습니다.'
+      return message(form, errorMessage, { status: 400 })
     }
   },
   restore: async ({ request }) => {
@@ -103,7 +105,8 @@ export const actions: Actions = {
       await restoreOrder(orderId)
       return message(form, '주문 복구 처리되었습니다.')
     } catch (error) {
-      return message(form, '주문 복구 처리 중 오류가 발생했습니다.', { status: 400 })
+      const errorMessage = error instanceof Error ? error.message : '주문 복구 처리 중 오류가 발생했습니다.'
+      return message(form, errorMessage, { status: 400 })
     }
   },
 

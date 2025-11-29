@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ locals: { user } }) => {
   const { store: hqStore } = await getHQStore()
 
   return {
-    store: toStoreEntity(storeMember.store),
+    store: toStoreEntity(storeMember?.store),
     hqStore: toStoreEntity(hqStore),
   }
 }

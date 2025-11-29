@@ -4,7 +4,7 @@ import { getCategories } from '$lib/services/categories.service'
 import { getProductById, updateProduct, updateProductImages } from '$lib/services/products.service'
 import { UnitType } from '$lib/types'
 import { error, fail } from '@sveltejs/kit'
-import { setError, superValidate } from 'sveltekit-superforms'
+import { message, setError, superValidate, type ErrorStatus } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
 
@@ -41,9 +41,9 @@ export const actions: Actions = {
       await updateProductImages(productId, images)
 
       return { form }
-    } catch (err) {
-      if (isAppError(err)) {
-        err.errorHandler()
+    } catch (error) {
+      if (isAppError(error)) {
+        return message(form, error.message, { status: error.status as ErrorStatus })
       }
       return setError(form, '상품 수정 중 오류가 발생했습니다.')
     }

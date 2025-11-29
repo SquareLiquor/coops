@@ -1,11 +1,6 @@
 import { toCoopEntities, toCoopEntity } from '$lib/converters/coop.converter'
-import type {
-  ConsumerCoopsFilterSchema,
-  CoopCreateInput,
-  CoopsFilterInput,
-  CoopUpdateInput,
-  ImageInput,
-} from '$lib/schemas'
+import { BusinessLogicError, NotFoundError } from '$lib/errors'
+import type { ConsumerCoopsFilterSchema, CoopCreateInput, CoopsFilterInput, CoopUpdateInput } from '$lib/schemas'
 import { isBrowser } from '@supabase/ssr'
 import dayjs from 'dayjs'
 import { createBrowserClient } from '../clients/browser'
@@ -25,7 +20,7 @@ export const getCoopsByStore = async (filter: CoopsFilterInput) => {
 
   const { storeId, categoryId, name, status, dateFrom, dateTo, page, pageSize } = filter
 
-  let query = supabase.from('coop_list_view').select(coopSelectQuery, { count: 'exact' }).eq('store_id', storeId)
+  let query = supabase.from('coop_overview_view').select(coopSelectQuery, { count: 'exact' }).eq('store_id', storeId)
 
   if (categoryId) query = query.eq('category_id', categoryId)
   if (name) query = query.ilike('name', `%${name}%`)
@@ -48,7 +43,11 @@ export const getCoopsForUser = async (filter: ConsumerCoopsFilterSchema) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { storeId, categoryId, dateAt } = filter
-  const query = supabase.from('coop_list_view').select(coopSelectQuery).eq('store_id', storeId).eq('status', 'ONGOING')
+  const query = supabase
+    .from('coop_overview_view')
+    .select(coopSelectQuery)
+    .eq('store_id', storeId)
+    .eq('status', 'ONGOING')
 
   if (categoryId) query.eq('category_id', categoryId)
   if (dateAt) {
@@ -120,34 +119,6 @@ export const updateCoop = async (formData: CoopUpdateInput) => {
   if (updateError) throw updateError
 }
 
-export const updateCoopImages = async (coopId: string, images: ImageInput[]) => {
-  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
-  const { error: deleteError } = await supabase.from('coop_images').delete().eq('coop_id', coopId)
-
-  if (deleteError) throw deleteError
-
-  const { error: insertError } = await supabase.from('coop_images').insert(
-    images
-      .filter((image) => image.use)
-      .map((image, index) => ({
-        coop_id: coopId,
-        url: image.url,
-        path: image.path,
-        representative: image.representative,
-        sort_order: index,
-      }))
-  )
-
-  if (insertError) throw insertError
-}
-
-export const deleteCoopImages = async (coopId: string) => {
-  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
-  const { error } = await supabase.from('coop_images').delete().eq('coop_id', coopId)
-
-  if (error) throw error
-}
-
 export const deleteCoop = async (coopId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
@@ -156,23 +127,36 @@ export const deleteCoop = async (coopId: string) => {
   if (error) throw error
 }
 
-export const insertCoopImages = async (coopId: string, images: ImageInput[]) => {
+/**
+ * 공동구매의 현재 주문량과 최대 수량 조회
+ */
+export const getCoopQuantityInfo = async (coopId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { data, error } = await supabase
-    .from('coop_images')
-    .insert(
-      images.map((image) => ({
-        coop_id: coopId,
-        url: image.url,
-        path: image.path,
-        representative: image.representative,
-        sort_order: image.sortOrder,
-      }))
-    )
-    .select()
+    .from('coop_overview_view')
+    .select('id, name, max_quantity, status, ordered_quantity')
+    .eq('id', coopId)
+    .maybeSingle()
 
-  if (error) throw error
+  if (error || !data) {
+    throw error
+      ? new BusinessLogicError('판매 상품 조회에 실패했습니다', {
+          code: 'COOP_QUERY_FAILED',
+          details: { coopId, error: error.message },
+        })
+      : new NotFoundError('판매 상품을 찾을 수 없습니다', {
+          code: 'COOP_NOT_FOUND',
+          details: { coopId },
+        })
+  }
 
-  return { data }
+  return {
+    coopId: data.id,
+    coopName: data.name,
+    maxQuantity: data.max_quantity,
+    currentQuantity: data.ordered_quantity,
+    status: data.status,
+    availableQuantity: data.max_quantity - data.ordered_quantity,
+  }
 }

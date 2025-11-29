@@ -113,7 +113,7 @@ USING (EXISTS (
 -- ==============================
 -- 8) 주문정보가 포함된 뷰
 -- ==============================
-CREATE OR REPLACE VIEW public.coop_list_view
+CREATE OR REPLACE VIEW public.coop_overview_view
 WITH (security_invoker = true) AS
 SELECT
   coop.id,
@@ -139,11 +139,11 @@ SELECT
     FROM public.coop_images ci
     WHERE ci.coop_id = coop.id
       AND ci.representative = true
-    ORDER BY ci.created_at ASC
+    ORDER BY ci.sort_order ASC NULLS LAST
     LIMIT 1
   ) AS representative_image_url,
 
-  (
+  COALESCE((
     SELECT json_agg(
       json_build_object(
         'id', ci.id,
@@ -152,17 +152,19 @@ SELECT
         'sort_order', ci.sort_order,
         'created_at', ci.created_at
       )
+      ORDER BY ci.sort_order ASC
     )
     FROM public.coop_images ci
     WHERE ci.coop_id = coop.id
-  ) AS images,
+  ), '[]'::json) AS images,
 
-  (
-    SELECT sum(oi.quantity)
+
+  COALESCE((
+    SELECT SUM(oi.quantity)
     FROM public.order_items oi
     WHERE oi.coop_id = coop.id
       AND oi.status IN ('CREATED', 'COMPLETED')
-  ) AS ordered_quantity,
+  ), 0) AS ordered_quantity,
 
   coop.created_at,
   coop.updated_at
@@ -173,7 +175,7 @@ JOIN public.products prd ON coop.product_id = prd.id
 JOIN public.categories ct ON coop.category_id = ct.id
 ;
 
-COMMENT ON VIEW public.coop_list_view IS '공동구매 목록 뷰';
+COMMENT ON VIEW public.coop_overview_view IS '공동구매 목록 뷰';
 
 -- 상태 검색용
 CREATE INDEX idx_coops_status ON public.coops (status);

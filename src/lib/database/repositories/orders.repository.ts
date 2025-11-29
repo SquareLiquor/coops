@@ -1,4 +1,5 @@
 import { toOrderEntities, toOrderEntity } from '$lib/converters/order.converter'
+import { BusinessLogicError } from '$lib/errors'
 import type { ConsumerOrdersFilterInput, OrderCreateInput, OrdersFilterInput } from '$lib/schemas'
 import { OrderStatus } from '$lib/types'
 import { isBrowser } from '@supabase/ssr'
@@ -78,17 +79,31 @@ export const createOrder = async (formData: OrderCreateInput) => {
     .select()
     .maybeSingle()
 
-  if (error) throw error
+  if (error) {
+    throw new BusinessLogicError('주문 생성에 실패했습니다', {
+      code: 'ORDER_CREATE_FAILED',
+      details: { error: error.message },
+    })
+  }
+
+  if (!data) {
+    throw new BusinessLogicError('주문 생성에 실패했습니다')
+  }
 
   return { order: toOrderEntity(data) }
 }
 
-export const deleteOrderById = async (orderId: string) => {
+export const deleteOrder = async (orderId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
   const { error } = await supabase.from('orders').delete().eq('id', orderId)
 
-  if (error) throw error
+  if (error) {
+    throw new BusinessLogicError('주문 삭제에 실패했습니다', {
+      code: 'ORDER_DELETE_FAILED',
+      details: { error: error.message },
+    })
+  }
 }
 
 export const checkConfirmable = async (orderId: string) => {
@@ -100,18 +115,19 @@ export const checkConfirmable = async (orderId: string) => {
 export const confirmOrder = async (orderId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const confimable = await checkConfirmable(orderId)
-
-  if (!confimable) {
-    throw new Error('Order is not confirmable')
-  }
-
   const { data, error } = await supabase
     .from('orders')
     .update({ status: OrderStatus.COMPLETED.code })
     .eq('id', orderId)
     .select()
     .maybeSingle()
+
+  if (error) {
+    throw new BusinessLogicError('주문 확인에 실패했습니다', {
+      code: 'ORDER_CONFIRM_FAILED',
+      details: { error: error.message },
+    })
+  }
 
   return { order: data }
 }
@@ -125,12 +141,6 @@ export const checkCancelable = async (orderId: string) => {
 export const cancelOrder = async (orderId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
 
-  const cancelable = await checkCancelable(orderId)
-
-  if (!cancelable) {
-    throw new Error('Order is not cancelable')
-  }
-
   const { data, error } = await supabase
     .from('orders')
     .update({ status: OrderStatus.CANCELLED.code })
@@ -138,7 +148,12 @@ export const cancelOrder = async (orderId: string) => {
     .select()
     .maybeSingle()
 
-  if (error) throw error
+  if (error) {
+    throw new BusinessLogicError('주문 취소에 실패했습니다', {
+      code: 'ORDER_CANCEL_FAILED',
+      details: { error: error.message },
+    })
+  }
 
   return { order: data }
 }
@@ -148,14 +163,9 @@ export const checkRestorable = async (orderId: string) => {
 
   return order?.status === OrderStatus.CANCELLED.code
 }
+
 export const restoreOrder = async (orderId: string) => {
   const supabase = isBrowser() ? createBrowserClient() : createServerClient()
-
-  const restorable = await checkRestorable(orderId)
-
-  if (!restorable) {
-    throw new Error('Order is not restorable')
-  }
 
   const { data, error } = await supabase
     .from('orders')
@@ -164,7 +174,12 @@ export const restoreOrder = async (orderId: string) => {
     .select()
     .maybeSingle()
 
-  if (error) throw error
+  if (error) {
+    throw new BusinessLogicError('주문 복구에 실패했습니다', {
+      code: 'ORDER_RESTORE_FAILED',
+      details: { error: error.message },
+    })
+  }
 
   return { order: data }
 }
@@ -174,15 +189,12 @@ export const createOrderItems = async (items: any[]) => {
 
   const { data, error } = await supabase.from('order_items').insert(items)
 
-  if (error) throw error
+  if (error) {
+    throw new BusinessLogicError('주문 상품 생성에 실패했습니다', {
+      code: 'ORDER_ITEMS_CREATE_FAILED',
+      details: { error: error.message },
+    })
+  }
 
   return { data }
-}
-
-export const deleteOrder = async (orderId: string) => {
-  const supabase = isBrowser() ? createBrowserClient() : createServerClient()
-
-  const { error } = await supabase.from('orders').delete().eq('id', orderId)
-
-  if (error) throw error
 }

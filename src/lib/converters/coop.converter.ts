@@ -162,6 +162,7 @@ export const coopDataToCartItemData = (coop: CoopEntity, quantity: number) => {
 
   return {
     coopId: coop.id,
+    remainingQuantity: coop.remainingQuantity,
     productId: coop.product.id,
     name,
     quantity,

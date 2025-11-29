@@ -9,6 +9,7 @@ export interface CartData {
 
 export interface CartItemData {
   coopId: string
+  remainingQuantity: number
   productId: string
   name: string
   quantity: number

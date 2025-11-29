@@ -2,11 +2,12 @@ import { toCoopUpdateInputFromCoopEntity } from '$lib/converters/coop.converter'
 import { isAppError } from '$lib/errors'
 import { CoopUpdateSchema } from '$lib/schemas'
 import { getCategories } from '$lib/services/categories.service'
-import { getCoopById, updateCoop, updateCoopImages } from '$lib/services/coops.service'
+import { updateCoopImages } from '$lib/services/coopImages.service'
+import { getCoopById, updateCoop } from '$lib/services/coops.service'
 import { updateProduct } from '$lib/services/products.service'
 import { SalesStatus, UnitType } from '$lib/types'
 import { error, fail } from '@sveltejs/kit'
-import { setError, superValidate } from 'sveltekit-superforms'
+import { message, superValidate, type ErrorStatus } from 'sveltekit-superforms'
 import { valibot } from 'sveltekit-superforms/adapters'
 import type { Actions, PageServerLoad } from './$types'
 
@@ -56,9 +57,11 @@ export const actions: Actions = {
 
       return { form }
     } catch (error) {
-      if (isAppError(error)) error.errorHandler()
+      if (isAppError(error)) {
+        return message(form, error.message, { status: error.status as ErrorStatus })
+      }
 
-      return setError(form, '공동구매 수정 중 오류가 발생했습니다.')
+      return message(form, '공동구매 수정 중 오류가 발생했습니다.', { status: 500 })
     }
   },
 }

@@ -1,4 +1,6 @@
-// Base error class for the application
+/**
+ * 애플리케이션 기본 에러 클래스
+ */
 export abstract class AppError extends Error {
   public abstract status: number
   public code?: string
@@ -11,14 +13,15 @@ export abstract class AppError extends Error {
     this.code = options?.code
     this.details = options?.details
   }
-
-  errorHandler() {
-    const { status, details } = this
-    console.error(this.message)
-  }
 }
 
-// Authentication related errors
+// ==============================
+// 인증/인가 에러
+// ==============================
+
+/**
+ * 회원가입 에러
+ */
 export class SignUpError extends AppError {
   public status = 400
 
@@ -28,6 +31,9 @@ export class SignUpError extends AppError {
   }
 }
 
+/**
+ * 로그인 에러
+ */
 export class SignInError extends AppError {
   public status = 401
 
@@ -37,6 +43,9 @@ export class SignInError extends AppError {
   }
 }
 
+/**
+ * 권한 에러
+ */
 export class AuthorizationError extends AppError {
   public status = 403
 
@@ -45,39 +54,13 @@ export class AuthorizationError extends AppError {
   }
 }
 
-// Validation related errors
-export class ValidationError extends AppError {
-  public status = 400
+// ==============================
+// 데이터 관련 에러
+// ==============================
 
-  constructor(
-    message: string = '입력값이 올바르지 않습니다',
-    options?: { code?: string; details?: Record<string, string> }
-  ) {
-    super(message, options)
-  }
-}
-
-export class FormValidationError extends ValidationError {
-  constructor(fieldErrors: Record<string, string>) {
-    super('폼 검증에 실패했습니다', {
-      code: 'FORM_VALIDATION_ERROR',
-      details: fieldErrors,
-    })
-  }
-}
-
-// Database related errors
-export class DatabaseError extends AppError {
-  public status = 500
-
-  constructor(
-    message: string = '데이터베이스 오류가 발생했습니다',
-    options?: { code?: string; details?: Record<string, any> }
-  ) {
-    super(message, options)
-  }
-}
-
+/**
+ * 리소스를 찾을 수 없음
+ */
 export class NotFoundError extends AppError {
   public status = 404
 
@@ -89,6 +72,9 @@ export class NotFoundError extends AppError {
   }
 }
 
+/**
+ * 데이터 충돌
+ */
 export class ConflictError extends AppError {
   public status = 409
 
@@ -97,7 +83,13 @@ export class ConflictError extends AppError {
   }
 }
 
-// Business logic errors
+// ==============================
+// 비즈니스 로직 에러
+// ==============================
+
+/**
+ * 일반 비즈니스 로직 에러
+ */
 export class BusinessLogicError extends AppError {
   public status = 422
 
@@ -106,15 +98,42 @@ export class BusinessLogicError extends AppError {
   }
 }
 
-export class RegistrationError extends BusinessLogicError {
+/**
+ * 공동구매 주문 가능 수량 초과 에러
+ */
+export class QuantityExceededError extends BusinessLogicError {
   constructor(
-    message: string = '회원가입 처리 중 오류가 발생했습니다',
+    requestedQuantity: number,
+    availableQuantity: number,
+    coopId?: string,
+    coopName?: string,
     options?: { code?: string; details?: Record<string, any> }
   ) {
-    super(message, options)
+    let message = `주문 가능 수량을 초과했습니다.<br />요청: ${requestedQuantity}, 가능: ${availableQuantity}`
+
+    if (coopName) {
+      message = `${coopName}의 주문 가능 수량을 초과했습니다.<br />요청: ${requestedQuantity}, 가능: ${availableQuantity}`
+    } else if (coopId) {
+      message = `상품 ID: ${coopId}의 주문 가능 수량을 초과했습니다.<br />요청: ${requestedQuantity}, 가능: ${availableQuantity}`
+    }
+
+    super(message, {
+      code: 'QUANTITY_EXCEEDED',
+      details: {
+        requestedQuantity,
+        availableQuantity,
+        coopId,
+        coopName,
+        ...options?.details,
+      },
+      ...options,
+    })
   }
 }
 
+/**
+ * 승인 처리 에러
+ */
 export class ApprovalError extends BusinessLogicError {
   constructor(
     message: string = '승인 처리 중 오류가 발생했습니다',
@@ -124,72 +143,29 @@ export class ApprovalError extends BusinessLogicError {
   }
 }
 
+/**
+ * 잘못된 상태 전환 에러 (발주, 주문 등의 상태 변경)
+ */
 export class InvalidStatusTransitionError extends BusinessLogicError {
   constructor(message: string = '잘못된 상태 전환입니다', options?: { code?: string; details?: Record<string, any> }) {
     super(message, options)
   }
 }
 
-// External service errors
-export class ExternalServiceError extends AppError {
-  public status = 502
+// ==============================
+// 유틸리티 함수
+// ==============================
 
-  constructor(
-    message: string = '외부 서비스 오류가 발생했습니다',
-    options?: { code?: string; details?: Record<string, any> }
-  ) {
-    super(message, options)
-  }
-}
-
-export class SupabaseError extends ExternalServiceError {
-  constructor(message: string, options?: { code?: string; details?: Record<string, any> }) {
-    super(`Supabase 오류: ${message}`, options)
-  }
-}
-
-// Network related errors
-export class NetworkError extends AppError {
-  public status = 503
-
-  constructor(
-    message: string = '네트워크 오류가 발생했습니다',
-    options?: { code?: string; details?: Record<string, any> }
-  ) {
-    super(message, options)
-  }
-}
-
-// Rate limiting errors
-export class RateLimitError extends AppError {
-  public status = 429
-
-  constructor(
-    message: string = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요',
-    options?: { code?: string; details?: Record<string, any> }
-  ) {
-    super(message, options)
-  }
-}
-
-// Configuration errors
-export class ConfigurationError extends AppError {
-  public status = 500
-
-  constructor(
-    message: string = '설정 오류가 발생했습니다',
-    options?: { code?: string; details?: Record<string, any> }
-  ) {
-    super(message, options)
-  }
-}
-
-// Helper function to determine if an error is an AppError
+/**
+ * AppError 인스턴스 체크
+ */
 export function isAppError(error: unknown): error is AppError {
   return error instanceof AppError
 }
 
-// Helper function to create error response
+/**
+ * 에러 응답 생성
+ */
 export function createErrorResponse(error: unknown) {
   if (isAppError(error)) {
     return {
@@ -203,7 +179,6 @@ export function createErrorResponse(error: unknown) {
     }
   }
 
-  // Handle unknown errors
   return {
     success: false,
     error: {
@@ -212,46 +187,4 @@ export function createErrorResponse(error: unknown) {
       status: 500,
     },
   }
-}
-
-// Error codes enum for better type safety
-export enum ErrorCodes {
-  // Auth
-  SIGNUP_FAILED = 'SIGNUP_FAILED',
-  SIGNIN_FAILED = 'SIGNIN_FAILED',
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  FORBIDDEN = 'FORBIDDEN',
-
-  // Validation
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  FORM_VALIDATION_ERROR = 'FORM_VALIDATION_ERROR',
-  INVALID_INPUT = 'INVALID_INPUT',
-
-  // Database
-  DATABASE_ERROR = 'DATABASE_ERROR',
-  NOT_FOUND = 'NOT_FOUND',
-  DUPLICATE_ENTRY = 'DUPLICATE_ENTRY',
-
-  // Business Logic
-  REGISTRATION_PENDING = 'REGISTRATION_PENDING',
-  REGISTRATION_REJECTED = 'REGISTRATION_REJECTED',
-  APPROVAL_REQUIRED = 'APPROVAL_REQUIRED',
-
-  // External Services
-  SUPABASE_ERROR = 'SUPABASE_ERROR',
-  EXTERNAL_SERVICE_ERROR = 'EXTERNAL_SERVICE_ERROR',
-
-  // Network
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  TIMEOUT = 'TIMEOUT',
-
-  // Rate Limiting
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
-
-  // Configuration
-  CONFIG_ERROR = 'CONFIG_ERROR',
-  MISSING_ENV_VAR = 'MISSING_ENV_VAR',
-
-  // Unknown
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }

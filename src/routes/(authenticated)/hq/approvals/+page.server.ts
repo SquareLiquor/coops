@@ -1,5 +1,4 @@
 import { toApprovalRequestEntities, toApprovalRequestEntity } from '$lib/converters/signup.converter'
-import { isAppError } from '$lib/errors'
 import { ApprovalsFilterSchema as FilterSchema } from '$lib/schemas'
 import { approveRequest, getApprovalRequests, rejectRequest } from '$lib/services/auth.service'
 import { approveRequestHook, rejectRequestHook } from '$lib/services/hooks'
@@ -67,10 +66,8 @@ export const actions: Actions = {
         alert: { type: 'success', title: '승인 완료', message: '사용자 가입 승인이 완료되었습니다.' },
       }
     } catch (error) {
-      console.error('Error in approve action:', error)
-      if (isAppError(error)) error.errorHandler()
-
       await approveRequestHook.runCleanup({ storeId, userId: user.id })
+
       return fail(500, {
         alert: { type: 'error', title: '승인 실패', message: '승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.' },
       })
@@ -96,9 +93,6 @@ export const actions: Actions = {
         alert: { type: 'warning', title: '거부 완료', message: '사용자 가입이 거부되었습니다.' },
       }
     } catch (error) {
-      console.error('Error in reject action:', error)
-      if (isAppError(error)) error.errorHandler()
-
       await rejectRequestHook.runCleanup({ storeId, userId: user.id })
       return fail(500, {
         alert: { type: 'error', title: '거부 실패', message: '거부 처리 중 오류가 발생했습니다. 다시 시도해주세요.' },

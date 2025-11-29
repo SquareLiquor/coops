@@ -1,4 +1,4 @@
-import { cleanupCoopImages, processCoopImages } from '$lib/services/coops.service'
+import { cleanupCoopImages, processCoopImages } from '$lib/services/coopImages.service'
 import type { HookContext } from '$lib/services/hooks/hooksManager'
 import type { CreateCoopHookContext } from '../createCoop.context'
 

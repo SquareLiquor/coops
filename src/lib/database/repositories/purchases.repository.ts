@@ -18,7 +18,7 @@ export const getPurchasesForStore = async (filter: PurchasesFilterInput) => {
 
   const { storeId, categoryId, status, dateFrom, dateTo, page, pageSize } = filter
 
-  let query = supabase.from('store_purchase_view').select('*', { count: 'exact' })
+  let query = supabase.from('purchase_store_overview_view').select('*', { count: 'exact' })
 
   if (storeId) query = query.eq('store_id', storeId)
   if (categoryId) query = query.eq('category_id', categoryId)
@@ -39,7 +39,7 @@ export const getPurchasesForHQ = async (filter: PurchasesFilterInput) => {
 
   const { storeId, categoryId, status, dateFrom, dateTo, page, pageSize } = filter
 
-  let query = supabase.from('hq_purchase_view').select('*', { count: 'exact' })
+  let query = supabase.from('purchase_hq_overview_view').select('*', { count: 'exact' })
 
   if (storeId) query = query.eq('store_id', storeId)
   if (categoryId) query = query.eq('category_id', categoryId)

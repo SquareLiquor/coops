@@ -187,7 +187,7 @@ USING (
 -- ==============================
 -- 8) 매장용 뷰 (coops 메인, purchases outer join)
 -- ==============================
-CREATE OR REPLACE VIEW public.store_purchase_view
+CREATE OR REPLACE VIEW public.purchase_store_overview_view
 WITH (security_invoker = true) AS
 SELECT
   coop.id AS coop_id,
@@ -253,12 +253,12 @@ JOIN public.categories ct ON coop.category_id = ct.id
 LEFT JOIN public.purchases p ON p.coop_id = coop.id
 ;
 
-COMMENT ON VIEW public.store_purchase_view IS '매장용 발주 정보 포함 공동구매 뷰';
+COMMENT ON VIEW public.purchase_store_overview_view IS '매장용 발주 정보 포함 공동구매 뷰';
 
 -- ==============================
 -- 9) 본사용 뷰 (purchases 메인)
 -- ==============================
-CREATE OR REPLACE VIEW public.hq_purchase_view
+CREATE OR REPLACE VIEW public.purchase_hq_overview_view
 WITH (security_invoker = true) AS
 SELECT
 p.id,
@@ -317,7 +317,7 @@ LEFT JOIN public.product_images origin_img ON origin_prd.id = origin_img.product
 JOIN public.categories ct ON coop.category_id = ct.id
 ;
 
-COMMENT ON VIEW public.hq_purchase_view IS '본사용 발주 관리 뷰';
+COMMENT ON VIEW public.purchase_hq_overview_view IS '본사용 발주 관리 뷰';
 
 -- Realtime을 사용한다면 추천
 ALTER TABLE public.purchases REPLICA IDENTITY FULL;
