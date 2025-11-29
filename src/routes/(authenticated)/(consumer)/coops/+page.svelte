@@ -20,7 +20,6 @@
   } from '$lib/stores'
   import type { CategoryEntity, CoopEntity } from '$lib/types'
   import { formatCurrency, toaster } from '$lib/utils'
-  import { isBrowser } from '@supabase/ssr'
   import dayjs from 'dayjs'
   import { onDestroy, onMount, tick } from 'svelte'
   import type { PageProps } from './$types'
@@ -115,8 +114,6 @@
 
 <div class="border-surface-200 from-primary-500/5 border-b bg-gradient-to-b to-white px-4 pt-2 pb-4">
   <form method="POST" action="?/fetch" use:filterEnhance>
-    <input type="hidden" name="storeId" value={isBrowser() ? store?.id : ''} />
-
     <div class="container mx-auto">
       <div class="flex items-center space-x-2">
         <div class="mt-2 w-35 flex-shrink-0">
