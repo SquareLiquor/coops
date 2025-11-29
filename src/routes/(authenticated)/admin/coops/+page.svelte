@@ -29,46 +29,6 @@
     message: '',
   })
 
-  function showInfoAlert() {
-    alertConfig = {
-      type: 'info',
-      mode: 'alert',
-      title: '정보',
-      message: '이것은 정보 알림입니다.',
-    }
-    showAlert = true
-  }
-
-  function showErrorAlert() {
-    alertConfig = {
-      type: 'error',
-      mode: 'alert',
-      title: '오류',
-      message: '오류가 발생했습니다.',
-    }
-    showAlert = true
-  }
-
-  function showWarningConfirm() {
-    alertConfig = {
-      type: 'warning',
-      mode: 'confirm',
-      title: '경고',
-      message: '이 작업을 계속하시겠습니까?',
-    }
-    showAlert = true
-  }
-
-  function showSuccessAlert() {
-    alertConfig = {
-      type: 'success',
-      mode: 'alert',
-      title: '성공',
-      message: '작업이 성공적으로 완료되었습니다.',
-    }
-    showAlert = true
-  }
-
   onMount(async () => {
     await tick()
 
@@ -120,35 +80,6 @@
   <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-bold text-gray-900">판매 상품 관리</h1>
     <div class="flex items-center gap-2">
-      <!-- Alert 테스트 버튼들 -->
-      <button
-        type="button"
-        onclick={showInfoAlert}
-        class="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
-      >
-        Info
-      </button>
-      <button
-        type="button"
-        onclick={showErrorAlert}
-        class="rounded-full bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
-      >
-        Error
-      </button>
-      <button
-        type="button"
-        onclick={showWarningConfirm}
-        class="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-orange-700"
-      >
-        Warning
-      </button>
-      <button
-        type="button"
-        onclick={showSuccessAlert}
-        class="rounded-full bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-green-700"
-      >
-        Success
-      </button>
       <a
         href="/admin/coops/create"
         class="bg-primary-600 hover:bg-primary-700 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
