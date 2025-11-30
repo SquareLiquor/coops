@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 
   const { store: storeData } = await getStoreById(store.id)
   
+  console.log(store, storeData)
   if (!storeData) {
     throw redirect(303, '/admin')
   }
@@ -35,7 +36,7 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      await updateStore(form.data)
+      const {store} = await updateStore(form.data)
 
       return { form }
     } catch (error) {

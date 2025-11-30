@@ -1,5 +1,5 @@
-import { toStoreEntity } from '$lib/converters/store.converter'
-import { getHQStore, getStoreMemberByUserId } from '$lib/database/repositories/stores.repository'
+import { getHQStore } from '$lib/database/repositories/stores.repository'
+import { getStoreMemberByUserId } from '$lib/services/stores.service'
 import type { LayoutServerLoad } from './$types'
 
 const storeSelectQuery = `
@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ locals: { user } }) => {
   const { store: hqStore } = await getHQStore()
 
   return {
-    store: toStoreEntity(storeMember?.store),
-    hqStore: toStoreEntity(hqStore),
+    store: storeMember?.store,
+    hqStore: hqStore,
   }
 }

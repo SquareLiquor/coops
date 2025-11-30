@@ -115,7 +115,7 @@ export const getHQStore = async () => {
 
   const { data, error } = await supabase.from('stores').select('*').eq('type', 'hq').maybeSingle()
 
-  return { store: data }
+  return { store: toStoreEntity(data) }
 }
 
 export const getStoreMemberByUserId = async (userId: string | undefined) => {
