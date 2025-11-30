@@ -60,7 +60,7 @@
   <!-- 하단: 설정 + 사용자 정보 -->
   <div class="border-t border-gray-200 px-3 py-4">
     <!-- 설정 버튼 -->
-    <!-- <a
+    <a
       href="/{storeType}/settings"
       class="mb-3 flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-all
         {currentPath === `/${storeType}/settings`
@@ -68,7 +68,7 @@
         : 'text-gray-500 hover:text-gray-700'}"
     >
       <span>설정</span>
-    </a> -->
+    </a>
 
     <!-- 사용자 정보 -->
     <div class="flex items-center gap-3 rounded-2xl bg-gray-50 p-2.5 transition-all hover:bg-gray-100">

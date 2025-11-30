@@ -171,8 +171,11 @@
                 bind:value={$formData.type}
                 {...$constraints.type}
               >
-                <!-- <option value="hq" disabled>본사</option> -->
-                <option value="branch">지점</option>
+                {#if $formData.type === 'hq'}
+                  <option value="hq">본사</option>
+                {:else}
+                  <option value="branch">지점</option>
+                {/if}
               </select>
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.type}

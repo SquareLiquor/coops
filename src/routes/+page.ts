@@ -17,7 +17,7 @@ export const load: PageLoad = async ({ url, parent }) => {
     throw redirect(302, '/coops')
   }
 
-  const { data } = await supabase.from('stores').select('*').neq('type', 'hq')
+  const { data } = await supabase.from('stores').select('*').neq('type', 'hq').eq('active', true)
   return { stores: toStoreEntities(data) }
 }
 
