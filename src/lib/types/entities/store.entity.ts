@@ -8,11 +8,15 @@ export interface StoreEntity {
   id: string
   name: string
   type: StoreType
-  address?: string
-  addressDetail?: string
-  latitude?: number
-  longitude?: number
-  placeId?: string
+  address: string
+  addressDetail: string
+  addressType: 'ROAD' | 'JIBUN'
+  roadAddress?: string
+  jibunAddress?: string
+  zipcode: string
+  buildingName?: string
+  latitude: number
+  longitude: number
   phone?: string
   ownerId?: string
   owner?: ProfileEntity

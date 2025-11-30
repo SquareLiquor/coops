@@ -1,5 +1,5 @@
 import * as storesRepository from '$lib/database/repositories/stores.repository'
-import type { StoresFilterInput } from '$lib/schemas'
+import type { StoreCreateInput, StoresFilterInput, StoreUpdateInput } from '$lib/schemas'
 
 /**
  * 매장 목록 조회
@@ -13,6 +13,20 @@ export const getStores = async (filter: StoresFilterInput) => {
  */
 export const getStoreById = async (id: string) => {
   return await storesRepository.getStoreById(id)
+}
+
+/**
+ * 매장 생성
+ */
+export const createStore = async (formData: StoreCreateInput) => {
+  return await storesRepository.createStore(formData)
+}
+
+/**
+ * 매장 수정
+ */
+export const updateStore = async (formData: StoreUpdateInput) => {
+  return await storesRepository.updateStore(formData)
 }
 
 /**

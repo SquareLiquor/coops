@@ -1,3 +1,5 @@
+import { formatPhoneNumber } from "./format"
+
 /**
  * 숫자 문자만 허용하는 입력 이벤트 핸들러
  * @param e - 입력 이벤트
@@ -17,6 +19,12 @@ export const onlyEmailInput = (e: Event) => {
   // Allow: letters, numbers, @, ., -, _, +
   const emailValue = target.value.replace(/[^a-zA-Z0-9@._+-]/g, '')
   target.value = emailValue
+}
+
+export const onlyPhoneNumberInput = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const numbers = target.value.replace(/[^\d]/g, '')
+  target.value = formatPhoneNumber(numbers)
 }
 
 export const debounce = <T extends (...args: any[]) => void>(fn: T, wait: number) => {

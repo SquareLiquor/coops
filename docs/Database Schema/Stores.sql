@@ -15,6 +15,10 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'store_type') THEN
     CREATE TYPE store_type AS ENUM ('hq', 'branch');
   END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'address_type') THEN
+    CREATE TYPE address_type AS ENUM ('ROAD', 'JIBUN');
+  END IF;
 END$$;
 
 -- ==============================
@@ -37,13 +41,24 @@ CREATE TABLE public.stores (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
   type store_type NOT NULL DEFAULT 'branch',
-  address text,
-  address_detail text,
-  latitude numeric(10,7),
-  longitude numeric(10,7),
-  place_id text,
-  phone text,
+  
+  -- 주소 정보 (카카오맵 연동)
+  address text NOT NULL,           -- 도로명 또는 지번 주소 (선택된 주소)
+  address_detail text,             -- 상세주소 (동, 호수 등)
+  address_type address_type NOT NULL DEFAULT 'ROAD', -- 주소 유형 (도로명 / 지번)
+  road_address text,               -- 도로명 주소
+  jibun_address text,              -- 지번 주소
+  zipcode text,                    -- 우편번호
+  building_name text,              -- 건물명
+  
+  -- 좌표 정보
+  latitude numeric(10,7),          -- 위도
+  longitude numeric(10,7),         -- 경도
+  
+  -- 기타
+  phone text NOT NULL,
   owner_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  active boolean NOT NULL DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -115,46 +130,55 @@ ALTER TABLE public.store_members ENABLE ROW LEVEL SECURITY;
 -- ==============================
 
 -- store 조회 정책
--- store_members: 자신이 속한 store 조회 가능
--- store.owner: 자신이 owner인 store 조회 가능
--- store.type = 'hq': 모든 store 조회 가능
+-- 모든 사용자 조회 가능
 CREATE POLICY "store select for all"
 ON public.stores
 FOR SELECT
 USING (true);
 
 -- store 생성 정책
--- store.type = 'hq' 사용자는 store 생성 가능
--- 일반 사용자는 생성 불가
-CREATE POLICY "store insert for HQ"
+-- HQ 매장의 store_member만 생성 가능
+CREATE POLICY "store insert for HQ members"
 ON public.stores
 FOR INSERT
 WITH CHECK (
-    type = 'hq' AND auth.uid() IS NOT NULL
+    EXISTS (
+        SELECT 1
+        FROM public.store_members sm
+        JOIN public.stores s ON s.id = sm.store_id
+        WHERE sm.user_id = auth.uid()
+          AND s.type = 'hq'
+    )
 );
 
 -- store 수정 정책
--- store.owner: 자신이 owner인 store 수정 가능
--- store.owner 변경: 단, owner는 한 명만 유지 (owner_id = auth.uid())
--- HQ 유저: 모든 store 수정 가능
-CREATE POLICY "store update for owner or HQ"
+-- HQ 매장의 store_member 또는 본인 매장의 store_member만 수정 가능
+CREATE POLICY "store update for HQ or own store members"
 ON public.stores
 FOR UPDATE
 USING (
-    type = 'hq'  -- HQ 유저는 모든 store
-    OR owner_id = auth.uid()  -- owner 자신
-)
-WITH CHECK (
-    type = 'hq' OR owner_id = auth.uid()  -- owner_id 변경 가능할 때만
+    EXISTS (
+        SELECT 1
+        FROM public.store_members sm
+        JOIN public.stores s ON s.id = sm.store_id
+        WHERE sm.user_id = auth.uid()
+          AND (s.type = 'hq' OR sm.store_id = public.stores.id)
+    )
 );
 
 -- store 삭제 정책
--- HQ 유저만 삭제 가능
-CREATE POLICY "store delete for HQ"
+-- HQ 매장의 store_member 또는 본인 매장의 store_member만 삭제 가능
+CREATE POLICY "store delete for HQ or own store members"
 ON public.stores
 FOR DELETE
 USING (
-    type = 'hq'
+    EXISTS (
+        SELECT 1
+        FROM public.store_members sm
+        JOIN public.stores s ON s.id = sm.store_id
+        WHERE sm.user_id = auth.uid()
+          AND (s.type = 'hq' OR sm.store_id = public.stores.id)
+    )
 );
 
 -- store_members 조회 정책

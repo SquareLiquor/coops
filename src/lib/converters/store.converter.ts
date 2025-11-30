@@ -1,4 +1,4 @@
-import type { StoreEntity, StoreMemberEntity } from '$lib/types'
+import { type StoreEntity, type StoreMemberEntity } from '$lib/types'
 import dayjs from 'dayjs'
 import { toProfileEntity } from './profile.converter'
 
@@ -11,9 +11,13 @@ export const toStoreEntity = (data: any): StoreEntity | undefined => {
     type,
     address,
     address_detail,
+    address_type,
+    road_address,
+    jibun_address,
+    zipcode,
+    building_name,
     latitude,
     longitude,
-    place_id,
     phone,
     owner_id,
     owner,
@@ -28,9 +32,13 @@ export const toStoreEntity = (data: any): StoreEntity | undefined => {
     type,
     address,
     addressDetail: address_detail,
+    addressType: address_type,
+    roadAddress: road_address,
+    jibunAddress: jibun_address,
+    zipcode,
+    buildingName: building_name,
     latitude,
     longitude,
-    placeId: place_id,
     phone,
     ownerId: owner_id,
     owner: toProfileEntity(owner),

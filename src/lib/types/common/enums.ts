@@ -53,3 +53,9 @@ export const PurchaseStatus: { [key: string]: PurchaseStatus } = {
   REJECTED: { code: 'REJECTED', label: '거부', color: 'error' },
   CANCELLED: { code: 'CANCELLED', label: '취소', color: 'surface' },
 }
+
+export type AddressType = EnumItem
+export const AddressType: { [key: string]: AddressType } = {
+  ROAD: { code: 'ROAD', label: '도로명' },
+  JIBUN: { code: 'JIBUN', label: '지번' },
+}
