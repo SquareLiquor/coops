@@ -328,7 +328,10 @@
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-medium text-gray-600">현재 발주 상태</span>
                   <span
-                    class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-${purchase.status.color}-100 text-${purchase.status.color}-800`}
+                    class={[
+                      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                      purchase.status.badgeClass,
+                    ]}
                   >
                     {purchase.status.label}
                   </span>

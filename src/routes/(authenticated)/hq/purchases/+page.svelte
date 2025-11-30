@@ -229,7 +229,7 @@
                 <span
                   class={[
                     'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
-                    purchase.status && `text-${purchase.status.color}-800 bg-${purchase.status.color}-100 `,
+                    purchase.status?.badgeClass,
                     !purchase.status && 'bg-gray-100 text-gray-800',
                   ]}
                 >

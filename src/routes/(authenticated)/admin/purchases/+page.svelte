@@ -247,7 +247,7 @@
                 <span
                   class={[
                     'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
-                    purchase.status && `text-${purchase.status.color}-800 bg-${purchase.status.color}-100 `,
+                    purchase.status?.badgeClass,
                     !purchase.status && 'bg-gray-100 text-gray-800',
                   ]}
                 >
@@ -331,10 +331,10 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">발주 대상이 없습니다</h3>
+            <h3 class="text-gray-900 mb-2 text-lg font-semibold">발주 내역이 없습니다.</h3>
           </div>
         </div>
       {/if}

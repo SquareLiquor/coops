@@ -148,7 +148,10 @@
               <div class="flex items-center space-x-2">
                 <!-- 상태 배지 -->
                 <span
-                  class={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium text-${order.status.color}-800 bg-${order.status.color}-100 `}
+                  class={[
+                    'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
+                    order.status.badgeClass,
+                  ]}
                 >
                   {order.status.label}
                 </span>

@@ -19,39 +19,39 @@ export const UnitType: { [key: string]: UnitType } = {
   BAG: { code: 'BAG', label: '봉지' },
 }
 
-export type ApprovalStatus = EnumItem & { color?: string }
+export type ApprovalStatus = EnumItem & { badgeClass?: string }
 export const ApprovalStatus: { [key: string]: ApprovalStatus } = {
-  PENDING: { code: 'pending', label: '승인 대기', color: 'warning' },
-  APPROVED: { code: 'approved', label: '승인 완료', color: 'success' },
-  REJECTED: { code: 'rejected', label: '승인 거부', color: 'error' },
+  PENDING: { code: 'pending', label: '승인 대기', badgeClass: 'text-warning-800 bg-warning-100' },
+  APPROVED: { code: 'approved', label: '승인 완료', badgeClass: 'text-success-800 bg-success-100' },
+  REJECTED: { code: 'rejected', label: '승인 거부', badgeClass: 'text-error-800 bg-error-100' },
 }
 
-export type SalesStatus = EnumItem & { color?: string }
+export type SalesStatus = EnumItem & { badgeClass?: string }
 export const SalesStatus: { [key: string]: SalesStatus } = {
-  PREPARING: { code: 'PREPARING', label: '판매 준비', color: 'sky' },
-  ONGOING: { code: 'ONGOING', label: '판매 진행', color: 'primary' },
-  ENDED: { code: 'ENDED', label: '판매 종료', color: 'surface' },
-  COMPLETED: { code: 'COMPLETED', label: '판매 완료', color: 'success' },
-  STOPPED: { code: 'STOPPED', label: '판매 중지', color: 'error' },
-  PAUSED: { code: 'PAUSED', label: '판매 일시 정지', color: 'warning' },
+  PREPARING: { code: 'PREPARING', label: '판매 준비', badgeClass: 'text-sky-800 bg-sky-100' },
+  ONGOING: { code: 'ONGOING', label: '판매 진행', badgeClass: 'text-primary-800 bg-primary-100' },
+  ENDED: { code: 'ENDED', label: '판매 종료', badgeClass: 'text-surface-800 bg-surface-100' },
+  COMPLETED: { code: 'COMPLETED', label: '판매 완료', badgeClass: 'text-success-800 bg-success-100' },
+  STOPPED: { code: 'STOPPED', label: '판매 중지', badgeClass: 'text-error-800 bg-error-100' },
+  PAUSED: { code: 'PAUSED', label: '판매 일시 정지', badgeClass: 'text-warning-800 bg-warning-100' },
 }
 
-export type OrderStatus = EnumItem & { color?: string }
+export type OrderStatus = EnumItem & { badgeClass?: string }
 export const OrderStatus: { [key: string]: OrderStatus } = {
-  CREATED: { code: 'CREATED', label: '주문 생성', color: 'tertiary' },
-  COMPLETED: { code: 'COMPLETED', label: '주문 완료', color: 'success' },
-  CANCELLED: { code: 'CANCELLED', label: '주문 취소', color: 'error' },
-  PARTIAL_CANCELLED: { code: 'PARTIAL_CANCELLED', label: '부분 취소', color: 'warning' },
+  CREATED: { code: 'CREATED', label: '주문 생성', badgeClass: 'text-tertiary-800 bg-tertiary-100' },
+  COMPLETED: { code: 'COMPLETED', label: '주문 완료', badgeClass: 'text-success-800 bg-success-100' },
+  CANCELLED: { code: 'CANCELLED', label: '주문 취소', badgeClass: 'text-error-800 bg-error-100' },
+  PARTIAL_CANCELLED: { code: 'PARTIAL_CANCELLED', label: '부분 취소', badgeClass: 'text-warning-800 bg-warning-100' },
 }
 
-export type PurchaseStatus = EnumItem & { color?: string }
+export type PurchaseStatus = EnumItem & { badgeClass?: string }
 export const PurchaseStatus: { [key: string]: PurchaseStatus } = {
-  REQUESTED: { code: 'REQUESTED', label: '요청', color: 'tertiary' },
-  APPROVED: { code: 'APPROVED', label: '승인', color: 'primary' },
-  DELIVERY_STARTED: { code: 'DELIVERY_STARTED', label: '출고', color: 'secondary' },
-  DELIVERED: { code: 'DELIVERED', label: '입고', color: 'success' },
-  REJECTED: { code: 'REJECTED', label: '거부', color: 'error' },
-  CANCELLED: { code: 'CANCELLED', label: '취소', color: 'surface' },
+  REQUESTED: { code: 'REQUESTED', label: '요청', badgeClass: 'text-tertiary-800 bg-tertiary-100' },
+  APPROVED: { code: 'APPROVED', label: '승인', badgeClass: 'text-primary-800 bg-primary-100' },
+  DELIVERY_STARTED: { code: 'DELIVERY_STARTED', label: '출고', badgeClass: 'text-secondary-800 bg-secondary-100' },
+  DELIVERED: { code: 'DELIVERED', label: '입고', badgeClass: 'text-success-800 bg-success-100' },
+  REJECTED: { code: 'REJECTED', label: '거부', badgeClass: 'text-error-800 bg-error-100' },
+  CANCELLED: { code: 'CANCELLED', label: '취소', badgeClass: 'text-surface-800 bg-surface-100' },
 }
 
 export type AddressType = EnumItem

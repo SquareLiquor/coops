@@ -239,9 +239,7 @@
                 </div>
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
-                <span
-                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium text-${order.status?.color}-800 bg-${order.status?.color}-100`}
-                >
+                <span class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${order.status?.badgeClass}`}>
                   {order.status?.label}
                 </span>
               </td>
