@@ -1,5 +1,4 @@
-import { getHQStore } from '$lib/database/repositories/stores.repository'
-import { getStoreMemberByUserId } from '$lib/services/stores.service'
+import { getHQStore, getStoreMemberByUserId } from '$lib/services/stores.service'
 import type { LayoutServerLoad } from './$types'
 
 const storeSelectQuery = `

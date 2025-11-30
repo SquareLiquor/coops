@@ -1,4 +1,3 @@
-import { toCategoryEntities, toCategoryEntity } from '$lib/converters/category.converter'
 import { isBrowser } from '@supabase/ssr'
 import * as v from 'valibot'
 import { createBrowserClient } from '../clients/browser'
@@ -21,7 +20,7 @@ export const getCategories = async (storeId: string) => {
     .order('name', { ascending: true })
 
   if (error) return { categories: [] }
-  return { categories: toCategoryEntities(data) }
+  return { categories: data }
 }
 
 export const createCategory = async ({ name, store_id }: Pick<CategoryInput, 'name' | 'store_id'>) => {
@@ -38,7 +37,7 @@ export const createCategory = async ({ name, store_id }: Pick<CategoryInput, 'na
 
   if (error) throw error
 
-  return { category: toCategoryEntity(data) }
+  return { category: data }
 }
 
 export const deleteCategory = async ({ id }: Pick<CategoryInput, 'id'>) => {

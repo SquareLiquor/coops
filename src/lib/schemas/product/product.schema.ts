@@ -9,11 +9,11 @@ export const ProductSchema = v.pipe(
     categoryId: v.string(),
     name: v.string(),
     description: v.string(),
-    price: v.number(),
+    price: v.pipe(v.number(), v.minValue(1, '가격은 0보다 커야 합니다.')),
     capacity: v.optional(v.string()),
     sellUnit: v.optional(v.string()),
     purchaseUnit: v.string(),
-    purchaseQty: v.number(),
+    purchaseQty: v.pipe(v.number(), v.minValue(1, '구매 수량은 1 이상이어야 합니다.')),
     images: v.pipe(v.array(ImageSchema), v.minLength(1, '상품 이미지를 최소 1개 이상 등록해주세요.')),
     active: v.optional(v.boolean()),
   })

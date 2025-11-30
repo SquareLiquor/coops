@@ -1,3 +1,4 @@
+import { toStoreEntities, toStoreEntity, toStoreMemberEntity } from '$lib/converters/store.converter'
 import * as storesRepository from '$lib/database/repositories/stores.repository'
 import type { StoreCreateInput, StoresFilterInput, StoreUpdateInput } from '$lib/schemas'
 
@@ -5,42 +6,51 @@ import type { StoreCreateInput, StoresFilterInput, StoreUpdateInput } from '$lib
  * 매장 목록 조회
  */
 export const getStores = async (filter: StoresFilterInput) => {
-  return await storesRepository.getStores(filter)
+  const result = await storesRepository.getStores(filter)
+  return {
+    stores: toStoreEntities(result.stores),
+    pagination: result.pagination,
+  }
 }
 
 /**
  * 매장 상세 조회
  */
 export const getStoreById = async (id: string) => {
-  return await storesRepository.getStoreById(id)
+  const result = await storesRepository.getStoreById(id)
+  return { store: toStoreEntity(result.store) }
 }
 
 /**
  * 매장 생성
  */
 export const createStore = async (formData: StoreCreateInput) => {
-  return await storesRepository.createStore(formData)
+  const result = await storesRepository.createStore(formData)
+  return { store: toStoreEntity(result.store) }
 }
 
 /**
  * 매장 수정
  */
 export const updateStore = async (formData: StoreUpdateInput) => {
-  return await storesRepository.updateStore(formData)
+  const result = await storesRepository.updateStore(formData)
+  return { store: toStoreEntity(result.store) }
 }
 
 /**
  * 본사 매장 조회
  */
 export const getHQStore = async () => {
-  return await storesRepository.getHQStore()
+  const result = await storesRepository.getHQStore()
+  return { store: toStoreEntity(result.store) }
 }
 
 /**
  * 사용자별 매장 멤버 정보 조회
  */
 export const getStoreMemberByUserId = async (userId: string | undefined) => {
-  return await storesRepository.getStoreMemberByUserId(userId)
+  const result = await storesRepository.getStoreMemberByUserId(userId)
+  return { storeMember: toStoreMemberEntity(result.storeMember) }
 }
 
 /**

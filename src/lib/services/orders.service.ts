@@ -1,3 +1,4 @@
+import { toOrderEntities, toOrderEntity } from '$lib/converters/order.converter'
 import * as ordersRepository from '$lib/database/repositories/orders.repository'
 import { BusinessLogicError } from '$lib/errors'
 import type { ConsumerOrdersFilterInput, OrderCreateInput, OrderItemCreateInput, OrdersFilterInput } from '$lib/schemas'
@@ -8,21 +9,27 @@ import * as ordersValidator from './validators/orders.validator'
  * 주문 목록 조회 (관리자용, 페이징)
  */
 export const getOrders = async (filter: OrdersFilterInput) => {
-  return await ordersRepository.getOrders(filter)
+  const result = await ordersRepository.getOrders(filter)
+  return {
+    orders: toOrderEntities(result.orders),
+    pagination: result.pagination,
+  }
 }
 
 /**
  * 사용자별 주문 목록 조회
  */
 export const getOrdersByUserId = async (filter: ConsumerOrdersFilterInput) => {
-  return await ordersRepository.getOrdersByUserId(filter)
+  const result = await ordersRepository.getOrdersByUserId(filter)
+  return { orders: toOrderEntities(result.orders) }
 }
 
 /**
  * 주문 상세 조회
  */
 export const getOrderById = async (orderId: string) => {
-  return await ordersRepository.getOrderById(orderId)
+  const result = await ordersRepository.getOrderById(orderId)
+  return { order: toOrderEntity(result.order) }
 }
 
 /**
@@ -42,7 +49,7 @@ export const createOrder = async (formData: OrderCreateInput) => {
   // 주문 아이템 생성
   await createOrderItems(orderResult.order.id, formData.items)
 
-  return orderResult
+  return { order: toOrderEntity(orderResult.order) }
 }
 
 /**

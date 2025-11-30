@@ -1,6 +1,6 @@
-import * as coopsRepository from '$lib/database/repositories/coops.repository'
 import { BusinessLogicError, QuantityExceededError } from '$lib/errors'
 import type { OrderItemCreateInput } from '$lib/schemas'
+import * as coopsService from '$lib/services/coops.service'
 
 /**
  * 주문 생성 전 검증
@@ -15,7 +15,7 @@ export const validateOrderCreation = async (items: OrderItemCreateInput[]) => {
  * 공동구매 주문 가능 여부 체크
  */
 const checkCoopAvailability = async (coopId: string, requestedQuantity: number) => {
-  const quantityInfo = await coopsRepository.getCoopQuantityInfo(coopId)
+  const quantityInfo = await coopsService.getCoopQuantityInfo(coopId)
 
   // 공동구매 상태 체크
   if (quantityInfo.status !== 'ONGOING') {

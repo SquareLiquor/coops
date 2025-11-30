@@ -1,4 +1,3 @@
-import { toCoopEntities, toCoopEntity } from '$lib/converters/coop.converter'
 import { BusinessLogicError, NotFoundError } from '$lib/errors'
 import type { ConsumerCoopsFilterSchema, CoopCreateInput, CoopsFilterInput, CoopUpdateInput } from '$lib/schemas'
 import { isBrowser } from '@supabase/ssr'
@@ -34,7 +33,7 @@ export const getCoopsByStore = async (filter: CoopsFilterInput) => {
   ).execute()
 
   return {
-    coops: toCoopEntities(result.data),
+    coops: result.data,
     pagination: result.pagination,
   }
 }
@@ -61,7 +60,7 @@ export const getCoopsForUser = async (filter: ConsumerCoopsFilterSchema) => {
     .order('sales_date', { ascending: false })
     .order('created_at', { ascending: false })
 
-  return { coops: toCoopEntities(data) }
+  return { coops: data }
 }
 
 export const getCoopById = async (coopId: string) => {
@@ -69,7 +68,7 @@ export const getCoopById = async (coopId: string) => {
 
   const { data, error } = await supabase.from('coops').select(coopSelectQuery).eq('id', coopId).maybeSingle()
 
-  return { coop: toCoopEntity(data) }
+  return { coop: data }
 }
 
 export const createCoop = async (formData: CoopCreateInput, productId: string) => {
@@ -95,7 +94,7 @@ export const createCoop = async (formData: CoopCreateInput, productId: string) =
 
   if (error) throw error
 
-  return { coop: toCoopEntity(data) }
+  return { coop: data }
 }
 
 export const updateCoop = async (formData: CoopUpdateInput) => {

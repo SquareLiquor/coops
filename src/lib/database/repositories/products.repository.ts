@@ -1,4 +1,3 @@
-import { toProductEntities, toProductEntity } from '$lib/converters/product.converter'
 import {
   type ImageInput,
   type ProductCreateInput,
@@ -32,7 +31,7 @@ export const getProducts = async (filter: ProductsFilterInput) => {
   const result = await paginate(query.order('created_at', { ascending: false }), { page, pageSize }).execute()
 
   return {
-    products: toProductEntities(result.data),
+    products: result.data,
     pagination: result.pagination,
   }
 }
@@ -44,7 +43,7 @@ export const getProductById = async (productId: string) => {
 
   if (error) throw error
 
-  return { product: toProductEntity(data) }
+  return { product: data }
 }
 
 export const createProduct = async (formData: ProductCreateInput) => {

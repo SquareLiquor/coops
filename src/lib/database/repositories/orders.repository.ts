@@ -1,4 +1,3 @@
-import { toOrderEntities, toOrderEntity } from '$lib/converters/order.converter'
 import { BusinessLogicError } from '$lib/errors'
 import type { ConsumerOrdersFilterInput, OrderCreateInput, OrdersFilterInput } from '$lib/schemas'
 import { OrderStatus } from '$lib/types'
@@ -51,7 +50,7 @@ export const getOrdersByUserId = async (filter: ConsumerOrdersFilterInput) => {
 
   const { data, error } = await query.order('created_at', { ascending: false })
 
-  return { orders: toOrderEntities(data) }
+  return { orders: data }
 }
 
 export const getOrderById = async (orderId: string) => {
@@ -90,7 +89,7 @@ export const createOrder = async (formData: OrderCreateInput) => {
     throw new BusinessLogicError('주문 생성에 실패했습니다')
   }
 
-  return { order: toOrderEntity(data) }
+  return { order: data }
 }
 
 export const deleteOrder = async (orderId: string) => {

@@ -1,4 +1,3 @@
-import { toStoreEntities, toStoreEntity, toStoreMemberEntity } from '$lib/converters/store.converter'
 import { BusinessLogicError } from '$lib/errors'
 import type { StoreCreateInput, StoresFilterInput, StoreUpdateInput } from '$lib/schemas'
 import { isBrowser } from '@supabase/ssr'
@@ -26,7 +25,7 @@ export const getStores = async (filter: StoresFilterInput) => {
   const result = await paginate(query, { page, pageSize }).execute()
 
   return {
-    stores: toStoreEntities(result.data),
+    stores: result.data,
     pagination: result.pagination,
   }
 }
@@ -38,7 +37,7 @@ export const getStoreById = async (id: string) => {
 
   if (error) throw error
 
-  return { store: toStoreEntity(data) }
+  return { store: data }
 }
 
 export const createStore = async (formData: StoreCreateInput) => {
@@ -72,7 +71,7 @@ export const createStore = async (formData: StoreCreateInput) => {
       details: { error: error.message }, })
   }
 
-  return { store: toStoreEntity(data) }
+  return { store: data }
 }
 
 export const updateStore = async (formData: StoreUpdateInput) => {
@@ -107,7 +106,7 @@ export const updateStore = async (formData: StoreUpdateInput) => {
       details: { error: error.message }, })
   }
 
-  return { store: toStoreEntity(data) }
+  return { store: data }
 }
 
 export const getHQStore = async () => {
@@ -115,7 +114,7 @@ export const getHQStore = async () => {
 
   const { data, error } = await supabase.from('stores').select('*').eq('type', 'hq').maybeSingle()
 
-  return { store: toStoreEntity(data) }
+  return { store: data }
 }
 
 export const getStoreMemberByUserId = async (userId: string | undefined) => {
@@ -127,7 +126,7 @@ export const getStoreMemberByUserId = async (userId: string | undefined) => {
     .eq('user_id', userId)
     .maybeSingle()
 
-  return { storeMember: toStoreMemberEntity(data) }
+  return { storeMember: data }
 }
 
 export const checkStoreMemberExists = async (storeId: string, userId: string) => {

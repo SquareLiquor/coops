@@ -1,3 +1,4 @@
+import { toProductEntities, toProductEntity } from '$lib/converters/product.converter'
 import * as productsRepository from '$lib/database/repositories/products.repository'
 import type { ImageInput, ProductCreateInput, ProductsFilterInput, ProductUpdateInput } from '$lib/schemas'
 
@@ -5,14 +6,19 @@ import type { ImageInput, ProductCreateInput, ProductsFilterInput, ProductUpdate
  * 상품 목록 조회 (페이징)
  */
 export const getProducts = async (filter: ProductsFilterInput) => {
-  return await productsRepository.getProducts(filter)
+  const result = await productsRepository.getProducts(filter)
+  return {
+    products: toProductEntities(result.products),
+    pagination: result.pagination,
+  }
 }
 
 /**
  * 상품 상세 조회
  */
 export const getProductById = async (productId: string) => {
-  return await productsRepository.getProductById(productId)
+  const result = await productsRepository.getProductById(productId)
+  return { product: toProductEntity(result.product) }
 }
 
 /**
