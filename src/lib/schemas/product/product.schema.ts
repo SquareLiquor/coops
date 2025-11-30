@@ -6,13 +6,13 @@ export const ProductSchema = v.pipe(
   v.object({
     storeId: v.string(),
     originId: v.optional(v.nullable(v.string())),
-    categoryId: v.string(),
-    name: v.string(),
-    description: v.string(),
+    categoryId: v.pipe(v.string(), v.nonEmpty('카테고리를 선택해주세요.')),
+    name: v.pipe(v.string(), v.trim(), v.nonEmpty('상품명을 입력해주세요.')),
+    description: v.pipe(v.string(), v.trim(), v.nonEmpty('상품 설명을 입력해주세요.')),
     price: v.pipe(v.number(), v.minValue(1, '가격은 0보다 커야 합니다.')),
     capacity: v.optional(v.string()),
     sellUnit: v.optional(v.string()),
-    purchaseUnit: v.string(),
+    purchaseUnit: v.pipe(v.string(), v.nonEmpty('구매 단위를 입력해주세요.')),
     purchaseQty: v.pipe(v.number(), v.minValue(1, '구매 수량은 1 이상이어야 합니다.')),
     images: v.pipe(v.array(ImageSchema), v.minLength(1, '상품 이미지를 최소 1개 이상 등록해주세요.')),
     active: v.optional(v.boolean()),
@@ -22,7 +22,7 @@ export const ProductSchema = v.pipe(
 export const ProductCreateSchema = v.pipe(
   v.object({
     ...ProductSchema.entries,
-    initialStock: v.number(),
+    initialStock: v.pipe(v.number(), v.minValue(1, '초기 재고는 0 이상이어야 합니다.')),
   })
 )
 

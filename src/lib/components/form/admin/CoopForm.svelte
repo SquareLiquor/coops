@@ -42,7 +42,7 @@
     schema,
     resultHandler: {
       handleSuccess: async () => onSubmit?.(),
-      handleFailure: async () => onError?.(),
+      handleFailure: async (result) => result.status !== 400 && onError?.(), // 400 에러는 폼 검증 오류이므로 onError 호출 안함
     },
     options: {
       dataType: 'json',
@@ -186,7 +186,6 @@
                 bind:value={$formData.name}
                 placeholder="상품명을 입력하세요"
                 disabled={mode === 'create' && !$formData.product?.originId}
-                {...$constraints.name}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.name}
@@ -262,7 +261,6 @@
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
                   bind:value={$formData.status}
                   disabled={mode === 'create' && !$formData.product?.originId}
-                  {...$constraints.status}
                 >
                   {#each salesStatuses as status}
                     <option value={status.code}>{status.label}</option>
@@ -284,7 +282,6 @@
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
                   bind:value={$formData.salesDate}
                   disabled={mode === 'create' && !$formData.product?.originId}
-                  {...$constraints.salesDate}
                 />
                 <div class="mt-1 min-h-[20px]">
                   {#if $errors.salesDate}
@@ -309,7 +306,6 @@
                   min="0"
                   placeholder="0"
                   disabled={mode === 'create' && !$formData.product?.originId}
-                  {...$constraints.maxQuantity}
                 />
                 <div class="mt-1 min-h-[20px]">
                   {#if $errors.maxQuantity}
@@ -337,7 +333,6 @@
                   min="0"
                   placeholder="0"
                   disabled={mode === 'create' && !$formData.product?.originId}
-                  {...$constraints.salesPrice}
                 />
                 <input type="hidden" name="originalPrice" bind:value={$formData.product.price} />
                 <div class="mt-1 min-h-[20px]">
@@ -423,17 +418,13 @@
             <div class="grid grid-cols-2 gap-4">
               <div class="flex flex-col">
                 <span class="mb-2 text-sm text-gray-700">발주 단위</span>
-                <select
+                <input
                   name="purchaseUnit"
-                  class="h-10 w-full rounded-full border border-gray-300 bg-gray-50 px-4 text-sm text-gray-500"
+                  class="h-10 w-full rounded-full border border-gray-300 bg-gray-50 px-4 text-right text-sm text-gray-500"
+                  type="text"
                   bind:value={$formData.product.purchaseUnit}
                   disabled
-                >
-                  <option value="" disabled selected>Select</option>
-                  {#each unitTypes as unit}
-                    <option value={unit.code}>{unit.label}</option>
-                  {/each}
-                </select>
+                />
                 <div class="mt-1 min-h-[20px]"></div>
               </div>
               <div class="flex flex-col">
@@ -524,6 +515,9 @@
                 disabled={!$formData.product?.originId}
               />
               <input type="hidden" name="images" bind:value={$formData.images} />
+              {#if $errors.images?._errors?.length}
+                <span class="mt-1 text-xs text-red-500">{$errors.images._errors[0]}</span>
+              {/if}
             </div>
           </div>
         {/if}

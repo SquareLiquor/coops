@@ -30,7 +30,7 @@
     schema,
     resultHandler: {
       handleSuccess: async () => onSubmit?.(),
-      handleFailure: async () => onError?.(),
+      handleFailure: async (result) => result.status !== 400 && onError?.(), // 400 에러는 폼 검증 오류이므로 onError 호출 안함
     },
     options: {
       dataType: 'json',
@@ -150,7 +150,6 @@
                 class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
                 bind:value={$formData.name}
                 placeholder="매장명을 입력하세요"
-                {...$constraints.name}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.name}
@@ -169,7 +168,6 @@
                 name="type"
                 class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none"
                 bind:value={$formData.type}
-                {...$constraints.type}
               >
                 {#if $formData.type === 'hq'}
                   <option value="hq">본사</option>
@@ -198,7 +196,6 @@
                 oninput={onlyPhoneNumberInput}
                 placeholder="010-1234-5678"
                 maxlength="13"
-                {...$constraints.phone}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.phone}
@@ -255,32 +252,18 @@
                     <circle cx="12" cy="12" r="5"></circle>
                   </svg>
                 </div>
-                {#if $formData.address?.address}
-                  <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" title="주소 초기화">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
-                {/if}
               </div>
               <input
                 type="text"
                 name="address.address"
                 class="h-10 w-full rounded-full border border-gray-300 bg-gray-50 px-4 text-sm text-gray-700"
-                value={$formData.address?.address || ''}
+                bind:value={$formData.address.address}
                 readonly
-                placeholder="주소 검색 후 선택"
+                placeholder="주소 검색 후 선택하세요"
               />
-              <input type="hidden" name="address.roadAddress" value={$formData.address?.roadAddress || ''} />
-              <input type="hidden" name="address.jibunAddress" value={$formData.address?.jibunAddress || ''} />
-              <input type="hidden" name="address.zipcode" value={$formData.address?.zipcode || ''} />
-              <input type="hidden" name="address.buildingName" value={$formData.address?.buildingName || ''} />
-              <input type="hidden" name="address.latitude" value={$formData.address?.latitude || ''} />
-              <input type="hidden" name="address.longitude" value={$formData.address?.longitude || ''} />
               <div class="mt-1 min-h-[20px]">
-                {#if $errors.address}
-                  <span class="text-xs text-red-500">{$errors.address}</span>
+                {#if $errors.address?.address}
+                  <span class="text-xs text-red-500">{$errors.address?.address}</span>
                 {/if}
               </div>
             </div>

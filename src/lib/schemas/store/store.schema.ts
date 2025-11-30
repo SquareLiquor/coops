@@ -2,7 +2,7 @@ import { type StoreEntity } from '$lib/types'
 import * as v from 'valibot'
 
 export const AddressSchema = v.object({
-  address: v.pipe(v.string(), v.minLength(1, '주소를 선택해주세요.')),
+  address: v.pipe(v.string(), v.nonEmpty('주소를 선택해주세요.')),
   addressDetail: v.string(),
   addressType: v.picklist(['ROAD', 'JIBUN']),
   roadAddress: v.optional(v.string()),
@@ -13,13 +13,19 @@ export const AddressSchema = v.object({
   longitude: v.number(),
 })
 
-export const StoreSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, '매장명을 입력해주세요.')),
-  type: v.picklist(['hq', 'branch']),
-  phone: v.pipe(v.string(), v.minLength(1, '전화번호를 입력해주세요.')),
-  address: v.object({...AddressSchema.entries}),
-  active: v.optional(v.boolean(), true),
-})
+export const StoreSchema = v.pipe(
+  v.object({
+    name: v.pipe(v.string(), v.nonEmpty('매장명을 입력해주세요.')),
+    type: v.picklist(['hq', 'branch']),
+    phone: v.pipe(v.string(), v.nonEmpty('전화번호를 입력해주세요.')),
+    address: v.object({...AddressSchema.entries}),
+    active: v.optional(v.boolean(), true),
+  }),
+  v.check(
+    (address) => !!address.address,
+    '주소를 입력해주세요.'
+  )
+)
 
 export const StoreCreateSchema = v.object({
   ...StoreSchema.entries,

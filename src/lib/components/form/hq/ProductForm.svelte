@@ -6,6 +6,7 @@
   import { createCategory } from '$lib/database'
   import { ProductCreateSchema, ProductUpdateSchema } from '$lib/schemas'
   import type { CategoryEntity, UnitType } from '$lib/types'
+  import { onlyNumberInput } from '$lib/utils'
 
   interface Props {
     data: {
@@ -41,7 +42,7 @@
     schema,
     resultHandler: {
       handleSuccess: async () => onSubmit?.(),
-      handleFailure: async () => onError?.(),
+      handleFailure: async (result) => result.status !== 400 && onError?.(), // 400 에러는 폼 검증 오류이므로 onError 호출 안함
     },
     options: {
       dataType: 'json',
@@ -168,7 +169,6 @@
                 class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
                 bind:value={$formData.name}
                 placeholder="상품명을 입력하세요"
-                {...$constraints.name}
               />
               <div class="mt-1 min-h-[20px]">
                 {#if $errors.name}
@@ -249,9 +249,11 @@
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
                   type="number"
                   bind:value={$formData.price}
+                  oninput={onlyNumberInput}
+                  inputmode="numeric"
+                  pattern="[0-9]*"
                   min="0"
                   placeholder="0"
-                  {...$constraints.price}
                 />
                 <div class="mt-1 min-h-[20px]">
                   {#if $errors.price}
@@ -267,9 +269,11 @@
                     class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
                     type="number"
                     bind:value={$formData.initialStock}
+                    oninput={onlyNumberInput}
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     min="0"
                     placeholder="0"
-                    {...$constraints.initialStock}
                   />
                   <div class="mt-1 min-h-[20px]">
                     {#if $errors.initialStock}
@@ -288,7 +292,6 @@
                   type="text"
                   bind:value={$formData.capacity}
                   placeholder="예: 500g, 1L"
-                  {...$constraints.capacity}
                 />
                 <div class="mt-1 min-h-[20px]">
                   {#if $errors.capacity}
@@ -362,7 +365,11 @@
                     <option value={unit.code}>{unit.label}</option>
                   {/each}
                 </select>
-                <div class="mt-1 min-h-[20px]"></div>
+                <div class="mt-1 min-h-[20px]">
+                  {#if $errors.purchaseUnit}
+                    <span class="text-xs text-red-500">{$errors.purchaseUnit}</span>
+                  {/if}
+                </div>
               </div>
               <div class="flex flex-col">
                 <span class="mb-2 text-sm text-gray-700">단위 당 수량</span>
@@ -371,10 +378,17 @@
                   class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-right text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
                   type="number"
                   bind:value={$formData.purchaseQty}
+                  oninput={onlyNumberInput}
+                  inputmode="numeric"
+                  pattern="[0-9]*"
                   min="0"
                   placeholder="0"
                 />
-                <div class="mt-1 min-h-[20px]"></div>
+                <div class="mt-1 min-h-[20px]">
+                  {#if $errors.purchaseQty}
+                    <span class="text-xs text-red-500">{$errors.purchaseQty}</span>
+                  {/if}
+                </div>
               </div>
             </div>
           </div>
@@ -438,6 +452,9 @@
                 options={{ maxFiles: 5, removeable: mode === 'create', bucket: 'products' }}
               />
               <input type="hidden" name="images" bind:value={$formData.images} />
+              {#if $errors.images?._errors?.length}
+                <span class="mt-1 text-xs text-red-500">{$errors.images._errors[0]}</span>
+              {/if}
             </div>
           </div>
         {/if}

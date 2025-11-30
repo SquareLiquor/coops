@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getProducts } from '$lib/database'
+  import { getProducts } from '$lib/services/products.service'
   import type { ProductEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import { X } from '@lucide/svelte'
