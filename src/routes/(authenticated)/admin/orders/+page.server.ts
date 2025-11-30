@@ -1,4 +1,3 @@
-import { toOrderEntities } from '$lib/converters/order.converter'
 import {
   cancelOrderItem,
   checkOrderItemCancelable,
@@ -50,7 +49,7 @@ export const actions: Actions = {
     try {
       const { orders, pagination } = await getOrders(form.data)
 
-      return { form, orders: toOrderEntities(orders), pagination }
+      return { form, orders, pagination }
     } catch (error) {
       return { form }
     }
