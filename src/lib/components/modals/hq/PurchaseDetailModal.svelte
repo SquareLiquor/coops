@@ -1,8 +1,8 @@
 <script lang="ts">
   import { buildForm } from '$lib/builders/form.builder'
   import PurchaseRejectModal from '$lib/components/modals/hq/PurchaseRejectModal.svelte'
-  import Alert from '$lib/components/ui/Alert.svelte'
   import { PurchaseStatusChangeSchema } from '$lib/schemas'
+  import { showError, showSuccess } from '$lib/stores'
   import { PurchaseStatus, type PurchaseEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
@@ -21,7 +21,6 @@
   let { purchase, actionForm, rejectForm, onClose }: Props = $props()
 
   const refreshPurchases = getContext<() => Promise<void>>('refreshPurchases')
-  let alert = $state<{ type: 'success' | 'error'; message: string } | null>(null)
   let showRejectModal = $state(false)
   let isBasicInfoOpen = $state(false)
   let isPriceInfoOpen = $state(false)
@@ -38,20 +37,18 @@
     schema: PurchaseStatusChangeSchema,
     resultHandler: {
       handleSuccess: async (result) => {
-        alert = {
-          type: 'success',
+        showSuccess({
           message: result.data?.message || '처리되었습니다.',
-        }
-        setTimeout(() => {
-          refreshPurchases?.()
-          onClose()
-        }, 1500)
+          onConfirm: () => {
+            refreshPurchases?.()
+            onClose()
+          },
+        })
       },
       handleFailure: async (result) => {
-        alert = {
-          type: 'error',
+        showError({
           message: result.data?.message || '처리 중 오류가 발생했습니다.',
-        }
+        })
       },
     },
     options: {
@@ -82,16 +79,6 @@
       </div>
     {/if}
 
-    {#if alert}
-      <Alert
-        title={alert.type === 'success' ? '성공' : '오류'}
-        type={alert.type}
-        message={alert.message}
-        onClose={() => (alert = null)}
-      />
-    {/if}
-
-    <!-- 헤더 -->
     <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
       <h2 class="text-xl font-bold text-gray-900">발주 상세 정보</h2>
       <button
@@ -104,10 +91,8 @@
       </button>
     </div>
 
-    <!-- 스크롤 가능한 본문 -->
     <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
       <div class="space-y-4">
-        <!-- 발주 기본 정보 (Collapsible) -->
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
           <button
             type="button"
@@ -162,7 +147,6 @@
           {/if}
         </div>
 
-        <!-- 수량 및 가격 정보 (Collapsible) -->
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
           <button
             type="button"
@@ -206,7 +190,6 @@
           {/if}
         </div>
 
-        <!-- 일자 정보 (Collapsible) -->
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
           <button
             type="button"
@@ -267,7 +250,6 @@
           {/if}
         </div>
 
-        <!-- 거부 사유 (거부된 경우) -->
         {#if equalsEnum(PurchaseStatus.REJECTED, purchase.status) && purchase.rejectionReason}
           <div class="rounded-lg border border-red-200 bg-red-50 p-4">
             <h3 class="mb-2 text-sm font-semibold text-red-900">거부 사유</h3>
@@ -277,7 +259,6 @@
       </div>
     </div>
 
-    <!-- 푸터 (액션 버튼) -->
     <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
       <button
         type="button"

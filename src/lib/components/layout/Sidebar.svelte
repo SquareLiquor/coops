@@ -26,19 +26,16 @@
   })
 </script>
 
-<!-- Modern Sidebar -->
 <aside
   class="flex h-full w-64 flex-col bg-white shadow-lg transition-all duration-300
     {isCollapsed ? '-ml-64' : 'ml-0'}"
 >
-  <!-- 상점명 영역 -->
   <div class="flex h-20 items-center border-b border-gray-200 px-5 py-4">
     <a href="/{storeType}" class="block">
       <h1 class="text-lg font-bold text-gray-900">{store?.name}</h1>
     </a>
   </div>
 
-  <!-- 메뉴 네비게이션 -->
   <nav class="flex-1 overflow-y-auto px-3 py-6">
     <ul class="space-y-1.5">
       {#each menuItems as item}
@@ -57,9 +54,7 @@
     </ul>
   </nav>
 
-  <!-- 하단: 설정 + 사용자 정보 -->
   <div class="border-t border-gray-200 px-3 py-4">
-    <!-- 설정 버튼 -->
     <a
       href="/{storeType}/settings"
       class="mb-3 flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-all
@@ -70,7 +65,6 @@
       <span>설정</span>
     </a>
 
-    <!-- 사용자 정보 -->
     <div class="flex items-center gap-3 rounded-2xl bg-gray-50 p-2.5 transition-all hover:bg-gray-100">
       <div
         class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-gray-900"

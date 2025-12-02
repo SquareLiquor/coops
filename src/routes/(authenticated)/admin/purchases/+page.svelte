@@ -1,10 +1,13 @@
 <script lang="ts">
   import { buildFilterForm } from '$lib/builders/filter.builder'
   import { buildForm } from '$lib/builders/form.builder'
+  import PageHeader from '$lib/components/layout/PageHeader.svelte'
   import PurchaseModal from '$lib/components/modals/admin/PurchaseModal.svelte'
-  import Alert from '$lib/components/ui/Alert.svelte'
+  import EmptyState from '$lib/components/ui/EmptyState.svelte'
+  import Loading from '$lib/components/ui/Loading.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
   import { PurchaseStatusChangeSchema, PurchasesFilterSchema } from '$lib/schemas'
+  import { showError, showSuccess } from '$lib/stores'
   import { PurchaseStatus, type PurchaseEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
@@ -17,7 +20,6 @@
   let purchases: PurchaseEntity[] = $state([])
   let selectedPurchase: PurchaseEntity | null = $state(null)
   let modalMode: 'create' | 'edit' = $state('create')
-  let alert = $state<{ type: 'success' | 'error'; message: string } | null>(null)
 
   onMount(async () => {
     await tick()
@@ -54,17 +56,11 @@
     resultHandler: {
       handleSuccess: async (result) => {
         await asyncFilterSubmit()
-        alert = {
-          type: 'success',
-          message: result.data?.message || '발주가 취소되었습니다.',
-        }
+        showSuccess({ message: result.data?.message || '발주가 취소되었습니다.' })
       },
       handleFailure: async (result) => {
         await asyncFilterSubmit()
-        alert = {
-          type: 'error',
-          message: result.data?.message || '발주 취소 중 오류가 발생했습니다.',
-        }
+        showError({ message: result.data?.message || '발주 취소 중 오류가 발생했습니다.' })
       },
     },
   })
@@ -80,101 +76,15 @@
   }
 </script>
 
-<svelte:head>
-  <title>발주관리 - 관리자</title>
-</svelte:head>
-
-{#if alert}
-  <Alert
-    title={alert.type === 'success' ? '성공' : '오류'}
-    type={alert.type}
-    message={alert.message}
-    onClose={() => (alert = null)}
-  />
-{/if}
-
 <div class="min-h-screen bg-gray-100 p-6">
-  <!-- Header -->
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-gray-900">발주 관리</h1>
-  </div>
+  <PageHeader title="발주 관리" />
 
   <div class="relative">
-    <form method="POST" action="?/fetch" use:filterEnhance class="mb-4" autocomplete="off">
-      <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
-      <input type="hidden" name="page" bind:value={$filterForm.page} />
+    <Loading show={$filterSubmitting} />
 
-      <!-- Filters Row -->
-      <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex items-center gap-2">
-          <!-- 날짜 필터 -->
-          <input
-            type="date"
-            name="dateFrom"
-            bind:value={$filterForm.dateFrom}
-            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-            {...$filterConstraints.dateFrom}
-          />
-          <span class="text-xs text-gray-400">~</span>
-          <input
-            type="date"
-            name="dateTo"
-            bind:value={$filterForm.dateTo}
-            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-            {...$filterConstraints.dateTo}
-          />
-
-          <!-- 카테고리 필터 -->
-          <select
-            class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-            name="categoryId"
-            bind:value={$filterForm.categoryId}
-          >
-            <option value={undefined} selected>전체</option>
-            {#each categories as category}
-              <option value={category.id}>{category.name}</option>
-            {/each}
-          </select>
-        </div>
-
-        <!-- 발주 상태 필터 (우측 또는 아래) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto">
-          <input type="hidden" name="status" bind:value={$filterForm.status} />
-          {#each purchaseStatuses as status}
-            <button
-              type="button"
-              class={[
-                'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
-                $filterForm.status === status.code && 'bg-primary-600 text-white',
-                $filterForm.status !== status.code && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-              ]}
-              onclick={() => ($filterForm.status = status.code)}
-            >
-              {status.label}
-            </button>
-          {/each}
-        </div>
-      </div>
-
-      {#if $filterErrors.dateFrom || $filterErrors.dateTo}
-        <div class="flex flex-col gap-1">
-          {#if $filterErrors.dateFrom}
-            <div class="text-sm text-red-600">{$filterErrors.dateFrom}</div>
-          {/if}
-          {#if $filterErrors.dateTo}
-            <div class="text-sm text-red-600">{$filterErrors.dateTo}</div>
-          {/if}
-        </div>
-      {/if}
-    </form>
+    {@render filter()}
 
     <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
-      {#if $filterSubmitting}
-        <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
-          <span class="loader-giant"></span>
-        </div>
-      {/if}
-
       <table class="min-w-full border-collapse">
         <thead>
           <tr class="border-b border-gray-200 bg-white">
@@ -291,7 +201,6 @@
               </td>
               <td class="px-3 py-2 text-center">
                 <div class="flex items-center justify-center gap-1">
-                  <!-- 발주 신청/재신청 버튼 -->
                   {#if !purchase.id || purchase.reRequestable}
                     <button
                       type="button"
@@ -302,7 +211,6 @@
                     </button>
                   {/if}
 
-                  <!-- 취소 버튼 -->
                   {#if purchase.cancelable}
                     <form method="POST" use:statusChangeEnhance>
                       <input type="hidden" name="id" value={purchase.id} />
@@ -323,28 +231,10 @@
         </tbody>
       </table>
 
-      {#if purchases.length === 0}
-        <div class="py-12 text-center">
-          <div class="flex flex-col items-center justify-center">
-            <svg class="mb-2 h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            <h3 class="text-gray-900 mb-2 text-lg font-semibold">발주 내역이 없습니다.</h3>
-          </div>
-        </div>
-      {/if}
+      <EmptyState show={purchases.length === 0} title="발주 내역이 없습니다" />
     </div>
 
-    <Pagination
-      currentPage={pagination.currentPage}
-      totalPages={pagination.totalPages}
-      onPageChange={(page) => ($filterForm.page = page)}
-    />
+    <Pagination {pagination} onPageChange={(page) => ($filterForm.page = page)} />
   </div>
 </div>
 
@@ -357,3 +247,69 @@
     onClose={() => (selectedPurchase = null)}
   />
 {/if}
+
+{#snippet filter()}
+  <form method="POST" action="?/fetch" use:filterEnhance class="mb-4" autocomplete="off">
+    <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
+    <input type="hidden" name="page" bind:value={$filterForm.page} />
+
+    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center gap-2">
+        <input
+          type="date"
+          name="dateFrom"
+          bind:value={$filterForm.dateFrom}
+          class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          {...$filterConstraints.dateFrom}
+        />
+        <span class="text-xs text-gray-400">~</span>
+        <input
+          type="date"
+          name="dateTo"
+          bind:value={$filterForm.dateTo}
+          class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          {...$filterConstraints.dateTo}
+        />
+
+        <select
+          class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          name="categoryId"
+          bind:value={$filterForm.categoryId}
+        >
+          <option value={undefined} selected>전체</option>
+          {#each categories as category}
+            <option value={category.id}>{category.name}</option>
+          {/each}
+        </select>
+      </div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto">
+        <input type="hidden" name="status" bind:value={$filterForm.status} />
+        {#each purchaseStatuses as status}
+          <button
+            type="button"
+            class={[
+              'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
+              $filterForm.status === status.code && 'bg-primary-600 text-white',
+              $filterForm.status !== status.code && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+            ]}
+            onclick={() => ($filterForm.status = status.code)}
+          >
+            {status.label}
+          </button>
+        {/each}
+      </div>
+    </div>
+
+    {#if $filterErrors.dateFrom || $filterErrors.dateTo}
+      <div class="flex flex-col gap-1">
+        {#if $filterErrors.dateFrom}
+          <div class="text-sm text-red-600">{$filterErrors.dateFrom}</div>
+        {/if}
+        {#if $filterErrors.dateTo}
+          <div class="text-sm text-red-600">{$filterErrors.dateTo}</div>
+        {/if}
+      </div>
+    {/if}
+  </form>
+{/snippet}

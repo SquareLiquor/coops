@@ -26,7 +26,6 @@
     class="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
     role="document"
   >
-    <!-- 헤더 -->
     <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
       <h2 class="text-xl font-bold text-gray-900">상품 상세</h2>
       <button
@@ -39,11 +38,9 @@
       </button>
     </div>
 
-    <!-- 스크롤 가능한 본문 -->
     <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
       {#if product}
         <div class="space-y-4">
-          <!-- 이미지 섹션 -->
           <div class="rounded-lg border border-gray-200 bg-white p-4">
             {#if product.images && product.images.length > 0}
               <div class="relative aspect-video overflow-hidden rounded-lg">
@@ -58,7 +55,6 @@
             {/if}
           </div>
 
-          <!-- 기본 정보 (Collapsible) -->
           <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <button
               type="button"
@@ -101,7 +97,6 @@
             {/if}
           </div>
 
-          <!-- 상품 정보 (Collapsible) -->
           <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <button
               type="button"
@@ -156,7 +151,6 @@
       {/if}
     </div>
 
-    <!-- 푸터: 버튼 -->
     <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
       <button
         type="button"

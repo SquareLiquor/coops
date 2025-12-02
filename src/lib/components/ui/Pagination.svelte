@@ -1,17 +1,18 @@
 <script lang="ts">
+  import type { Pagination } from '$lib/types'
   import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from '@lucide/svelte'
 
   let {
-    currentPage = 1,
-    totalPages = 1,
+    pagination,
     onPageChange,
   }: {
-    currentPage: number
-    totalPages: number
+    pagination: Pagination
     onPageChange: (page: number) => void
   } = $props()
 
-  console.log('Pagination:', { currentPage, totalPages })
+  const currentPage = $derived(pagination.page)
+  const totalPages = $derived(pagination.totalPages)
+
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return
     onPageChange(page)
@@ -48,7 +49,6 @@
 {#if totalPages > 1}
   <div class="mt-4">
     <div class="flex items-center justify-center gap-1">
-      <!-- 처음으로 -->
       <button
         type="button"
         onclick={() => goToPage(1)}
@@ -59,7 +59,6 @@
         <ChevronsLeft class="h-4 w-4" />
       </button>
 
-      <!-- 이전 -->
       <button
         type="button"
         onclick={() => goToPage(currentPage - 1)}
@@ -70,7 +69,6 @@
         <ChevronLeft class="h-4 w-4" />
       </button>
 
-      <!-- 페이지 번호들 -->
       {#each pageNumbers() as pageNum}
         {#if pageNum === '...'}
           <span class="flex h-8 w-8 items-center justify-center text-sm text-gray-400">...</span>
@@ -86,7 +84,6 @@
         {/if}
       {/each}
 
-      <!-- 다음 -->
       <button
         type="button"
         onclick={() => goToPage(currentPage + 1)}
@@ -97,7 +94,6 @@
         <ChevronRight class="h-4 w-4" />
       </button>
 
-      <!-- 마지막으로 -->
       <button
         type="button"
         onclick={() => goToPage(totalPages)}

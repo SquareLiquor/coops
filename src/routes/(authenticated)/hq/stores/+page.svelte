@@ -1,7 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { buildFilterForm } from '$lib/builders/filter.builder'
-  import Alert from '$lib/components/ui/Alert.svelte'
+  import PageHeader from '$lib/components/layout/PageHeader.svelte'
+  import EmptyState from '$lib/components/ui/EmptyState.svelte'
+  import Loading from '$lib/components/ui/Loading.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
   import { StoresFilterSchema } from '$lib/schemas'
   import type { StoreEntity } from '$lib/types'
@@ -11,15 +13,6 @@
 
   let { data }: PageProps = $props()
   let stores: StoreEntity[] = $state([])
-
-  // Alert 상태
-  let showAlert = $state(false)
-  let alertConfig = $state({
-    type: 'info' as 'info' | 'error' | 'warning' | 'success',
-    mode: 'alert' as 'alert' | 'confirm',
-    title: '',
-    message: '',
-  })
 
   onMount(async () => {
     await tick()
@@ -40,32 +33,23 @@
       handleFailure: () => (stores = []),
     },
   })
-
-  const handlePageChange = (page: number) => {
-    $filterForm.page = page
-    asyncFilterSubmit()
-  }
 </script>
 
-<svelte:head>
-  <title>가맹점 관리</title>
-</svelte:head>
-
-{@render alert()}
-{@render loading()}
-
 <div class="min-h-screen bg-gray-100 p-6">
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-gray-900">가맹점 관리</h1>
-    <button
-      class="bg-primary-600 hover:bg-primary-700 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
-      onclick={() => goto('/hq/stores/create')}
-    >
-      새 매장 등록
-    </button>
-  </div>
+  <PageHeader title="가맹점 관리">
+    {#snippet actions()}
+      <button
+        class="bg-primary-600 hover:bg-primary-700 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
+        onclick={() => goto('/hq/stores/create')}
+      >
+        새 매장 등록
+      </button>
+    {/snippet}
+  </PageHeader>
 
   <div class="relative">
+    <Loading show={$filterSubmitting} />
+
     {@render filter()}
 
     <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
@@ -87,7 +71,7 @@
               onclick={() => goto(`/hq/stores/${store.id}`)}
             >
               <td class="border-r border-gray-100 px-3 py-2 text-center text-xs text-gray-600">
-                {(pagination.currentPage - 1) * 10 + index + 1}
+                {(pagination.page - 1) * 10 + index + 1}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-left">
                 <div class="flex items-center gap-2">
@@ -124,25 +108,12 @@
         </tbody>
       </table>
 
-      {@render emptyList()}
+      <EmptyState show={stores.length === 0} title="등록된 매장이 없습니다" />
     </div>
 
-    <Pagination
-      currentPage={pagination.currentPage}
-      totalPages={pagination.totalPages}
-      onPageChange={handlePageChange}
-    />
+    <Pagination {pagination} onPageChange={(page) => ($filterForm.page = page)} />
   </div>
 </div>
-
-<!-- Snipperts -->
-{#snippet loading()}
-  {#if $filterSubmitting}
-    <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
-      <span class="loader-giant"></span>
-    </div>
-  {/if}
-{/snippet}
 
 {#snippet filter()}
   <form method="POST" action="?/fetch" use:filterEnhance>
@@ -158,35 +129,4 @@
       </div>
     </div>
   </form>
-{/snippet}
-
-{#snippet emptyList()}
-  {#if stores.length === 0}
-    <div class="py-12 text-center">
-      <div class="flex flex-col items-center justify-center">
-        <svg class="mb-2 h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-          />
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">등록된 매장이 없습니다</h3>
-      </div>
-    </div>
-  {/if}
-{/snippet}
-
-{#snippet alert()}
-  {#if showAlert}
-    <Alert
-      type={alertConfig.type}
-      mode={alertConfig.mode}
-      title={alertConfig.title}
-      message={alertConfig.message}
-      onClose={() => (showAlert = false)}
-      onConfirm={() => (showAlert = false)}
-    />
-  {/if}
 {/snippet}

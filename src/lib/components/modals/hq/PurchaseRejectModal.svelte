@@ -1,7 +1,7 @@
 <script lang="ts">
   import { buildForm } from '$lib/builders/form.builder'
-  import Alert from '$lib/components/ui/Alert.svelte'
   import { PurchaseRejectSchema } from '$lib/schemas'
+  import { showError, showSuccess } from '$lib/stores'
   import type { PurchaseEntity } from '$lib/types'
   import { X } from '@lucide/svelte'
   import { getContext } from 'svelte'
@@ -16,7 +16,6 @@
   let { purchase, rejectForm, onClose }: Props = $props()
 
   const refreshPurchases = getContext<() => Promise<void>>('refreshPurchases')
-  let alert = $state<{ type: 'success' | 'error'; message: string } | null>(null)
 
   rejectForm.data.id = purchase.id
   rejectForm.data.rejectionReason = ''
@@ -26,20 +25,18 @@
     schema: PurchaseRejectSchema,
     resultHandler: {
       handleSuccess: async (result) => {
-        alert = {
-          type: 'success',
+        showSuccess({
           message: result.data?.message || '발주가 거부되었습니다.',
-        }
-        setTimeout(() => {
-          refreshPurchases?.()
-          onClose()
-        }, 1500)
+          onConfirm: () => {
+            refreshPurchases?.()
+            onClose()
+          },
+        })
       },
       handleFailure: async (result) => {
-        alert = {
-          type: 'error',
+        showError({
           message: result.data?.message || '발주 거부 중 오류가 발생했습니다.',
-        }
+        })
       },
     },
     options: {
@@ -67,19 +64,8 @@
         </div>
       {/if}
 
-      {#if alert}
-        <Alert
-          title={alert.type === 'success' ? '성공' : '오류'}
-          type={alert.type}
-          message={alert.message}
-          onClose={() => (alert = null)}
-        />
-      {/if}
-
-      <!-- Hidden input -->
       <input type="hidden" name="id" value={$form.id} />
 
-      <!-- 헤더 -->
       <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
         <h2 class="text-xl font-bold text-gray-900">발주 거부</h2>
         <button
@@ -92,10 +78,8 @@
         </button>
       </div>
 
-      <!-- 스크롤 가능한 본문 -->
       <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
         <div class="space-y-4">
-          <!-- 발주 정보 -->
           <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
             <dl class="space-y-2.5">
               <div class="flex items-start justify-between">
@@ -113,7 +97,6 @@
             </dl>
           </div>
 
-          <!-- 거부 사유 -->
           <div>
             <label for="rejectionReason" class="mb-1.5 block text-sm font-medium text-gray-700">
               거부 사유 <span class="text-red-500">*</span>
@@ -134,7 +117,6 @@
         </div>
       </div>
 
-      <!-- 푸터 -->
       <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
         <button
           type="button"

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PageHeader from '$lib/components/layout/PageHeader.svelte'
   import { ApprovalStatus, PurchaseStatus } from '$lib/types'
   import { formatCurrency, formatNumberWithCommas } from '$lib/utils'
   import dayjs from 'dayjs'
@@ -56,17 +57,15 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-100 p-6">
-  <!-- Header -->
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-gray-900">본사 대시보드</h1>
-    <div class="text-sm text-gray-500">
-      {dayjs().format('YYYY년 M월 D일')}
-    </div>
-  </div>
+  <PageHeader title="본사 대시보드">
+    {#snippet actions()}
+      <div class="text-sm text-gray-500">
+        {dayjs().format('YYYY년 M월 D일')}
+      </div>
+    {/snippet}
+  </PageHeader>
 
-  <!-- KPI Cards -->
   <div class="mb-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-    <!-- 총 매출 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-medium text-gray-600">총 매출</h3>
@@ -93,7 +92,6 @@
       {/if}
     </div>
 
-    <!-- 총 주문 건수 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-medium text-gray-600">총 주문 건수</h3>
@@ -122,7 +120,6 @@
       {/if}
     </div>
 
-    <!-- 미승인 매니저 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-medium text-gray-600">미승인 매니저</h3>
@@ -141,7 +138,6 @@
       <div class="text-sm text-gray-500">승인 대기중</div>
     </div>
 
-    <!-- 미승인 발주 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <div class="mb-2 flex items-center justify-between">
         <h3 class="text-sm font-medium text-gray-600">미승인 발주</h3>
@@ -161,9 +157,7 @@
     </div>
   </div>
 
-  <!-- 승인 상태 & 발주 상태 Summary -->
   <div class="mb-6 grid gap-6 lg:grid-cols-2">
-    <!-- 승인 상태별 현황 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <h3 class="mb-4 text-lg font-semibold text-gray-900">승인 상태별 현황</h3>
       <div class="space-y-3">
@@ -183,7 +177,6 @@
       </div>
     </div>
 
-    <!-- 발주 상태별 현황 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <h3 class="mb-4 text-lg font-semibold text-gray-900">발주 상태별 현황</h3>
       <div class="space-y-3">
@@ -207,9 +200,7 @@
     </div>
   </div>
 
-  <!-- 3 Detail Sections -->
   <div class="grid gap-6 lg:grid-cols-3">
-    <!-- 매출 상위 가맹점 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <h3 class="mb-4 text-lg font-semibold text-gray-900">이번달 매출 상위 가맹점</h3>
       <div class="space-y-3">
@@ -233,7 +224,6 @@
       </div>
     </div>
 
-    <!-- 최근 승인 요청 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <h3 class="mb-4 text-lg font-semibold text-gray-900">최근 승인 요청</h3>
       <div class="space-y-3">
@@ -263,7 +253,6 @@
       </div>
     </div>
 
-    <!-- 최근 발주 요청 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <h3 class="mb-4 text-lg font-semibold text-gray-900">최근 발주 요청</h3>
       <div class="space-y-3">

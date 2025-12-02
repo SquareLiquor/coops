@@ -1,15 +1,6 @@
 import type { PaginationInput } from '$lib/schemas'
+import type { PaginationResult } from '$lib/types'
 import type { PostgrestFilterBuilder } from '@supabase/postgrest-js'
-
-export type PaginationResult<T> = {
-  data: T[]
-  pagination: {
-    page: number
-    pageSize: number
-    totalCount: number
-    totalPages: number
-  }
-}
 
 /**
  * Supabase 쿼리에 페이징을 체이닝 방식으로 적용하는 빌더

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { buildForm } from '$lib/builders/form.builder'
-  import Alert from '$lib/components/ui/Alert.svelte'
   import { PurchaseCreateSchema, PurchaseUpdateSchema } from '$lib/schemas'
+  import { showError, showSuccess } from '$lib/stores'
   import { PurchaseStatus } from '$lib/types'
   import { formatCurrency, formatNumberWithCommas } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
@@ -13,7 +13,6 @@
   let isOriginInfoOpen = $state(false)
   let isSalesInfoOpen = $state(false)
   const updatePurchases = getContext<() => Promise<void>>('updatePurchases')
-  let alert = $state<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const isEditMode = mode === 'edit' && !!purchase.id
   // 재신청 모드: 기존 id가 있고 reRequestable이면 update로 처리
@@ -49,17 +48,16 @@
     resultHandler: {
       handleSuccess: async (result) => {
         await updatePurchases()
-        alert = {
-          type: 'success',
+        showSuccess({
           message: result.data?.message || (isEditMode ? '발주 정보가 수정되었습니다.' : '발주 신청이 완료되었습니다.'),
-        }
+          onConfirm: onClose,
+        })
       },
       handleFailure: async (result) => {
         await updatePurchases()
-        alert = {
-          type: 'error',
+        showError({
           message: result.data?.message || '오류가 발생했습니다.',
-        }
+        })
       },
     },
     options: {
@@ -101,7 +99,6 @@
         </div>
       {/if}
 
-      <!-- Hidden inputs -->
       {#if isEditMode || isReRequestMode}
         <input type="hidden" name="id" value={($form as any).id} />
       {:else}
@@ -113,7 +110,6 @@
       <input type="hidden" name="unit" value={$form.unit} />
       <input type="hidden" name="totalPrice" value={totalPrice} />
 
-      <!-- 헤더 -->
       <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
         <h2 class="text-xl font-bold text-gray-900">
           {isViewMode ? '발주 상세' : isEditMode ? '발주 수정' : isReRequestMode ? '발주 재신청' : '발주 신청'}
@@ -128,10 +124,8 @@
         </button>
       </div>
 
-      <!-- 스크롤 가능한 본문 -->
       <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
         <div class="space-y-4">
-          <!-- 1단: 본사 상품 정보 (Collapsible) -->
           <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <button
               type="button"
@@ -189,7 +183,6 @@
             {/if}
           </div>
 
-          <!-- 2단: 판매 상품 정보 (Collapsible) -->
           <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <button
               type="button"
@@ -251,9 +244,7 @@
             {/if}
           </div>
 
-          <!-- 3단: 신청 폼 -->
           <div class="space-y-4 pt-2">
-            <!-- 발주 수량 -->
             <div>
               <label for="quantity" class="mb-2 block text-sm font-medium"> 발주 수량 </label>
               <div class="relative">
@@ -281,7 +272,6 @@
               {/if}
             </div>
 
-            <!-- 발주 요약 -->
             {#if $form.quantity > 0}
               <div class="space-y-2 rounded-lg bg-blue-50 px-4 py-3">
                 <div class="flex items-center justify-between text-xs">
@@ -302,7 +292,6 @@
               </div>
             {/if}
 
-            <!-- 비고 -->
             <div>
               <label for="notes" class="mb-2 block text-sm font-medium text-gray-700">비고</label>
               <textarea
@@ -322,7 +311,6 @@
               {/if}
             </div>
 
-            <!-- 현재 발주 상태 -->
             {#if purchase.status}
               <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
                 <div class="flex items-center justify-between">
@@ -348,7 +336,6 @@
         </div>
       </div>
 
-      <!-- 푸터: 버튼 -->
       <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
         <button
           type="button"
@@ -370,13 +357,3 @@
     </section>
   </form>
 </div>
-
-{#if alert}
-  <Alert
-    title={alert.type === 'success' ? '성공' : '오류'}
-    type={alert.type}
-    message={alert.message}
-    {onClose}
-    onConfirm={onClose}
-  />
-{/if}

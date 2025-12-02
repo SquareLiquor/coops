@@ -1,5 +1,6 @@
 <script lang="ts">
   import favicon from '$lib/assets/favicon.svg'
+  import GlobalAlert from '$lib/components/layout/GlobalAlert.svelte'
   import { setupAuthStateListener, syncUserToAuthState } from '$lib/stores'
   import { onMount } from 'svelte'
   import '../app.css'
@@ -25,6 +26,8 @@
 <svelte:head>
   <link rel="icon" href={favicon} />
 </svelte:head>
+
+<GlobalAlert />
 
 <div class="from-surface-50/50 to-surface-50/10 min-h-screen bg-gradient-to-br">
   {@render children?.()}

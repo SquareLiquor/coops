@@ -36,7 +36,6 @@
 </script>
 
 <div class="flex h-screen bg-white">
-  <!-- 토글 버튼 (항상 표시) -->
   <button
     type="button"
     onclick={() => (isCollapsed = !isCollapsed)}
@@ -51,7 +50,6 @@
     {/if}
   </button>
 
-  <!-- 오버레이 (모바일에서 사이드바 열렸을 때) -->
   {#if isAutoHidden && !isCollapsed}
     <button
       type="button"

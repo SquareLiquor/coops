@@ -1,8 +1,6 @@
 <script lang="ts">
+  import type { AlertMode, AlertType } from '$lib/types'
   import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from '@lucide/svelte'
-
-  type AlertType = 'info' | 'error' | 'warning' | 'success'
-  type AlertMode = 'alert' | 'confirm'
 
   let {
     type = 'info',
@@ -71,21 +69,17 @@
   }
 </script>
 
-<!-- 오버레이 -->
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-  <!-- Alert 모달 -->
   <div class="w-full max-w-md rounded-2xl bg-white shadow-xl">
-    <!-- 헤더 영역 -->
     <div class="relative flex items-center gap-4 border-b border-gray-100 p-6">
-      <!-- 아이콘 -->
       <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full {config.iconBg}">
         <IconComponent class="h-6 w-6 {config.iconColor}" />
       </div>
 
-      <!-- 제목 -->
-      <h3 class="flex-1 text-lg font-semibold text-gray-900">{title}</h3>
+      {#if title}
+        <h3 class="flex-1 text-lg font-semibold text-gray-900">{title}</h3>
+      {/if}
 
-      <!-- 닫기 버튼 -->
       {#if onClose}
         <button
           type="button"
@@ -98,12 +92,10 @@
       {/if}
     </div>
 
-    <!-- 메시지 영역 -->
     <div class="p-6">
       <p class="text-sm leading-relaxed text-gray-600">{message}</p>
     </div>
 
-    <!-- 버튼 영역 -->
     <div class="flex gap-3 border-t border-gray-100 p-6">
       {#if mode === 'confirm'}
         <button

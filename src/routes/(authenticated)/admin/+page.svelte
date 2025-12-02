@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PageHeader from '$lib/components/layout/PageHeader.svelte'
   import type { DashboardData } from '$lib/services/dashboard.service'
   import type { CoopEntity, OrderEntity, PurchaseEntity } from '$lib/types'
   import { OrderStatus, PurchaseStatus } from '$lib/types'
@@ -117,16 +118,13 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-100 p-6">
-  <!-- Header -->
   <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">대시보드</h1>
+    <PageHeader title="대시보드" />
     <p class="text-gray-600 mt-1">매장 운영 현황을 한눈에 확인하세요</p>
   </div>
 
-  <!-- 1. 이번달 매출 요약 -->
   {#if monthlyStats}
     <div class="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <!-- 총 매출 -->
       <div class="rounded-xl bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
@@ -154,7 +152,6 @@
         </div>
       </div>
 
-      <!-- 총 주문 건수 -->
       <div class="rounded-xl bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
@@ -182,7 +179,6 @@
         </div>
       </div>
 
-      <!-- 평균 주문 금액 -->
       <div class="rounded-xl bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
@@ -203,7 +199,6 @@
         </div>
       </div>
 
-      <!-- 미확인 주문 -->
       <div class="rounded-xl bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
@@ -230,9 +225,7 @@
     </div>
   {/if}
 
-  <!-- 2단 그리드: 주요 현황 -->
   <div class="mb-6 grid gap-6 lg:grid-cols-2">
-    <!-- 주문 상태별 현황 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <h3 class="text-gray-900 mb-4 text-lg font-semibold">주문 상태별 현황</h3>
       {#if orderStatusStats.length > 0}
@@ -256,7 +249,6 @@
       {/if}
     </div>
 
-    <!-- 발주 상태별 현황 -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <h3 class="text-gray-900 text-lg font-semibold">발주 상태별 현황</h3>
@@ -290,9 +282,7 @@
     </div>
   </div>
 
-  <!-- 3단 그리드: 상세 현황 -->
   <div class="grid gap-6 lg:grid-cols-3">
-    <!-- 진행중 판매 상품 현황 -->
     <div class="rounded-xl bg-white shadow-sm">
       <div class="p-6">
         <div class="flex items-center justify-between pb-4">
@@ -306,7 +296,6 @@
             {#each activeProducts as product}
               <div class="hover:bg-gray-50 space-y-3 rounded-lg border border-gray-100 p-3 transition-colors">
                 <div class="flex items-start gap-2.5">
-                  <!-- 상품 이미지 -->
                   <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                     {#if product.images && product.images.length > 0}
                       <img
@@ -319,7 +308,6 @@
                     {/if}
                   </div>
 
-                  <!-- 상품 정보 -->
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-1">
                       <h4 class="text-gray-900 text-sm font-medium truncate">{product.name}</h4>
@@ -338,7 +326,6 @@
                       {/if}
                     </div>
 
-                    <!-- 진행률 -->
                     <div class="space-y-1.5">
                       <div class="flex justify-between text-xs">
                         <span class="text-gray-600">주문 진행률</span>
@@ -365,7 +352,6 @@
       </div>
     </div>
 
-    <!-- 최근 주문 현황 -->
     <div class="rounded-xl bg-white shadow-sm">
       <div class="p-6">
         <div class="flex items-center justify-between pb-4">
@@ -379,7 +365,6 @@
             {#each recentOrders as order}
               <div class="hover:bg-gray-50 rounded-lg border border-gray-100 p-3 transition-colors">
                 <div class="flex items-start gap-2.5">
-                  <!-- 상품 이미지 -->
                   <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                     {#if order.items[0]?.coop?.images && order.items[0].coop.images.length > 0}
                       <img
@@ -393,7 +378,6 @@
                     {/if}
                   </div>
 
-                  <!-- 주문 정보 -->
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-1">
                       <div class="flex-1 min-w-0">
@@ -425,7 +409,6 @@
       </div>
     </div>
 
-    <!-- 최근 발주 현황 -->
     <div class="rounded-xl bg-white shadow-sm">
       <div class="p-6">
         <div class="flex items-center justify-between pb-4">
@@ -439,7 +422,6 @@
             {#each recentPurchases as purchase}
               <div class="hover:bg-gray-50 rounded-lg border border-gray-100 p-3 transition-colors">
                 <div class="flex items-start gap-2.5">
-                  <!-- 상품 이미지 -->
                   <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                     {#if purchase.originProductRepresentativeImage}
                       <img
@@ -452,7 +434,6 @@
                     {/if}
                   </div>
 
-                  <!-- 발주 정보 -->
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-1">
                       <div class="flex-1 min-w-0">

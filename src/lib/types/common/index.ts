@@ -1,3 +1,4 @@
+export * from './alert.type'
 export * from './enums'
 export * from './form'
 export * from './pagination.type'

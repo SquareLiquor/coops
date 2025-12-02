@@ -58,11 +58,8 @@
   <title>설정 - 공동구매</title>
 </svelte:head>
 
-<!-- 소비자 설정 페이지 - Mobile First -->
 <div class="to-surface-50/30 min-h-screen bg-gradient-to-br from-white">
-  <!-- Main Content -->
   <main class="container mx-auto px-4 py-6 pb-20">
-    <!-- Profile Section -->
     <div
       class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 mb-6 overflow-hidden rounded-xl border bg-white shadow-sm"
     >
@@ -71,7 +68,6 @@
       </div>
 
       <div class="p-6">
-        <!-- Profile Image -->
         <div class="mb-6 flex flex-col items-center">
           <div class="relative mb-4">
             <img
@@ -110,7 +106,6 @@
           {/if}
         </div>
 
-        <!-- Profile Form -->
         <div class="space-y-4">
           <div>
             <label for="user-name" class="text-surface-700 dark:text-surface-300 mb-1 block text-sm font-medium">
@@ -168,7 +163,6 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="mt-6 flex space-x-3">
           {#if isEditing}
             <button
@@ -195,7 +189,6 @@
       </div>
     </div>
 
-    <!-- Settings Section -->
     <div
       class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 mb-6 overflow-hidden rounded-xl border bg-white shadow-sm"
     >
@@ -204,7 +197,6 @@
       </div>
 
       <div class="divide-surface-100 dark:divide-surface-700 divide-y">
-        <!-- Notification Settings -->
         <div class="p-4">
           <div class="flex items-center justify-between">
             <div>
@@ -220,7 +212,6 @@
           </div>
         </div>
 
-        <!-- Marketing Settings -->
         <div class="p-4">
           <div class="flex items-center justify-between">
             <div>
@@ -238,7 +229,6 @@
       </div>
     </div>
 
-    <!-- App Info Section -->
     <div
       class="border-surface-200 dark:border-surface-700 dark:bg-surface-800 mb-6 overflow-hidden rounded-xl border bg-white shadow-sm"
     >
@@ -280,7 +270,6 @@
       </div>
     </div>
 
-    <!-- Logout Button -->
     <div class="mb-6">
       <button
         onclick={logout}

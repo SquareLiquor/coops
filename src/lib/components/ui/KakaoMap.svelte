@@ -176,7 +176,6 @@
                 class="focus:border-primary-500 w-full rounded-full border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20"
               />
 
-              <!-- 검색 결과 드롭다운 -->
               {#if showResults && searchResults.length > 0}
                 <div class="absolute top-full mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-xl">
                   {#each searchResults as result, index}

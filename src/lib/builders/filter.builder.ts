@@ -6,6 +6,13 @@ import { valibot } from 'sveltekit-superforms/adapters'
 import type { BaseSchema, InferOutput } from 'valibot'
 import type { BuilderSuperFormParamaters } from './type'
 
+const initialPagination = {
+  page: 1,
+  totalPages: 1,
+  totalCount: 0,
+  pageSize: 10,
+}
+
 export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: BuilderSuperFormParamaters<S>) => {
   const { form, schema, changeHandler = {}, submitHandler = {}, resultHandler = {}, options = {} } = params
   const { beforeChange } = changeHandler
@@ -14,11 +21,7 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
   const { dataType = 'json', resetForm = false, useClientValidation = false } = options
 
   // 페이징 상태 객체 (외부에서 $state로 감싸서 사용)
-  const pagination = {
-    currentPage: 1,
-    totalPages: 1,
-    totalCount: 0,
-  }
+  let pagination = initialPagination
 
   const formOptions: FormOptions<InferOutput<S>, any, InferOutput<S>> = {
     validators: valibot(schema),
@@ -48,17 +51,13 @@ export const buildFilterForm = <S extends BaseSchema<any, any, any>>(params: Bui
         // pagination 정보가 있으면 상태 업데이트
         const paginationData = (result as any).data?.pagination
         if (paginationData) {
-          pagination.currentPage = paginationData.page
-          pagination.totalPages = paginationData.totalPages
-          pagination.totalCount = paginationData.totalCount
+          pagination = paginationData
         }
         handleSuccess && handleSuccess(result, paginationData)
       }
       if (result?.type === 'failure') {
         // 실패 시 페이징 초기화
-        pagination.currentPage = 1
-        pagination.totalPages = 1
-        pagination.totalCount = 0
+        pagination = initialPagination
         handleFailure && handleFailure(result)
       }
     },

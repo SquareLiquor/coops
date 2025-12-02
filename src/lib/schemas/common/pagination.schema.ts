@@ -6,7 +6,6 @@ export const PaginationSchema = v.object({
 })
 
 export type PaginationInput = v.InferInput<typeof PaginationSchema>
-export type PaginationOutput = v.InferOutput<typeof PaginationSchema>
 
 export const getInitialPaginationValues = (): PaginationInput => {
   return { page: 1, pageSize: 10 }

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import Alert from '$lib/components/ui/Alert.svelte'
   import Carousel from '$lib/components/ui/Carousel.svelte'
   import type { CoopEntity } from '$lib/types'
   import { formatNumberWithCommas } from '$lib/utils'
@@ -12,7 +11,6 @@
   let isBasicInfoOpen = $state(false)
   let isSalesInfoOpen = $state(false)
   let isProductInfoOpen = $state(false)
-  let showAlert = $state(false)
 
   const handleEdit = () => {
     goto(`/admin/coops/${coop?.id}`)
@@ -31,7 +29,6 @@
     class="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
     role="document"
   >
-    <!-- 헤더 -->
     <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
       <h2 class="text-xl font-bold text-gray-900">공동구매 상세</h2>
       <button
@@ -44,11 +41,9 @@
       </button>
     </div>
 
-    <!-- 스크롤 가능한 본문 -->
     <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
       {#if coop}
         <div class="space-y-4">
-          <!-- 이미지 섹션 -->
           <div class="rounded-lg border border-gray-200 bg-white p-4">
             {#if coop.images && coop.images.length > 0}
               <div class="relative aspect-video overflow-hidden rounded-lg">
@@ -63,7 +58,6 @@
             {/if}
           </div>
 
-          <!-- 기본 정보 (Collapsible) -->
           <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <button
               type="button"
@@ -110,7 +104,6 @@
             {/if}
           </div>
 
-          <!-- 판매 정보 (Collapsible) -->
           <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
             <button
               type="button"
@@ -227,7 +220,6 @@
       {/if}
     </div>
 
-    <!-- 푸터: 버튼 -->
     <div class="flex items-center justify-between border-t border-gray-200 px-6 py-3">
       <button
         type="button"
@@ -248,17 +240,3 @@
     </div>
   </section>
 </div>
-
-{#if showAlert}
-  <Alert
-    type="error"
-    mode="confirm"
-    title="상품 삭제"
-    message="정말로 이 상품을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다."
-    confirmText="삭제"
-    cancelText="취소"
-    onConfirm={() => (showAlert = false)}
-    onCancel={() => (showAlert = false)}
-    onClose={() => (showAlert = false)}
-  />
-{/if}

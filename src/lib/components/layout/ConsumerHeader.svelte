@@ -31,16 +31,6 @@
     <div class="px-4 py-2">
       <div class="relative flex items-center">
         <House class="text-white" size={24} />
-        <!-- <div class="flex items-center">
-        <button
-          type="button"
-          class="ml-2 cursor-pointer border-none bg-transparent text-xl"
-          aria-label="매장 홈으로 이동"
-          onclick={() => goto('/coops')}
-        >
-          {store.logo}
-        </button>
-      </div> -->
 
         <div class="absolute left-1/2 -translate-x-1/2 transform">
           <h1 class="text-base font-bold text-white">{store.name}</h1>
@@ -90,16 +80,6 @@
                   >
                     주문 내역
                   </button>
-                  <!-- <button
-                      type="button"
-                      class="text-surface-700 hover:bg-surface-50 block w-full px-4 py-2 text-left text-sm"
-                      onclick={() => {
-                        showUserMenu = false
-                        goto('/settings')
-                      }}
-                    >
-                      설정
-                    </button> -->
                   <hr class="my-2" style="border-color: #a6adc8;" />
                   <button
                     class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"

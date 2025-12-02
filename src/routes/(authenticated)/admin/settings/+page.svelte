@@ -14,10 +14,6 @@
   }
 </script>
 
-<svelte:head>
-  <title>매장 정보 수정 - 관리자</title>
-</svelte:head>
-
 <div class="flex h-full flex-col">
   <StoreForm {data} mode="edit" onSubmit={handleSuccess} onCancel={handleCancel} />
 </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { buildForm } from '$lib/builders/form.builder'
-  import Alert from '$lib/components/ui/Alert.svelte'
   import { OrderUpdateSchema } from '$lib/schemas'
+  import { showError, showSuccess } from '$lib/stores'
   import { OrderStatus, type OrderEntity } from '$lib/types'
   import { formatCurrency } from '$lib/utils'
   import { equalsEnum } from '$lib/utils/enum'
@@ -12,7 +12,6 @@
   let { form, order, onClose }: { form: any; order: OrderEntity; onClose: () => void } = $props()
 
   const updateOrder = getContext<(orderId: string) => Promise<void>>('updateOrder')
-  let alert: { type: 'success' | 'error'; message: string } | null = $state(null)
 
   const { enhance, submitting } = buildForm({
     form,
@@ -20,11 +19,11 @@
     resultHandler: {
       handleSuccess: async (result) => {
         await updateOrder(order.id)
-        alert = { type: 'success', message: result.data?.form.message || '성공했습니다.' }
+        showSuccess({ message: result.data?.form.message || '성공했습니다.' })
       },
       handleFailure: async (result) => {
         await updateOrder(order.id)
-        alert = { type: 'error', message: result.data?.form.message || '오류가 발생했습니다.' }
+        showError({ message: result.data?.form.message || '오류가 발생했습니다.' })
       },
     },
   })
@@ -41,7 +40,6 @@
     class="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
     role="document"
   >
-    <!-- 헤더 -->
     <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
       <h2 class="text-xl font-bold text-gray-900">주문 상세</h2>
       <button
@@ -54,7 +52,6 @@
       </button>
     </div>
 
-    <!-- 스크롤 가능한 본문 -->
     <div class="flex-1 overflow-y-auto px-6 pt-6 pb-6">
       <div class="space-y-4">
         <div class="rounded-lg border border-gray-200 bg-white">
@@ -211,13 +208,3 @@
     </div>
   </section>
 </div>
-
-{#if alert}
-  <Alert
-    type={alert.type}
-    mode="alert"
-    title={alert.type === 'success' ? '성공' : '오류'}
-    message={alert.message}
-    onClose={() => (alert = null)}
-  />
-{/if}

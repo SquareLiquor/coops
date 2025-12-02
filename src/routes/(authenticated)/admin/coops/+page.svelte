@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import { buildFilterForm } from '$lib/builders/filter.builder'
+  import PageHeader from '$lib/components/layout/PageHeader.svelte'
   import CoopDetailModal from '$lib/components/modals/admin/CoopDetailModal.svelte'
-  import Alert from '$lib/components/ui/Alert.svelte'
+  import EmptyState from '$lib/components/ui/EmptyState.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
   import { CoopsFilterSchema } from '$lib/schemas'
   import type { CoopEntity } from '$lib/types'
@@ -14,20 +16,6 @@
   let { categories, salesStatuses } = data
   let coops: CoopEntity[] = $state([])
   let selectedCoopId: string | null = $state(null)
-
-  function handlePageChange(page: number) {
-    $filterForm.page = page
-    asyncFilterSubmit()
-  }
-
-  // Alert 상태 관리
-  let showAlert = $state(false)
-  let alertConfig = $state({
-    type: 'info' as 'info' | 'error' | 'warning' | 'success',
-    mode: 'alert' as 'alert' | 'confirm',
-    title: '',
-    message: '',
-  })
 
   onMount(async () => {
     await tick()
@@ -71,26 +59,17 @@
   }
 </script>
 
-<svelte:head>
-  <title>판매 상품 관리 - 관리자</title>
-</svelte:head>
-
 <div class="min-h-screen bg-gray-100 p-6">
-  <!-- Header -->
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-gray-900">판매 상품 관리</h1>
-    <div class="flex items-center gap-2">
-      <a
-        href="/admin/coops/create"
-        class="bg-primary-600 hover:bg-primary-700 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
+  <PageHeader title="판매 상품 관리">
+    {#snippet actions()}
+      <button
+        class="bg-primary-600 hover:bg-primary-700 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors"
+        onclick={() => goto('/admin/coops/create')}
       >
-        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
         새 상품 등록
-      </a>
-    </div>
-  </div>
+      </button>
+    {/snippet}
+  </PageHeader>
 
   <div class="relative">
     <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
@@ -98,10 +77,8 @@
       <input type="hidden" name="page" bind:value={$filterForm.page} />
       <input type="hidden" name="pageSize" bind:value={$filterForm.pageSize} />
 
-      <!-- Filters Row -->
       <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div class="flex items-center gap-2">
-          <!-- 날짜 필터 -->
           <input
             type="date"
             name="dateFrom"
@@ -118,7 +95,6 @@
             {...$filterConstraints.dateTo}
           />
 
-          <!-- 카테고리 필터 -->
           <select
             class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
             name="categoryId"
@@ -130,7 +106,6 @@
             {/each}
           </select>
 
-          <!-- 상품명 검색 -->
           <input
             type="text"
             name="name"
@@ -140,7 +115,6 @@
           />
         </div>
 
-        <!-- 판매 상태 필터 (우측 또는 아래) -->
         <div class="flex items-center gap-1.5 overflow-x-auto">
           <input type="hidden" name="status" bind:value={$filterForm.status} />
           {#each salesStatuses as option}
@@ -310,49 +284,17 @@
                 {dayjs(coop.createdAt).format('YYYY.MM.DD')}
               </td>
             </tr>
-          {:else}
-            <tr>
-              <td colspan="9" class="border-0 py-12 text-center">
-                <div class="flex flex-col items-center justify-center">
-                  <svg class="mb-2 h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                    />
-                  </svg>
-                  <h3 class="text-sm font-medium text-gray-900">판매 상품이 없습니다</h3>
-                  <p class="mt-1 text-sm text-gray-500">새 상품을 등록하여 시작하세요</p>
-                </div>
-              </td>
-            </tr>
           {/each}
         </tbody>
       </table>
+
+      <EmptyState show={coops.length === 0} title="판매 상품이 없습니다" description="새 상품을 등록하여 시작하세요" />
     </div>
 
-    <!-- 페이지네이션 -->
-    <Pagination
-      currentPage={pagination.currentPage}
-      totalPages={pagination.totalPages}
-      onPageChange={handlePageChange}
-    />
+    <Pagination {pagination} onPageChange={(page) => ($filterForm.page = page)} />
   </div>
 </div>
 
 {#if selectedCoopId}
   <CoopDetailModal coop={coops.find((c) => c.id === selectedCoopId) || null} onClose={() => (selectedCoopId = null)} />
-{/if}
-
-{#if showAlert}
-  <Alert
-    type={alertConfig.type}
-    mode={alertConfig.mode}
-    title={alertConfig.title}
-    message={alertConfig.message}
-    onConfirm={() => (showAlert = false)}
-    onCancel={() => (showAlert = false)}
-    onClose={() => (showAlert = false)}
-  />
 {/if}

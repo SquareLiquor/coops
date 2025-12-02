@@ -41,7 +41,6 @@
     class="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
     role="document"
   >
-    <!-- 헤더 -->
     <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
       <h2 class="text-xl font-bold text-gray-900">본사 상품 선택</h2>
       <button
@@ -54,7 +53,6 @@
       </button>
     </div>
 
-    <!-- 검색 영역 -->
     <div class="border-b border-gray-200 bg-white px-6 py-4">
       <input
         type="text"
@@ -64,7 +62,6 @@
       />
     </div>
 
-    <!-- 스크롤 가능한 본문 -->
     <div class="flex-1 overflow-y-auto">
       {#if filteredProducts.length === 0}
         <div class="flex h-64 items-center justify-center text-sm text-gray-500">
@@ -74,7 +71,6 @@
         <div class="divide-y divide-gray-100">
           {#each filteredProducts as product, index}
             <div class="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-gray-50">
-              <!-- 상품 이미지 -->
               <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                 {#if product.images && product.images.length > 0}
                   <img
@@ -87,7 +83,6 @@
                 {/if}
               </div>
 
-              <!-- 상품 정보 -->
               <div class="flex flex-1 flex-col justify-center gap-1.5">
                 <div class="flex items-center gap-2">
                   <span class="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
@@ -115,7 +110,6 @@
                 </div>
               </div>
 
-              <!-- 선택 버튼 -->
               <button
                 type="button"
                 class="bg-primary-600 hover:bg-primary-700 rounded-full px-4 py-2 text-xs font-medium text-white transition-colors focus:outline-none"

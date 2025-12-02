@@ -14,8 +14,4 @@
   }
 </script>
 
-<svelte:head>
-  <title>매장 정보 수정</title>
-</svelte:head>
-
 <StoreForm {data} mode="edit" onSubmit={handleSuccess} onCancel={handleCancel} />
