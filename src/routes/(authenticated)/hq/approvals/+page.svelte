@@ -197,9 +197,7 @@
                 {request.store?.name}
               </td>
               <td class="border-r border-gray-100 px-3 py-2 text-center whitespace-nowrap">
-                <span
-                  class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium text-${request.status?.color}-800 bg-${request.status?.color}-100`}
-                >
+                <span class={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${request.status?.badgeClass}`}>
                   {request.status?.label}
                 </span>
               </td>
