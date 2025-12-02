@@ -267,14 +267,10 @@
       {/if}
     </div>
 
-    {#if requests.length > 0 || pagination.totalPages > 1}
-      <div class="mt-4">
-        <Pagination
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
-    {/if}
+    <Pagination
+      currentPage={pagination.currentPage}
+      totalPages={pagination.totalPages}
+      onPageChange={handlePageChange}
+    />
   </div>
 </div>

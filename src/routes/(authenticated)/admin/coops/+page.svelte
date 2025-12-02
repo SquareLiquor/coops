@@ -333,15 +333,11 @@
     </div>
 
     <!-- 페이지네이션 -->
-    {#if coops.length > 0}
-      <div class="mt-6">
-        <Pagination
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          onPageChange={handlePageChange}
-        />
-      </div>
-    {/if}
+    <Pagination
+      currentPage={pagination.currentPage}
+      totalPages={pagination.totalPages}
+      onPageChange={handlePageChange}
+    />
   </div>
 </div>
 

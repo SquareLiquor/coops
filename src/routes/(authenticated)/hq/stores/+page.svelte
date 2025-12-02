@@ -127,7 +127,11 @@
       {@render emptyList()}
     </div>
 
-    {@render paging(pagination)}
+    <Pagination
+      currentPage={pagination.currentPage}
+      totalPages={pagination.totalPages}
+      onPageChange={handlePageChange}
+    />
   </div>
 </div>
 
@@ -170,14 +174,6 @@
         </svg>
         <h3 class="mt-2 text-sm font-medium text-gray-900">등록된 매장이 없습니다</h3>
       </div>
-    </div>
-  {/if}
-{/snippet}
-
-{#snippet paging({ currentPage, totalPages }: { currentPage: number; totalPages: number })}
-  {#if totalPages > 1}
-    <div class="mt-4">
-      <Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
     </div>
   {/if}
 {/snippet}

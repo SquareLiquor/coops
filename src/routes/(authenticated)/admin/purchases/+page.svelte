@@ -340,15 +340,11 @@
       {/if}
     </div>
 
-    {#if purchases.length > 0 || pagination.totalPages > 1}
-      <div class="mt-4">
-        <Pagination
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          onPageChange={(page) => ($filterForm.page = page)}
-        />
-      </div>
-    {/if}
+    <Pagination
+      currentPage={pagination.currentPage}
+      totalPages={pagination.totalPages}
+      onPageChange={(page) => ($filterForm.page = page)}
+    />
   </div>
 </div>
 
