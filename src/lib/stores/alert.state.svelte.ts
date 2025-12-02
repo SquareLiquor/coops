@@ -16,7 +16,7 @@ const isAlertVisible = () => alertState !== null
 const showSuccess = (options: ShowAlertOptions) => {
   _showAlert({
     type: 'success',
-    title: options.title || '성공',
+    title: options.title,
     message: options.message,
     onConfirm: options.onConfirm,
   })
@@ -32,7 +32,7 @@ const showSuccess = (options: ShowAlertOptions) => {
 const showError = (options: ShowAlertOptions) => {
   _showAlert({
     type: 'error',
-    title: options.title || '오류',
+    title: options.title,
     message: options.message,
     onConfirm: options.onConfirm,
   })
@@ -47,7 +47,7 @@ const showError = (options: ShowAlertOptions) => {
 const showWarning = (options: ShowAlertOptions) => {
   _showAlert({
     type: 'warning',
-    title: options.title || '경고',
+    title: options.title,
     message: options.message,
     onConfirm: options.onConfirm,
   })
@@ -62,7 +62,7 @@ const showWarning = (options: ShowAlertOptions) => {
 const showInfo = (options: ShowAlertOptions) => {
   _showAlert({
     type: 'info',
-    title: options.title || '알림',
+    title: options.title,
     message: options.message,
     onConfirm: options.onConfirm,
   })
@@ -90,7 +90,7 @@ const showConfirm = (options: ShowConfirmOptions) => {
     ...options,
     mode: 'confirm',
     type: options.type || 'warning',
-    title: options.title || '확인',
+    title: options.title,
   })
 }
 
@@ -121,7 +121,7 @@ const _showAlert = (options: AlertOptions) => {
   alertState = {
     type: options.type || 'info',
     mode: options.mode || 'alert',
-    title: options.title || _getDefaultTitle(options.type || 'info'),
+    title: options.title,
     message: options.message,
     confirmText: options.confirmText || '확인',
     cancelText: options.cancelText || '취소',

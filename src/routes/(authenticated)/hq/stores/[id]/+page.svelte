@@ -8,7 +8,6 @@
 
   const handleSubmit = async () => {
     showSuccess({
-      title: '수정 완료',
       message: '매장 수정을 성공했습니다.',
       onConfirm: () => goto('/hq/stores'),
     })
@@ -16,7 +15,6 @@
 
   const handleError = async () => {
     showError({
-      title: '수정 실패',
       message: '매장 수정 중 오류가 발생했습니다.',
     })
   }

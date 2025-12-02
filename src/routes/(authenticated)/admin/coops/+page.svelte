@@ -4,6 +4,7 @@
   import PageHeader from '$lib/components/layout/PageHeader.svelte'
   import CoopDetailModal from '$lib/components/modals/admin/CoopDetailModal.svelte'
   import EmptyState from '$lib/components/ui/EmptyState.svelte'
+  import Loading from '$lib/components/ui/Loading.svelte'
   import Pagination from '$lib/components/ui/Pagination.svelte'
   import { CoopsFilterSchema } from '$lib/schemas'
   import type { CoopEntity } from '$lib/types'
@@ -72,86 +73,11 @@
   </PageHeader>
 
   <div class="relative">
-    <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
-      <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
-      <input type="hidden" name="page" bind:value={$filterForm.page} />
-      <input type="hidden" name="pageSize" bind:value={$filterForm.pageSize} />
+    <Loading show={$filterSubmitting} />
 
-      <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex items-center gap-2">
-          <input
-            type="date"
-            name="dateFrom"
-            bind:value={$filterForm.dateFrom}
-            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-            {...$filterConstraints.dateFrom}
-          />
-          <span class="text-xs text-gray-400">~</span>
-          <input
-            type="date"
-            name="dateTo"
-            bind:value={$filterForm.dateTo}
-            class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-            {...$filterConstraints.dateTo}
-          />
-
-          <select
-            class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-            name="categoryId"
-            bind:value={$filterForm.categoryId}
-          >
-            <option value={undefined} selected>전체</option>
-            {#each categories as category}
-              <option value={category.id}>{category.name}</option>
-            {/each}
-          </select>
-
-          <input
-            type="text"
-            name="name"
-            bind:value={$filterForm.name}
-            placeholder="상품명 검색"
-            class="focus:border-primary-500 w-48 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
-          />
-        </div>
-
-        <div class="flex items-center gap-1.5 overflow-x-auto">
-          <input type="hidden" name="status" bind:value={$filterForm.status} />
-          {#each salesStatuses as option}
-            <button
-              type="button"
-              class={[
-                'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
-                $filterForm.status === option.code && 'bg-primary-600 text-white',
-                $filterForm.status !== option.code && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-              ]}
-              onclick={() => ($filterForm.status = option.code)}
-            >
-              {option.label}
-            </button>
-          {/each}
-        </div>
-      </div>
-
-      {#if $filterErrors.dateFrom || $filterErrors.dateTo}
-        <div class="mt-2 flex flex-col gap-1">
-          {#if $filterErrors.dateFrom}
-            <div class="text-sm text-red-600">{$filterErrors.dateFrom}</div>
-          {/if}
-          {#if $filterErrors.dateTo}
-            <div class="text-sm text-red-600">{$filterErrors.dateTo}</div>
-          {/if}
-        </div>
-      {/if}
-    </form>
+    {@render filter()}
 
     <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
-      {#if $filterSubmitting}
-        <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/60">
-          <span class="loader-giant"></span>
-        </div>
-      {/if}
-
       <table class="min-w-full border-collapse">
         <thead>
           <tr class="border-b border-gray-200 bg-white">
@@ -298,3 +224,78 @@
 {#if selectedCoopId}
   <CoopDetailModal coop={coops.find((c) => c.id === selectedCoopId) || null} onClose={() => (selectedCoopId = null)} />
 {/if}
+
+{#snippet filter()}
+  <form method="POST" action="?/fetch" use:filterEnhance class="mb-4">
+    <input type="hidden" name="storeId" bind:value={$filterForm.storeId} />
+    <input type="hidden" name="page" bind:value={$filterForm.page} />
+    <input type="hidden" name="pageSize" bind:value={$filterForm.pageSize} />
+
+    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center gap-2">
+        <input
+          type="date"
+          name="dateFrom"
+          bind:value={$filterForm.dateFrom}
+          class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          {...$filterConstraints.dateFrom}
+        />
+        <span class="text-xs text-gray-400">~</span>
+        <input
+          type="date"
+          name="dateTo"
+          bind:value={$filterForm.dateTo}
+          class="focus:border-primary-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          {...$filterConstraints.dateTo}
+        />
+
+        <select
+          class="focus:border-primary-500 min-w-[100px] rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+          name="categoryId"
+          bind:value={$filterForm.categoryId}
+        >
+          <option value={undefined} selected>전체</option>
+          {#each categories as category}
+            <option value={category.id}>{category.name}</option>
+          {/each}
+        </select>
+
+        <input
+          type="text"
+          name="name"
+          bind:value={$filterForm.name}
+          placeholder="상품명 검색"
+          class="focus:border-primary-500 w-48 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs transition-colors focus:outline-none"
+        />
+      </div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto">
+        <input type="hidden" name="status" bind:value={$filterForm.status} />
+        {#each salesStatuses as option}
+          <button
+            type="button"
+            class={[
+              'flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
+              $filterForm.status === option.code && 'bg-primary-600 text-white',
+              $filterForm.status !== option.code && 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+            ]}
+            onclick={() => ($filterForm.status = option.code)}
+          >
+            {option.label}
+          </button>
+        {/each}
+      </div>
+    </div>
+
+    {#if $filterErrors.dateFrom || $filterErrors.dateTo}
+      <div class="mt-2 flex flex-col gap-1">
+        {#if $filterErrors.dateFrom}
+          <div class="text-sm text-red-600">{$filterErrors.dateFrom}</div>
+        {/if}
+        {#if $filterErrors.dateTo}
+          <div class="text-sm text-red-600">{$filterErrors.dateTo}</div>
+        {/if}
+      </div>
+    {/if}
+  </form>
+{/snippet}

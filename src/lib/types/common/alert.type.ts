@@ -4,7 +4,7 @@ export type AlertMode = 'alert' | 'confirm'
 export type AlertConfig = {
   type: AlertType
   mode: AlertMode
-  title: string
+  title?: string
   message: string
   confirmText?: string
   cancelText?: string

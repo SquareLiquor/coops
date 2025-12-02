@@ -78,6 +78,8 @@
 
       {#if title}
         <h3 class="flex-1 text-lg font-semibold text-gray-900">{title}</h3>
+      {:else}
+        <div class="flex-1"></div>
       {/if}
 
       {#if onClose}
