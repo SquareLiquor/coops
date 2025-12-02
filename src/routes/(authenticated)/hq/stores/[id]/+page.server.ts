@@ -26,7 +26,6 @@ export const actions: Actions = {
   update: async ({ request }) => {
     const form = await superValidate(request, valibot(StoreUpdateSchema))
 
-    console.log(form)
     if (!form.valid) return fail(400, { form })
 
     try {

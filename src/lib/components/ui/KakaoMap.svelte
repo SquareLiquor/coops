@@ -51,7 +51,6 @@
       const newAddress = selectedAddressType === 'ROAD' ? selectedAddress.roadAddress : selectedAddress.jibunAddress
 
       if (newAddress && selectedAddress.address !== newAddress) {
-        console.log('selectedAddressType changed:', selectedAddressType)
         selectedAddress = {
           ...selectedAddress,
           address: newAddress,

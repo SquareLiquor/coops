@@ -8,14 +8,13 @@ import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { store } = await parent()
-  
+
   if (!store) {
     throw redirect(303, '/auth/unauthorized')
   }
 
   const { store: storeData } = await getStoreById(store.id)
-  
-  console.log(store, storeData)
+
   if (!storeData) {
     throw redirect(303, '/admin')
   }
@@ -36,7 +35,7 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form })
 
     try {
-      const {store} = await updateStore(form.data)
+      const { store } = await updateStore(form.data)
 
       return { form }
     } catch (error) {
