@@ -152,7 +152,7 @@
                 <div class="flex items-start justify-between">
                   <dt class="text-xs font-medium text-gray-500">발주 상태</dt>
                   <dd
-                    class={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium text-${purchase.status?.color || 'gray'}-800 bg-${purchase.status?.color || 'gray'}-100`}
+                    class={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${purchase.status?.badgeClass}`}
                   >
                     {purchase.status?.label || '-'}
                   </dd>
