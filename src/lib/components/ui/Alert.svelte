@@ -15,7 +15,7 @@
   }: {
     type?: AlertType
     mode?: AlertMode
-    title: string
+    title?: string
     message: string
     confirmText?: string
     cancelText?: string
