@@ -55,7 +55,7 @@
   const titleText = $derived(isEditMode ? '매장 수정' : '매장 등록')
 </script>
 
-<div class="min-h-screen bg-gray-100 p-6">
+<form method="POST" action={formAction} use:enhance class="flex h-full min-h-0 flex-1 flex-col bg-gray-100 p-6">
   <PageHeader title={titleText}>
     {#snippet actions()}
       <button
@@ -74,235 +74,233 @@
     {/snippet}
   </PageHeader>
 
-  <form method="POST" action={formAction} use:enhance class="flex h-full min-h-0 flex-1 flex-col">
-    <Loading show={$submitting} />
+  <Loading show={$submitting} />
 
-    {#if isEditMode}
-      <input type="hidden" name="id" value={($formData as any).id} />
-    {/if}
+  {#if isEditMode}
+    <input type="hidden" name="id" value={($formData as any).id} />
+  {/if}
 
-    <div class="scrollbar-gutter-stable flex min-h-0 flex-1 flex-col gap-6 overflow-y-scroll pr-2 lg:flex-row">
-      <div class="flex w-full flex-col gap-6 lg:w-1/3">
-        <section class="rounded-2xl bg-white shadow-sm">
-          <div class="flex w-full items-center justify-between p-6">
-            <button
-              type="button"
-              class="text-sm font-semibold text-gray-900 hover:text-gray-700"
-              onclick={() => (basicInfoCollapsed = !basicInfoCollapsed)}
-            >
-              <h2>기본 정보</h2>
-            </button>
-            <button
-              type="button"
-              class="flex items-center gap-2"
-              onclick={() => (basicInfoCollapsed = !basicInfoCollapsed)}
-            >
-              {#if basicInfoComplete}
-                <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              {:else}
-                <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="5"></circle>
-                </svg>
-              {/if}
-              <svg
-                class="h-5 w-5 text-gray-400 transition-transform"
-                class:rotate-180={!basicInfoCollapsed}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+  <div class="scrollbar-gutter-stable flex min-h-0 flex-1 flex-col gap-6 overflow-y-scroll pr-2 lg:flex-row">
+    <div class="flex w-full flex-col gap-6 lg:w-1/3">
+      <section class="rounded-2xl bg-white shadow-sm">
+        <div class="flex w-full items-center justify-between p-6">
+          <button
+            type="button"
+            class="text-sm font-semibold text-gray-900 hover:text-gray-700"
+            onclick={() => (basicInfoCollapsed = !basicInfoCollapsed)}
+          >
+            <h2>기본 정보</h2>
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-2"
+            onclick={() => (basicInfoCollapsed = !basicInfoCollapsed)}
+          >
+            {#if basicInfoComplete}
+              <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
-            </button>
-          </div>
-          {#if !basicInfoCollapsed}
-            <div class="flex flex-col gap-4 px-6 pb-6">
-              <div class="flex flex-col">
-                <div class="mb-2 flex items-center justify-between">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-sm text-gray-700">매장명</span>
-                    <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="5"></circle>
-                    </svg>
-                  </div>
-                  <label class="relative inline-flex cursor-pointer items-center">
-                    <input type="checkbox" name="active" class="peer sr-only" bind:checked={$formData.active} />
-                    <div
-                      class="peer peer-checked:bg-primary-500 peer-focus:ring-primary-300 h-6 w-11 rounded-full bg-gray-200 peer-focus:ring-2 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
-                    ></div>
-                    <span class="ml-3 text-sm font-medium text-gray-900">
-                      {$formData.active ? '활성' : '비활성'}
-                    </span>
-                  </label>
-                </div>
-                <input
-                  type="text"
-                  name="name"
-                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                  bind:value={$formData.name}
-                  placeholder="매장명을 입력하세요"
-                />
-                <div class="mt-1 min-h-[20px]">
-                  {#if $errors.name}
-                    <span class="text-xs text-red-500">{$errors.name}</span>
-                  {/if}
-                </div>
-              </div>
-              <div class="flex flex-col">
-                <div class="mb-2 flex items-center gap-1.5">
-                  <span class="text-sm text-gray-700">매장 유형</span>
+            {:else}
+              <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5"></circle>
+              </svg>
+            {/if}
+            <svg
+              class="h-5 w-5 text-gray-400 transition-transform"
+              class:rotate-180={!basicInfoCollapsed}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+        {#if !basicInfoCollapsed}
+          <div class="flex flex-col gap-4 px-6 pb-6">
+            <div class="flex flex-col">
+              <div class="mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm text-gray-700">매장명</span>
                   <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="5"></circle>
                   </svg>
                 </div>
-                <select
-                  name="type"
-                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none"
-                  bind:value={$formData.type}
-                >
-                  {#if $formData.type === 'hq'}
-                    <option value="hq">본사</option>
-                  {:else}
-                    <option value="branch">지점</option>
-                  {/if}
-                </select>
-                <div class="mt-1 min-h-[20px]">
-                  {#if $errors.type}
-                    <span class="text-xs text-red-500">{$errors.type}</span>
-                  {/if}
-                </div>
+                <label class="relative inline-flex cursor-pointer items-center">
+                  <input type="checkbox" name="active" class="peer sr-only" bind:checked={$formData.active} />
+                  <div
+                    class="peer peer-checked:bg-primary-500 peer-focus:ring-primary-300 h-6 w-11 rounded-full bg-gray-200 peer-focus:ring-2 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+                  ></div>
+                  <span class="ml-3 text-sm font-medium text-gray-900">
+                    {$formData.active ? '활성' : '비활성'}
+                  </span>
+                </label>
               </div>
-              <div class="flex flex-col">
-                <div class="mb-2 flex items-center gap-1.5">
-                  <span class="text-sm text-gray-700">전화번호</span>
-                  <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="5"></circle>
-                  </svg>
-                </div>
-                <input
-                  type="tel"
-                  name="phone"
-                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                  bind:value={$formData.phone}
-                  oninput={onlyPhoneNumberInput}
-                  placeholder="010-1234-5678"
-                  maxlength="13"
-                />
-                <div class="mt-1 min-h-[20px]">
-                  {#if $errors.phone}
-                    <span class="text-xs text-red-500">{$errors.phone}</span>
-                  {/if}
-                </div>
+              <input
+                type="text"
+                name="name"
+                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                bind:value={$formData.name}
+                placeholder="매장명을 입력하세요"
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.name}
+                  <span class="text-xs text-red-500">{$errors.name}</span>
+                {/if}
               </div>
             </div>
-          {/if}
-        </section>
-
-        <section class="rounded-2xl bg-white shadow-sm">
-          <div class="flex w-full items-center justify-between p-6">
-            <button
-              type="button"
-              class="text-sm font-semibold text-gray-900 hover:text-gray-700"
-              onclick={() => (addressInfoCollapsed = !addressInfoCollapsed)}
-            >
-              <h2>주소 정보</h2>
-            </button>
-            <button
-              type="button"
-              class="flex items-center gap-2"
-              onclick={() => (addressInfoCollapsed = !addressInfoCollapsed)}
-            >
-              {#if addressInfoComplete}
-                <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              {:else}
-                <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-col">
+              <div class="mb-2 flex items-center gap-1.5">
+                <span class="text-sm text-gray-700">매장 유형</span>
+                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="5"></circle>
                 </svg>
-              {/if}
-              <svg
-                class="h-5 w-5 text-gray-400 transition-transform"
-                class:rotate-180={!addressInfoCollapsed}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              </div>
+              <select
+                name="type"
+                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:outline-none"
+                bind:value={$formData.type}
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
+                {#if $formData.type === 'hq'}
+                  <option value="hq">본사</option>
+                {:else}
+                  <option value="branch">지점</option>
+                {/if}
+              </select>
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.type}
+                  <span class="text-xs text-red-500">{$errors.type}</span>
+                {/if}
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="mb-2 flex items-center gap-1.5">
+                <span class="text-sm text-gray-700">전화번호</span>
+                <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </div>
+              <input
+                type="tel"
+                name="phone"
+                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                bind:value={$formData.phone}
+                oninput={onlyPhoneNumberInput}
+                placeholder="010-1234-5678"
+                maxlength="13"
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.phone}
+                  <span class="text-xs text-red-500">{$errors.phone}</span>
+                {/if}
+              </div>
+            </div>
           </div>
-          {#if !addressInfoCollapsed}
-            <div class="flex flex-col gap-4 px-6 pb-6">
-              <div class="flex flex-col">
-                <div class="mb-2 flex items-center justify-between">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-sm text-gray-700">기본 주소</span>
-                    <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="5"></circle>
-                    </svg>
-                  </div>
-                </div>
-                <input
-                  type="text"
-                  name="address.address"
-                  class="h-10 w-full rounded-full border border-gray-300 bg-gray-50 px-4 text-sm text-gray-700"
-                  bind:value={$formData.address.address}
-                  readonly
-                  placeholder="주소 검색 후 선택하세요"
-                />
-                <div class="mt-1 min-h-[20px]">
-                  {#if $errors.address?.address}
-                    <span class="text-xs text-red-500">{$errors.address?.address}</span>
-                  {/if}
+        {/if}
+      </section>
+
+      <section class="rounded-2xl bg-white shadow-sm">
+        <div class="flex w-full items-center justify-between p-6">
+          <button
+            type="button"
+            class="text-sm font-semibold text-gray-900 hover:text-gray-700"
+            onclick={() => (addressInfoCollapsed = !addressInfoCollapsed)}
+          >
+            <h2>주소 정보</h2>
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-2"
+            onclick={() => (addressInfoCollapsed = !addressInfoCollapsed)}
+          >
+            {#if addressInfoComplete}
+              <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            {:else}
+              <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5"></circle>
+              </svg>
+            {/if}
+            <svg
+              class="h-5 w-5 text-gray-400 transition-transform"
+              class:rotate-180={!addressInfoCollapsed}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+        {#if !addressInfoCollapsed}
+          <div class="flex flex-col gap-4 px-6 pb-6">
+            <div class="flex flex-col">
+              <div class="mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm text-gray-700">기본 주소</span>
+                  <svg class="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                  </svg>
                 </div>
               </div>
-              <div class="flex flex-col">
-                <span class="mb-2 text-sm text-gray-700">상세 주소</span>
-                <input
-                  type="text"
-                  name="address.addressDetail"
-                  class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
-                  bind:value={$formData.address.addressDetail}
-                  placeholder="동, 호수 등을 입력하세요"
-                />
-                <div class="mt-1 min-h-[20px]">
-                  {#if $errors.address?.addressDetail}
-                    <span class="text-xs text-red-500">{$errors.address.addressDetail}</span>
-                  {/if}
-                </div>
+              <input
+                type="text"
+                name="address.address"
+                class="h-10 w-full rounded-full border border-gray-300 bg-gray-50 px-4 text-sm text-gray-700"
+                bind:value={$formData.address.address}
+                readonly
+                placeholder="주소 검색 후 선택하세요"
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.address?.address}
+                  <span class="text-xs text-red-500">{$errors.address?.address}</span>
+                {/if}
               </div>
-              {#if $formData.address?.address}
-                <div class="rounded-lg bg-gray-50 p-3">
+            </div>
+            <div class="flex flex-col">
+              <span class="mb-2 text-sm text-gray-700">상세 주소</span>
+              <input
+                type="text"
+                name="address.addressDetail"
+                class="focus:border-primary-500 focus:ring-primary-200 h-10 w-full rounded-full border border-gray-300 bg-white px-4 text-sm placeholder-gray-400 focus:ring-2 focus:outline-none"
+                bind:value={$formData.address.addressDetail}
+                placeholder="동, 호수 등을 입력하세요"
+              />
+              <div class="mt-1 min-h-[20px]">
+                {#if $errors.address?.addressDetail}
+                  <span class="text-xs text-red-500">{$errors.address.addressDetail}</span>
+                {/if}
+              </div>
+            </div>
+            {#if $formData.address?.address}
+              <div class="rounded-lg bg-gray-50 p-3">
+                <p class="mt-1 text-xs text-gray-600">
+                  <span class="font-medium">우편번호:</span>
+                  {$formData.address.zipcode || '-'}
+                </p>
+                {#if $formData.address.latitude && $formData.address.longitude}
                   <p class="mt-1 text-xs text-gray-600">
-                    <span class="font-medium">우편번호:</span>
-                    {$formData.address.zipcode || '-'}
+                    <span class="font-medium">좌표:</span>
+                    {$formData.address.latitude.toFixed(6)}, {$formData.address.longitude.toFixed(6)}
                   </p>
-                  {#if $formData.address.latitude && $formData.address.longitude}
-                    <p class="mt-1 text-xs text-gray-600">
-                      <span class="font-medium">좌표:</span>
-                      {$formData.address.latitude.toFixed(6)}, {$formData.address.longitude.toFixed(6)}
-                    </p>
-                  {/if}
-                </div>
-              {/if}
-            </div>
-          {/if}
-        </section>
-      </div>
-
-      <div class="flex w-full flex-col lg:w-2/3">
-        <section class="flex flex-1 flex-col rounded-2xl bg-white shadow-sm">
-          <div class="p-6">
-            <h2 class="text-sm font-semibold text-gray-900">주소 검색</h2>
+                {/if}
+              </div>
+            {/if}
           </div>
-          <div class="flex min-h-0 flex-1 flex-col px-6 pb-6">
-            <KakaoMap bind:selectedAddress={$formData.address} />
-          </div>
-        </section>
-      </div>
+        {/if}
+      </section>
     </div>
-  </form>
-</div>
+
+    <div class="flex w-full flex-col lg:w-2/3">
+      <section class="flex flex-1 flex-col rounded-2xl bg-white shadow-sm">
+        <div class="p-6">
+          <h2 class="text-sm font-semibold text-gray-900">주소 검색</h2>
+        </div>
+        <div class="flex min-h-0 flex-1 flex-col px-6 pb-6">
+          <KakaoMap bind:selectedAddress={$formData.address} />
+        </div>
+      </section>
+    </div>
+  </div>
+</form>
